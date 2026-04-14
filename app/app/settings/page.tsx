@@ -32,6 +32,8 @@ export default async function SettingsPage() {
   }
 
   const entitlements = getPlanEntitlements(user.billing);
+  const canViewGoToMarketOps =
+    team.currentUserRole === "owner" || team.currentUserRole === "admin";
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8 lg:px-10">
@@ -41,15 +43,17 @@ export default async function SettingsPage() {
         Manage your private beta account, Stripe billing, team access, and production-facing storage setup.
       </p>
 
-      <div className="mt-8">
-        <BetaOpsOverview
-          summary={marketingSummary}
-          leads={leads}
-          currentUserRole={team.currentUserRole}
-          initialNotes={team.betaOpsNotes ?? ""}
-          initialTimeline={team.betaOpsTimeline ?? []}
-        />
-      </div>
+      {canViewGoToMarketOps ? (
+        <div className="mt-8">
+          <BetaOpsOverview
+            summary={marketingSummary}
+            leads={leads}
+            currentUserRole={team.currentUserRole}
+            initialNotes={team.betaOpsNotes ?? ""}
+            initialTimeline={team.betaOpsTimeline ?? []}
+          />
+        </div>
+      ) : null}
 
       <div className="mt-8">
         <ProductionReadinessSettings summary={readinessSummary} />
@@ -75,17 +79,25 @@ export default async function SettingsPage() {
         />
       </div>
 
-      <div className="mt-8" id="marketing-analytics">
-        <MarketingAnalyticsSettings summary={marketingSummary} />
-      </div>
+      {canViewGoToMarketOps ? (
+        <div className="mt-8" id="marketing-analytics">
+          <MarketingAnalyticsSettings summary={marketingSummary} />
+        </div>
+      ) : null}
 
-      <div className="mt-8" id="inbound-leads">
-        <PublicLeadsSettings
-          initialLeads={leads}
-          currentUserRole={team.currentUserRole}
-          teamMembers={team.members}
-        />
-      </div>
+      {canViewGoToMarketOps ? (
+        <div className="mt-8" id="inbound-leads">
+          <PublicLeadsSettings
+            initialLeads={leads}
+            currentUserRole={team.currentUserRole}
+            teamMembers={team.members}
+          />
+        </div>
+      ) : (
+        <div className="mt-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
+          Marketing analytics and inbound leads are visible only to owners and admins.
+        </div>
+      )}
     </div>
   );
 }

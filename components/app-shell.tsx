@@ -1,11 +1,15 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { BarChart3, BriefcaseBusiness, Database, Settings } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { LayoutDashboard, BriefcaseBusiness, Database, Settings } from "lucide-react";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { href: "/app", label: "Dashboard", icon: BarChart3 },
-  { href: "/app", label: "Workspaces", icon: BriefcaseBusiness },
+  { href: "/app", label: "Overview", icon: LayoutDashboard },
+  { href: "/app#workspaces", label: "Workspaces", icon: BriefcaseBusiness },
   { href: "/app/knowledge-base", label: "Knowledge Base", icon: Database },
   { href: "/app/settings", label: "Settings", icon: Settings },
 ];
@@ -26,12 +30,34 @@ export function AppShell({
     }>;
   };
 }) {
+  const pathname = usePathname();
+  const [hash, setHash] = useState("");
+
+  useEffect(() => {
+    const updateHash = () => {
+      setHash(window.location.hash.replace("#", ""));
+    };
+
+    updateHash();
+    window.addEventListener("hashchange", updateHash);
+
+    return () => window.removeEventListener("hashchange", updateHash);
+  }, []);
+
+  const activeHref = useMemo(() => {
+    if (pathname.startsWith("/app/workspaces/")) return "/app#workspaces";
+    if (pathname === "/app" && hash === "workspaces") return "/app#workspaces";
+    if (pathname.startsWith("/app/knowledge-base")) return "/app/knowledge-base";
+    if (pathname.startsWith("/app/settings")) return "/app/settings";
+    return "/app";
+  }, [hash, pathname]);
+
   return (
     <div className="min-h-screen bg-[#f6f7f9] text-zinc-950">
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-zinc-200 bg-white p-5 lg:block">
         <Link href="/" className="flex items-center gap-3">
           <div className="grid size-10 place-items-center rounded-lg bg-emerald-500 font-black text-zinc-950">
-            PF
+            PD
           </div>
           <div>
             <p className="font-bold tracking-tight">ProposalDock</p>
@@ -40,19 +66,25 @@ export function AppShell({
         </Link>
 
         <nav className="mt-10 space-y-1">
-          {nav.map((item, index) => (
+          {nav.map((item, index) => {
+            const isActive = activeHref === item.href;
+
+            return (
             <Link
               key={`${item.label}-${index}`}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100",
-                index === 0 && "bg-zinc-950 text-white hover:bg-zinc-900",
+                "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-sm font-medium transition",
+                isActive
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900 shadow-sm"
+                  : "border-transparent text-zinc-700 hover:border-zinc-200 hover:bg-zinc-100",
               )}
+              aria-current={isActive ? "page" : undefined}
             >
               <item.icon className="size-4" />
               {item.label}
             </Link>
-          ))}
+          )})}
         </nav>
 
         <OrganizationSwitcher

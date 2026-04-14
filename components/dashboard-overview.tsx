@@ -733,9 +733,11 @@ export function DashboardOverview({
       </Card>
 
       {filteredWorkspaces.length ? (
-        <WorkspaceLibrary initialWorkspaces={filteredWorkspaces} />
+        <section className="mt-8 scroll-mt-24" id="workspaces">
+          <WorkspaceLibrary initialWorkspaces={filteredWorkspaces} />
+        </section>
       ) : (
-        <div className="mt-8 rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center">
+        <div className="mt-8 rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center" id="workspaces">
           <p className="font-semibold">No workspaces matched</p>
           <p className="mt-1 text-sm text-zinc-600">
             Try another search or broaden the health filter.

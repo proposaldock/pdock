@@ -136,7 +136,7 @@ export async function createCheckoutSession(input: {
       },
     ],
     allow_promotion_codes: true,
-    success_url: `${input.origin}/app/settings?billing=success`,
+    success_url: `${input.origin}/app/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${input.origin}/app/settings?billing=cancel`,
     metadata: {
       plan: input.plan,
@@ -219,4 +219,11 @@ export async function syncStripeCheckoutSession(session: Stripe.Checkout.Session
   const stripe = getStripeClient();
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   await syncStripeSubscription(subscription);
+}
+
+export async function syncStripeCheckoutSessionById(sessionId: string) {
+  const stripe = getStripeClient();
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  await syncStripeCheckoutSession(session);
+  return session;
 }

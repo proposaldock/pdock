@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,17 +38,23 @@ export function BillingSettings({
   isConfigured,
   memberSince,
 }: BillingSettingsProps) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [billingState, setBillingState] = useState(billing);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
   const hasAutoOpened = useRef(false);
+  const hasSyncedSuccess = useRef(false);
   const billingIntent = searchParams.get("plan");
   const billingResult = searchParams.get("billing");
+  const sessionId = searchParams.get("session_id");
   const effectivePlan = useMemo(
-    () => getEffectivePlan(billing.plan, billing.status),
-    [billing.plan, billing.status],
+    () => getEffectivePlan(billingState.plan, billingState.status),
+    [billingState.plan, billingState.status],
   );
-  const hasPaidPlan = hasPaidBillingAccess(billing.status) && billing.plan !== "free";
+  const hasPaidPlan =
+    hasPaidBillingAccess(billingState.status) && billingState.plan !== "free";
 
   const redirectToBilling = useCallback(async (
     action: "checkout" | "portal",
@@ -80,14 +86,55 @@ export function BillingSettings({
   }, []);
 
   useEffect(() => {
+    setBillingState(billing);
+  }, [billing]);
+
+  useEffect(() => {
     if (hasAutoOpened.current || !isConfigured) return;
     if (billingResult === "success" || billingResult === "cancel") return;
     if (billingIntent !== "pro" && billingIntent !== "team") return;
-    if (hasPaidPlan && billing.plan === billingIntent) return;
+    if (hasPaidPlan && billingState.plan === billingIntent) return;
 
     hasAutoOpened.current = true;
     void redirectToBilling("checkout", billingIntent);
-  }, [billing.plan, billingIntent, billingResult, hasPaidPlan, isConfigured, redirectToBilling]);
+  }, [billingIntent, billingResult, billingState.plan, hasPaidPlan, isConfigured, redirectToBilling]);
+
+  useEffect(() => {
+    if (billingResult !== "success" || !sessionId || hasSyncedSuccess.current) return;
+
+    hasSyncedSuccess.current = true;
+    setBusyAction("confirming");
+    setError("");
+
+    void (async () => {
+      try {
+        const response = await fetch(
+          `/api/billing/summary?session_id=${encodeURIComponent(sessionId)}`,
+        );
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to confirm billing.");
+        }
+
+        setBillingState(payload.billing);
+        setConfirmationMessage(
+          payload.billing.plan === "team"
+            ? "Team plan confirmed. Shared workspaces and team tools are now unlocked."
+            : payload.billing.plan === "pro"
+              ? "Pro plan confirmed. Premium solo features are now unlocked."
+              : "Payment was received, but the plan has not refreshed yet.",
+        );
+        router.refresh();
+      } catch (caught) {
+        setError(
+          caught instanceof Error ? caught.message : "Unable to confirm billing.",
+        );
+      } finally {
+        setBusyAction(null);
+      }
+    })();
+  }, [billingResult, router, sessionId]);
 
   return (
     <div className="grid gap-6">
@@ -98,7 +145,9 @@ export function BillingSettings({
         <CardContent className="grid gap-5">
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone="teal">{effectivePlan.toUpperCase()}</Badge>
-            <Badge tone={statusTone(billing.status)}>{billing.status.replaceAll("_", " ")}</Badge>
+            <Badge tone={statusTone(billingState.status)}>
+              {billingState.status.replaceAll("_", " ")}
+            </Badge>
           </div>
           <div className="grid gap-3 text-sm text-zinc-600 md:grid-cols-2">
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
@@ -111,15 +160,28 @@ export function BillingSettings({
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
               <p className="font-semibold text-zinc-900">Renewal</p>
               <p className="mt-2">
-                {billing.currentPeriodEnd
-                  ? formatDateTime(billing.currentPeriodEnd)
+                {billingState.currentPeriodEnd
+                  ? formatDateTime(billingState.currentPeriodEnd)
                   : "No paid renewal date yet"}
               </p>
               <p className="mt-1 text-xs text-zinc-500">
-                Customer {billing.stripeCustomerId ? "connected to Stripe" : "not connected yet"}
+                Customer{" "}
+                {billingState.stripeCustomerId ? "connected to Stripe" : "not connected yet"}
               </p>
             </div>
           </div>
+
+          {confirmationMessage ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-medium text-emerald-900">
+              {confirmationMessage}
+            </div>
+          ) : null}
+
+          {billingResult === "cancel" ? (
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm font-medium text-yellow-900">
+              Checkout was canceled. No plan changes were made.
+            </div>
+          ) : null}
 
           {!isConfigured ? (
             <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
@@ -140,7 +202,9 @@ export function BillingSettings({
               onClick={() => redirectToBilling("checkout", "pro")}
               disabled={!isConfigured || busyAction !== null || effectivePlan === "pro"}
             >
-              {busyAction === "checkout:pro"
+              {busyAction === "confirming"
+                ? "Confirming purchase..."
+                : busyAction === "checkout:pro"
                 ? "Opening checkout..."
                 : effectivePlan === "pro"
                   ? "Current plan"
@@ -153,7 +217,9 @@ export function BillingSettings({
               onClick={() => redirectToBilling("checkout", "team")}
               disabled={!isConfigured || busyAction !== null || effectivePlan === "team"}
             >
-              {busyAction === "checkout:team"
+              {busyAction === "confirming"
+                ? "Confirming purchase..."
+                : busyAction === "checkout:team"
                 ? "Opening checkout..."
                 : effectivePlan === "team"
                   ? "Current plan"
@@ -164,7 +230,9 @@ export function BillingSettings({
             <Button
               variant="ghost"
               onClick={() => redirectToBilling("portal")}
-              disabled={!isConfigured || !billing.stripeCustomerId || busyAction !== null}
+              disabled={
+                !isConfigured || !billingState.stripeCustomerId || busyAction !== null
+              }
             >
               {busyAction === "portal" ? "Opening portal..." : "Manage billing"}
             </Button>
