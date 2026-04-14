@@ -70,7 +70,10 @@ export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeA
         method: "POST",
         body: formData,
       });
-      const payload = await response.json();
+      const contentType = response.headers.get("content-type") || "";
+      const payload = contentType.includes("application/json")
+        ? await response.json()
+        : { error: await response.text() };
 
       if (!response.ok) {
         throw new Error(payload.error || "Analysis failed.");

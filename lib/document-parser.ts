@@ -1,4 +1,3 @@
-import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -18,14 +17,9 @@ export function getAcceptedUploadText() {
   return ACCEPTED_UPLOAD_TEXT;
 }
 
-export async function parseUploadedDocument(file: File) {
-  const mimeType = file.type || "application/octet-stream";
-  const lowerName = file.name.toLowerCase();
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  let extracted = "";
-
-  if (lowerName.endsWith(".pdf") || mimeType === "application/pdf") {
+async function parsePdfBuffer(buffer: Buffer, filename: string) {
+  try {
+    const { PDFParse } = await import("pdf-parse");
     PDFParse.setWorker(
       pathToFileURL(
         path.join(
@@ -41,8 +35,27 @@ export async function parseUploadedDocument(file: File) {
     );
     const parser = new PDFParse({ data: buffer });
     const result = await parser.getText();
-    extracted = result.text;
     await parser.destroy();
+    return result.text;
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown PDF parsing failure.";
+
+    throw new Error(
+      `${filename}: PDF parsing is not available in the current server runtime. Paste the brief text directly or upload DOCX/TXT instead. (${message})`,
+    );
+  }
+}
+
+export async function parseUploadedDocument(file: File) {
+  const mimeType = file.type || "application/octet-stream";
+  const lowerName = file.name.toLowerCase();
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  let extracted = "";
+
+  if (lowerName.endsWith(".pdf") || mimeType === "application/pdf") {
+    extracted = await parsePdfBuffer(buffer, file.name);
   } else if (
     lowerName.endsWith(".docx") ||
     mimeType ===
