@@ -1,8 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type {
   Message,
   MessageCreateParamsNonStreaming,
 } from "@anthropic-ai/sdk/resources";
+import type { ParseableMessageCreateParams, ParsedMessage } from "@anthropic-ai/sdk/lib/parser";
 import { proposalAnalysisSchema } from "@/lib/analysis-schema";
 import { buildSourceChunks } from "@/lib/source-chunks";
 import type {
@@ -193,6 +195,33 @@ async function createMessageWithRetry(
   throw toAIServiceError(lastError, fallbackMessage);
 }
 
+async function createParsedMessageWithRetry<T>(
+  anthropic: Anthropic,
+  params: ParseableMessageCreateParams & { stream?: false },
+  fallbackMessage: string,
+): Promise<ParsedMessage<T>> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= MAX_ANTHROPIC_RETRIES; attempt += 1) {
+    try {
+      return (await anthropic.messages.parse(
+        params as Parameters<typeof anthropic.messages.parse>[0],
+      )) as ParsedMessage<T>;
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === MAX_ANTHROPIC_RETRIES || !isAnthropicRetryable(error)) {
+        break;
+      }
+
+      const delay = ANTHROPIC_RETRY_BASE_MS * 2 ** attempt;
+      await sleep(delay);
+    }
+  }
+
+  throw toAIServiceError(lastError, fallbackMessage);
+}
+
 function deriveFallbackSectionSourceRefs(input: {
   workspace: Workspace;
   section: ProposalSection;
@@ -238,10 +267,13 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
     )
     .join("\n");
 
-  const message = await createMessageWithRetry(anthropic, {
+  const message = await createParsedMessageWithRetry<ProposalAnalysis>(anthropic, {
     model,
     max_tokens: 4200,
     temperature: 0.2,
+    output_config: {
+      format: zodOutputFormat(proposalAnalysisSchema),
+    },
     system: [
       "You are an expert proposal analyst for B2B service firms.",
       "Analyze RFPs, briefs, and client requests as a workflow product, not as a chatbot.",
@@ -249,7 +281,7 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
       "Mark uncertain items clearly. Prefer grounded output tied to source material.",
       "Do not invent capabilities the company has not provided.",
       "Keep the output concise, professional, and structured.",
-      "Return strict JSON only. Do not wrap it in markdown.",
+      "Return structured output only.",
     ].join(" "),
     messages: [
       {
@@ -257,57 +289,7 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
         content: [
           {
             type: "text",
-            text: `Return JSON matching exactly this TypeScript shape:
-{
-  "overview": {
-    "documentType": "string",
-    "submissionDeadline": "string | null",
-    "estimatedComplexity": "low | medium | high",
-    "summary": "string"
-  },
-  "requirements": [
-    {
-      "id": "string",
-      "title": "string",
-      "description": "string",
-      "priority": "high | medium | low",
-      "status": "covered | partially_covered | missing",
-      "needsSME": true,
-      "sourceRefs": ["string"]
-    }
-  ],
-  "risks": [
-    {
-      "title": "string",
-      "severity": "high | medium | low",
-      "description": "string",
-      "recommendation": "string",
-      "sourceRefs": ["string"]
-    }
-  ],
-  "draft": {
-    "executiveSummary": "string",
-    "responseStrategy": "string",
-    "keyDifferentiators": ["string"],
-    "openQuestions": ["string"],
-    "sourceRefs": ["string"]
-  },
-  "sources": [
-    {
-      "id": "string",
-      "label": "string",
-      "excerpt": "string",
-      "content": "string",
-      "sourceType": "document | knowledge_asset",
-      "documentId": "string",
-      "documentLabel": "string",
-      "assetId": "string",
-      "assetTitle": "string"
-    }
-  ]
-}
-
-Rules:
+            text: `Rules:
 - Use requirement IDs like REQ-001.
 - sourceRefs must point only to source ids from the provided source catalog.
 - If a date is not explicit, use null.
@@ -330,14 +312,7 @@ ${material}`,
       },
     ],
   }, "Analysis failed. Please retry.");
-
-  const text = message.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("\n");
-
-  const json = parseModelJson(text);
-  const parsed = proposalAnalysisSchema.parse(json);
+  const parsed = proposalAnalysisSchema.parse(message.parsed_output);
   const sourceMap = new Map(
     sourceChunks.map((source) => [
       source.id,
