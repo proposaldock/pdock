@@ -11,9 +11,11 @@ type OrganizationOption = {
 export function OrganizationSwitcher({
   organizations,
   activeOrganizationId,
+  compact = false,
 }: {
   organizations: OrganizationOption[];
   activeOrganizationId: string;
+  compact?: boolean;
 }) {
   const router = useRouter();
 
@@ -34,7 +36,7 @@ export function OrganizationSwitcher({
   }
 
   return (
-    <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+    <div className={compact ? "rounded-lg border border-zinc-200 bg-zinc-50 p-4" : "mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4"}>
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">Active team</p>
       <select
         value={activeOrganizationId}

@@ -22,7 +22,7 @@ export default async function WorkspacePage({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8 lg:px-10">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
       <Link
         href="/app"
         className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 hover:text-zinc-950"

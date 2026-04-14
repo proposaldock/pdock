@@ -3,7 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BriefcaseBusiness, Database, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  BriefcaseBusiness,
+  Database,
+  Menu,
+  Settings,
+  X,
+} from "lucide-react";
 import { OrganizationSwitcher } from "@/components/organization-switcher";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +39,7 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const [hash, setHash] = useState("");
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   useEffect(() => {
     const updateHash = () => {
@@ -54,6 +62,75 @@ export function AppShell({
 
   return (
     <div className="min-h-screen bg-[#f6f7f9] text-zinc-950">
+      <div className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <Link href="/" className="flex min-w-0 items-center gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-emerald-500 font-black text-zinc-950">
+              PD
+            </div>
+            <div className="min-w-0">
+              <p className="truncate font-bold tracking-tight">ProposalDock</p>
+              <p className="truncate text-xs text-zinc-500">Proposal operating system</p>
+            </div>
+          </Link>
+          <button
+            type="button"
+            onClick={() => setIsMobileNavOpen((current) => !current)}
+            className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white text-zinc-700"
+            aria-expanded={isMobileNavOpen}
+            aria-label={isMobileNavOpen ? "Close navigation" : "Open navigation"}
+          >
+            {isMobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
+
+        <div className="overflow-x-auto border-t border-zinc-100 px-4 py-3">
+          <div className="flex min-w-max gap-2">
+            {nav.map((item) => {
+              const isActive = activeHref === item.href;
+
+              return (
+                <Link
+                  key={`mobile-${item.href}`}
+                  href={item.href}
+                  onClick={() => setIsMobileNavOpen(false)}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium whitespace-nowrap transition",
+                    isActive
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-900"
+                      : "border-zinc-200 bg-white text-zinc-700",
+                  )}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <item.icon className="size-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {isMobileNavOpen ? (
+          <div className="border-t border-zinc-200 px-4 py-4">
+            <OrganizationSwitcher
+              organizations={user.organizations}
+              activeOrganizationId={user.activeOrganizationId}
+              compact
+            />
+
+            <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+              <p className="font-semibold text-zinc-950">{user.name}</p>
+              <p className="mt-1 text-sm text-zinc-500">{user.email}</p>
+              <form action="/api/auth/logout" method="post" className="mt-4">
+                <button className="text-sm font-semibold text-emerald-700">
+                  Sign out
+                </button>
+              </form>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-zinc-200 bg-white p-5 lg:block">
         <Link href="/" className="flex items-center gap-3">
           <div className="grid size-10 place-items-center rounded-lg bg-emerald-500 font-black text-zinc-950">

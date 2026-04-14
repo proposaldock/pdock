@@ -330,8 +330,8 @@ export function WorkspaceResults({
             </Badge>
           </div>
         </div>
-        <div className="flex gap-3">
-          <div className="flex rounded-lg border border-zinc-200 bg-white p-1">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div className="flex flex-wrap rounded-lg border border-zinc-200 bg-white p-1">
             <button
               type="button"
               onClick={() => void updateVisibility("private")}
@@ -369,7 +369,12 @@ export function WorkspaceResults({
               Selected teammates
             </button>
           </div>
-          <Button variant="secondary" onClick={rerun} disabled={isRerunning}>
+          <Button
+            variant="secondary"
+            onClick={rerun}
+            disabled={isRerunning}
+            className="w-full sm:w-auto"
+          >
             <RefreshCw className={cn("size-4", isRerunning && "animate-spin")} />
             {isRerunning ? "Running..." : "Re-run analysis"}
           </Button>
@@ -426,7 +431,7 @@ export function WorkspaceResults({
         </div>
       ) : null}
 
-      <div className="mt-8 flex gap-2 overflow-x-auto border-b border-zinc-200">
+      <div className="mt-8 flex gap-2 overflow-x-auto border-b border-zinc-200 pb-1">
         {tabs.map((tab) => (
           <button
             key={tab}

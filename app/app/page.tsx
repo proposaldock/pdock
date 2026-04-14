@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8 lg:px-10">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-emerald-700">Dashboard</p>

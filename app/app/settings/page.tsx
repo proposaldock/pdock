@@ -36,7 +36,7 @@ export default async function SettingsPage() {
     team.currentUserRole === "owner" || team.currentUserRole === "admin";
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8 lg:px-10">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
       <p className="text-sm font-semibold text-emerald-700">Settings</p>
       <h1 className="mt-1 text-3xl font-black tracking-tight">Billing, account, and team</h1>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">
