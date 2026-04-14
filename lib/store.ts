@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import { prisma } from "@/lib/prisma";
 import type {
   BillingStatus,
@@ -579,6 +580,17 @@ async function importLegacyJsonIfNeeded() {
 
 async function ensureStore() {
   await importLegacyJsonIfNeeded();
+}
+
+async function requirePlatformAdmin(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
+
+  if (!isPlatformAdminEmail(user?.email)) {
+    throw new Error("You do not have permission to access ProposalDock internal ops.");
+  }
 }
 
 function normalizeTeamRole(value: string | null | undefined): TeamRole {
@@ -1590,6 +1602,7 @@ export async function updateActiveOrganizationBetaOpsNotes(input: {
   notes: string;
 }) {
   await ensureStore();
+  await requirePlatformAdmin(input.userId);
   const team = await listOrganizationTeamForUser(input.userId);
 
   if (team.currentUserRole !== "owner" && team.currentUserRole !== "admin") {
@@ -1644,9 +1657,11 @@ export async function updateActiveOrganizationBetaOpsNotes(input: {
 
 export async function listPublicLeadsForUser(userId: string): Promise<PublicLead[]> {
   await ensureStore();
-  const team = await listOrganizationTeamForUser(userId);
-
-  if (team.currentUserRole !== "owner" && team.currentUserRole !== "admin") {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
+  if (!isPlatformAdminEmail(user?.email)) {
     return [];
   }
 
@@ -1666,11 +1681,8 @@ export async function updatePublicLeadForUser(input: {
   nextFollowUpAt: string | null;
 }) {
   await ensureStore();
+  await requirePlatformAdmin(input.userId);
   const team = await listOrganizationTeamForUser(input.userId);
-
-  if (team.currentUserRole !== "owner" && team.currentUserRole !== "admin") {
-    throw new Error("You do not have permission to update inbound leads.");
-  }
 
   const assignedMember = input.assignedUserId
     ? team.members.find((member) => member.userId === input.assignedUserId)

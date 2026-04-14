@@ -10,6 +10,7 @@ import { requireCurrentUser } from "@/lib/auth";
 import { isBillingConfigured } from "@/lib/billing";
 import { getPlanEntitlements } from "@/lib/entitlements";
 import { getMarketingSummary } from "@/lib/marketing-analytics";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import { getProductionReadinessSummary } from "@/lib/production-readiness";
 import {
   getUserAccountById,
@@ -32,8 +33,7 @@ export default async function SettingsPage() {
   }
 
   const entitlements = getPlanEntitlements(user.billing);
-  const canViewGoToMarketOps =
-    team.currentUserRole === "owner" || team.currentUserRole === "admin";
+  const isPlatformAdmin = isPlatformAdminEmail(user.email);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
@@ -43,7 +43,7 @@ export default async function SettingsPage() {
         Manage your private beta account, Stripe billing, team access, and production-facing storage setup.
       </p>
 
-      {canViewGoToMarketOps ? (
+      {isPlatformAdmin ? (
         <div className="mt-8">
           <BetaOpsOverview
             summary={marketingSummary}
@@ -55,13 +55,17 @@ export default async function SettingsPage() {
         </div>
       ) : null}
 
-      <div className="mt-8">
-        <ProductionReadinessSettings summary={readinessSummary} />
-      </div>
+      {isPlatformAdmin ? (
+        <>
+          <div className="mt-8">
+            <ProductionReadinessSettings summary={readinessSummary} />
+          </div>
 
-      <div className="mt-8">
-        <ProductionEnvSettings />
-      </div>
+          <div className="mt-8">
+            <ProductionEnvSettings />
+          </div>
+        </>
+      ) : null}
 
       <div className="mt-8" id="billing">
         <BillingSettings
@@ -79,13 +83,13 @@ export default async function SettingsPage() {
         />
       </div>
 
-      {canViewGoToMarketOps ? (
+      {isPlatformAdmin ? (
         <div className="mt-8" id="marketing-analytics">
           <MarketingAnalyticsSettings summary={marketingSummary} />
         </div>
       ) : null}
 
-      {canViewGoToMarketOps ? (
+      {isPlatformAdmin ? (
         <div className="mt-8" id="inbound-leads">
           <PublicLeadsSettings
             initialLeads={leads}
@@ -95,7 +99,7 @@ export default async function SettingsPage() {
         </div>
       ) : (
         <div className="mt-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
-          Marketing analytics and inbound leads are visible only to owners and admins.
+          Internal operating panels are only visible to the ProposalDock platform admin.
         </div>
       )}
     </div>
