@@ -1,40 +1,13 @@
-async function getHealth() {
-  const baseUrl =
-    process.env.APP_URL?.trim() ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
-      : "") ||
-    "http://localhost:3000";
-
-  try {
-    const response = await fetch(`${baseUrl}/api/health`, {
-      cache: "no-store",
-    });
-    return response.json() as Promise<{
-      ok: boolean;
-      app: string;
-      timestamp: string;
-      checks: Record<string, boolean>;
-    }>;
-  } catch {
-    return {
-      ok: false,
-      app: "ProposalDock",
-      timestamp: new Date().toISOString(),
-      checks: {
-        authSecret: false,
-        anthropic: false,
-        billing: false,
-        blobStorage: false,
-        databaseIsHosted: false,
-        appUrl: false,
-      },
-    };
-  }
-}
+import { getHealthChecks } from "@/lib/production-readiness";
 
 export default async function StatusPage() {
-  const health = await getHealth();
+  const checks = getHealthChecks();
+  const health = {
+    ok: checks.authSecret && checks.anthropic && checks.appUrl,
+    app: "ProposalDock",
+    timestamp: new Date().toISOString(),
+    checks,
+  };
 
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">

@@ -9,7 +9,7 @@ type ReadinessCheck = {
 };
 
 export function getProductionReadinessSummary() {
-  const appUrl = process.env.APP_URL?.trim() ?? "";
+  const appUrl = resolveAppUrl() ?? "";
   const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
   const checks: ReadinessCheck[] = [
     {
@@ -90,5 +90,29 @@ export function getProductionReadinessSummary() {
     criticalReady,
     criticalTotal,
     publicLaunchReady: criticalReady === criticalTotal,
+  };
+}
+
+export function resolveAppUrl() {
+  return (
+    process.env.APP_URL?.trim() ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
+      : "") ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL.trim()}` : "") ||
+    null
+  );
+}
+
+export function getHealthChecks() {
+  return {
+    authSecret: Boolean(process.env.AUTH_SECRET),
+    anthropic: Boolean(process.env.ANTHROPIC_API_KEY),
+    billing: isBillingConfigured(),
+    blobStorage: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+    databaseIsHosted: Boolean(
+      process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith("file:"),
+    ),
+    appUrl: Boolean(resolveAppUrl()),
   };
 }
