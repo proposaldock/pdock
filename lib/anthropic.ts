@@ -142,6 +142,11 @@ function isAnthropicRetryable(error: unknown) {
   return status === 429 || status === 500 || status === 502 || status === 503 || status === 504 || isAnthropicOverloaded(error);
 }
 
+function isStructuredOutputParseError(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  return message.includes("Failed to parse structured output");
+}
+
 function toAIServiceError(error: unknown, fallbackMessage: string) {
   if (error instanceof AIServiceError) {
     return error;
@@ -183,7 +188,10 @@ async function createMessageWithRetry(
     } catch (error) {
       lastError = error;
 
-      if (attempt === MAX_ANTHROPIC_RETRIES || !isAnthropicRetryable(error)) {
+      if (
+        attempt === MAX_ANTHROPIC_RETRIES ||
+        (!isAnthropicRetryable(error) && !isStructuredOutputParseError(error))
+      ) {
         break;
       }
 
@@ -193,6 +201,114 @@ async function createMessageWithRetry(
   }
 
   throw toAIServiceError(lastError, fallbackMessage);
+}
+
+async function analyzeProposalFromTextJson(input: {
+  anthropic: Anthropic;
+  model: string;
+  material: string;
+  sourceCatalog: string;
+  fallbackMessage: string;
+}) {
+  const message = await createMessageWithRetry(input.anthropic, {
+    model: input.model,
+    max_tokens: 4200,
+    temperature: 0.2,
+    system: [
+      "You are an expert proposal analyst for B2B service firms.",
+      "Analyze RFPs, briefs, and client requests as a workflow product, not as a chatbot.",
+      "Extract requirements conservatively and separate facts from assumptions.",
+      "Mark uncertain items clearly. Prefer grounded output tied to source material.",
+      "Do not invent capabilities the company has not provided.",
+      "Keep the output concise, professional, and structured.",
+      "Return strict JSON only. Do not wrap it in markdown.",
+    ].join(" "),
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: `Return JSON matching exactly this TypeScript shape:
+{
+  "overview": {
+    "documentType": "string",
+    "submissionDeadline": "string | null",
+    "estimatedComplexity": "low | medium | high",
+    "summary": "string"
+  },
+  "requirements": [
+    {
+      "id": "string",
+      "title": "string",
+      "description": "string",
+      "priority": "high | medium | low",
+      "status": "covered | partially_covered | missing",
+      "needsSME": true,
+      "sourceRefs": ["string"]
+    }
+  ],
+  "risks": [
+    {
+      "title": "string",
+      "severity": "high | medium | low",
+      "description": "string",
+      "recommendation": "string",
+      "sourceRefs": ["string"]
+    }
+  ],
+  "draft": {
+    "executiveSummary": "string",
+    "responseStrategy": "string",
+    "keyDifferentiators": ["string"],
+    "openQuestions": ["string"],
+    "sourceRefs": ["string"]
+  },
+  "sources": [
+    {
+      "id": "string",
+      "label": "string",
+      "excerpt": "string",
+      "content": "string",
+      "sourceType": "document | knowledge_asset",
+      "documentId": "string",
+      "documentLabel": "string",
+      "assetId": "string",
+      "assetTitle": "string"
+    }
+  ]
+}
+
+Rules:
+- Use requirement IDs like REQ-001.
+- sourceRefs must point only to source ids from the provided source catalog.
+- If a date is not explicit, use null.
+- Status should compare RFP needs with provided company knowledge.
+- Treat manual company knowledge and selected knowledge base assets as the only approved capability sources.
+- Missing or uncertain capabilities must be marked missing or partially_covered, never covered.
+- Keep 5-10 requirements unless the source material clearly needs fewer.
+- Risks must include sourceRefs.
+- Draft must include sourceRefs for the evidence behind the executive summary and strategy.
+- Return only cited sources in the sources array.
+- Preserve cited source ids, labels, excerpts, content, sourceType, documentId, documentLabel, assetId, and assetTitle exactly from the source catalog.
+
+Source catalog:
+${input.sourceCatalog}
+
+Material:
+${input.material}`,
+          },
+        ],
+      },
+    ],
+  }, input.fallbackMessage);
+
+  const text = message.content
+    .filter((block) => block.type === "text")
+    .map((block) => block.text)
+    .join("\n");
+
+  return proposalAnalysisSchema.parse(parseModelJson(text));
 }
 
 async function createParsedMessageWithRetry<T>(
@@ -267,29 +383,32 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
     )
     .join("\n");
 
-  const message = await createParsedMessageWithRetry<ProposalAnalysis>(anthropic, {
-    model,
-    max_tokens: 4200,
-    temperature: 0.2,
-    output_config: {
-      format: zodOutputFormat(proposalAnalysisSchema),
-    },
-    system: [
-      "You are an expert proposal analyst for B2B service firms.",
-      "Analyze RFPs, briefs, and client requests as a workflow product, not as a chatbot.",
-      "Extract requirements conservatively and separate facts from assumptions.",
-      "Mark uncertain items clearly. Prefer grounded output tied to source material.",
-      "Do not invent capabilities the company has not provided.",
-      "Keep the output concise, professional, and structured.",
-      "Return structured output only.",
-    ].join(" "),
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: `Rules:
+  let parsed: ProposalAnalysis;
+
+  try {
+    const message = await createParsedMessageWithRetry<ProposalAnalysis>(anthropic, {
+      model,
+      max_tokens: 4200,
+      temperature: 0.2,
+      output_config: {
+        format: zodOutputFormat(proposalAnalysisSchema),
+      },
+      system: [
+        "You are an expert proposal analyst for B2B service firms.",
+        "Analyze RFPs, briefs, and client requests as a workflow product, not as a chatbot.",
+        "Extract requirements conservatively and separate facts from assumptions.",
+        "Mark uncertain items clearly. Prefer grounded output tied to source material.",
+        "Do not invent capabilities the company has not provided.",
+        "Keep the output concise, professional, and structured.",
+        "Return structured output only.",
+      ].join(" "),
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Rules:
 - Use requirement IDs like REQ-001.
 - sourceRefs must point only to source ids from the provided source catalog.
 - If a date is not explicit, use null.
@@ -307,12 +426,25 @@ ${sourceCatalog}
 
 Material:
 ${material}`,
-          },
-        ],
-      },
-    ],
-  }, "Analysis failed. Please retry.");
-  const parsed = proposalAnalysisSchema.parse(message.parsed_output);
+            },
+          ],
+        },
+      ],
+    }, "Analysis failed. Please retry.");
+    parsed = proposalAnalysisSchema.parse(message.parsed_output);
+  } catch (error) {
+    if (!isStructuredOutputParseError(error)) {
+      throw error;
+    }
+
+    parsed = await analyzeProposalFromTextJson({
+      anthropic,
+      model,
+      material,
+      sourceCatalog,
+      fallbackMessage: "Analysis failed. Please retry.",
+    });
+  }
   const sourceMap = new Map(
     sourceChunks.map((source) => [
       source.id,
@@ -335,9 +467,9 @@ ${material}`,
     for (const ref of requirement.sourceRefs) referencedIds.add(ref);
   }
   for (const risk of parsed.risks) {
-    for (const ref of risk.sourceRefs) referencedIds.add(ref);
+    for (const ref of risk.sourceRefs ?? []) referencedIds.add(ref);
   }
-  for (const ref of parsed.draft.sourceRefs) {
+  for (const ref of parsed.draft.sourceRefs ?? []) {
     referencedIds.add(ref);
   }
 
