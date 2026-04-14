@@ -1,56 +1,56 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/postgres-client"
+  output   = "../generated/sqlite-client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = env("SQLITE_DATABASE_URL")
 }
 
 model Workspace {
-  id               String   @id
-  workspaceName    String
-  clientName       String
+  id              String   @id
+  workspaceName   String
+  clientName      String
   companyKnowledge String
-  instructions     String?
-  ownerId          String?
-  organizationId   String?
-  visibility       String?
-  payload          Json
-  knowledgeAssets  Json?
-  analysis         Json
-  reviewState      Json?
-  proposalState    Json?
-  activityLog      Json?
-  createdAt        DateTime
-  updatedAt        DateTime
+  instructions    String?
+  ownerId         String?
+  organizationId  String?
+  visibility      String?
+  payload         Json
+  knowledgeAssets Json?
+  analysis        Json
+  reviewState     Json?
+  proposalState   Json?
+  activityLog     Json?
+  createdAt       DateTime
+  updatedAt       DateTime
 
-  owner        User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner        User?         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   accesses     WorkspaceAccess[]
 }
 
 model KnowledgeAsset {
-  id              String   @id
-  title           String
-  category        String
-  content         String
-  excerpt         String
-  ownerId         String?
-  organizationId  String?
-  fileSize        Int?
-  sourceFilename  String?
-  sourceMimeType  String?
-  sourceKind      String?
+  id             String   @id
+  title          String
+  category       String
+  content        String
+  excerpt        String
+  ownerId        String?
+  organizationId String?
+  fileSize       Int?
+  sourceFilename String?
+  sourceMimeType String?
+  sourceKind     String?
   storageProvider String?
-  storagePath     String?
-  storageUrl      String?
-  createdAt       DateTime
-  updatedAt       DateTime
+  storagePath    String?
+  storageUrl     String?
+  createdAt      DateTime
+  updatedAt      DateTime
 
-  owner        User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  owner        User?         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -67,10 +67,10 @@ model User {
   createdAt                DateTime
   updatedAt                DateTime
 
-  workspaces              Workspace[]
-  knowledgeAssets         KnowledgeAsset[]
+  workspaces             Workspace[]
+  knowledgeAssets        KnowledgeAsset[]
   organizationMemberships OrganizationMembership[]
-  workspaceAccesses       WorkspaceAccess[]
+  workspaceAccesses      WorkspaceAccess[]
 }
 
 model WorkspaceAccess {
@@ -87,7 +87,7 @@ model WorkspaceAccess {
 }
 
 model Organization {
-  id              String   @id
+  id              String                   @id
   name            String
   betaOpsNotes    String?
   betaOpsTimeline Json?
@@ -100,7 +100,7 @@ model Organization {
 }
 
 model OrganizationMembership {
-  id             String   @id
+  id             String       @id
   organizationId String
   userId         String
   role           String
@@ -115,23 +115,23 @@ model OrganizationMembership {
 }
 
 model PublicLead {
-  id               String   @id
-  type             String
-  status           String
-  name             String
-  email            String
-  company          String
-  teamSize         String?
-  plan             String?
-  source           String?
-  message          String?
-  internalNotes    String?
-  assignedUserId   String?
+  id        String   @id
+  type      String
+  status    String
+  name      String
+  email     String
+  company   String
+  teamSize  String?
+  plan      String?
+  source    String?
+  message   String?
+  internalNotes String?
+  assignedUserId String?
   assignedUserName String?
-  nextFollowUpAt   DateTime?
-  activityLog      Json?
-  createdAt        DateTime
-  updatedAt        DateTime
+  nextFollowUpAt DateTime?
+  activityLog Json?
+  createdAt DateTime
+  updatedAt DateTime
 }
 
 model MarketingEvent {

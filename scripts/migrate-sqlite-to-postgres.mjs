@@ -1,6 +1,6 @@
 import path from "node:path";
-import { PrismaClient as SqlitePrismaClient } from "@prisma/client";
-import { PrismaClient as PostgresPrismaClient } from "../generated/postgres-client/index.js";
+import { PrismaClient as SqlitePrismaClient } from "../generated/sqlite-client/index.js";
+import { PrismaClient as PostgresPrismaClient } from "@prisma/client";
 
 function resolveSqliteUrl() {
   const explicit = process.env.SQLITE_DATABASE_URL?.trim();

@@ -7,4 +7,5 @@ dist
 data/workspaces.json
 prisma/dev.db
 prisma/dev.db-journal
+generated/sqlite-client
 npm-debug.log*

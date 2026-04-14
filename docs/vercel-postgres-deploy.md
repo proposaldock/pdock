@@ -29,15 +29,9 @@ Set these in Vercel project settings:
 
 ## 3. Use the Postgres Prisma schema for launch
 
-The local development setup still uses SQLite via `SQLITE_DATABASE_URL`. ProposalDock now includes a separate production schema at `prisma/schema.postgres.prisma` so you can prepare Postgres without breaking local work.
+The main application schema now uses Postgres from `prisma/schema.prisma`, which matches Vercel production. A separate SQLite schema lives at `prisma/schema.sqlite.prisma` for local migration and fallback tooling.
 
-1. Keep local development on:
-
-```env
-SQLITE_DATABASE_URL=file:./dev.db
-```
-
-2. Set `DATABASE_URL` to your hosted Postgres connection string
+1. Set `DATABASE_URL` to your hosted Postgres connection string
 2. Run:
 
 ```powershell
@@ -58,7 +52,12 @@ Then run:
 npm run db:migrate:sqlite-to-postgres
 ```
 
-4. Once production is stable, you can decide whether to fully replace the local SQLite schema or keep the split setup for local-only development.
+4. If you still want to inspect or maintain a local SQLite file, keep `SQLITE_DATABASE_URL=file:./dev.db` and use the SQLite-specific scripts when needed:
+
+```powershell
+npm run db:generate:sqlite
+npm run db:push:sqlite
+```
 
 ## 4. Verify before public traffic
 
