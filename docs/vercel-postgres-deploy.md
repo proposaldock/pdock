@@ -16,6 +16,7 @@ Set these in Vercel project settings:
 
 - `APP_URL=https://your-domain`
 - `DATABASE_URL=postgresql://...`
+- `POSTGRES_DATABASE_URL=postgresql://...`
 - `AUTH_SECRET=...`
 - `ANTHROPIC_API_KEY=...`
 - `ANTHROPIC_MODEL=claude-sonnet-4-6`
@@ -28,9 +29,15 @@ Set these in Vercel project settings:
 
 ## 3. Use the Postgres Prisma schema for launch
 
-The local development setup still uses SQLite. ProposalDock now includes a separate production schema at `prisma/schema.postgres.prisma` so you can prepare Postgres without breaking local work.
+The local development setup still uses SQLite via `SQLITE_DATABASE_URL`. ProposalDock now includes a separate production schema at `prisma/schema.postgres.prisma` so you can prepare Postgres without breaking local work.
 
-1. Set `DATABASE_URL` to your hosted Postgres connection string
+1. Keep local development on:
+
+```env
+SQLITE_DATABASE_URL=file:./dev.db
+```
+
+2. Set `DATABASE_URL` to your hosted Postgres connection string
 2. Run:
 
 ```powershell
