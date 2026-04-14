@@ -6,9 +6,11 @@ import {
   parseUploadedDocument,
 } from "@/lib/document-parser";
 import { storeUploadedFile } from "@/lib/file-storage";
+import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import {
   createActivityEntry,
   getKnowledgeAssetsByIds,
+  getUserAccountById,
   listWorkspacesForUser,
   saveWorkspace,
 } from "@/lib/store";
@@ -57,6 +59,23 @@ export async function POST(request: Request) {
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
+
+    const entitlements = getPlanEntitlements(account.billing);
+    const existingWorkspaces = await listWorkspacesForUser(user.id);
+    const ownedWorkspaceCount = existingWorkspaces.filter(
+      (workspace) => workspace.ownerId === user.id,
+    ).length;
+
+    if (ownedWorkspaceCount >= entitlements.workspaceLimit) {
+      return NextResponse.json(
+        { error: getPlanGuardMessage("workspace_limit") },
+        { status: 403 },
+      );
+    }
 
     const formData = await request.formData();
     const workspaceName = cleanText(formData.get("workspaceName"));

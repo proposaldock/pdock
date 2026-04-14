@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
 import { parseUploadedDocument } from "@/lib/document-parser";
+import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import { storeUploadedFile } from "@/lib/file-storage";
 import {
   createKnowledgeAsset,
+  getUserAccountById,
   listKnowledgeAssetsForUser,
 } from "@/lib/store";
 
@@ -13,6 +15,16 @@ export async function GET() {
   const { user, response } = await requireApiUser();
   if (!user) return response;
 
+  const account = await getUserAccountById(user.id);
+  if (!account) {
+    return NextResponse.json({ error: "Account not found." }, { status: 404 });
+  }
+
+  const entitlements = getPlanEntitlements(account.billing);
+  if (!entitlements.canUseKnowledgeBase) {
+    return NextResponse.json({ assets: [] });
+  }
+
   const assets = await listKnowledgeAssetsForUser(user.id);
   return NextResponse.json({ assets });
 }
@@ -21,6 +33,18 @@ export async function POST(request: Request) {
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
+
+    const entitlements = getPlanEntitlements(account.billing);
+    if (!entitlements.canUseKnowledgeBase) {
+      return NextResponse.json(
+        { error: getPlanGuardMessage("knowledge_base") },
+        { status: 403 },
+      );
+    }
 
     const contentType = request.headers.get("content-type") || "";
     let title = "";

@@ -1,5 +1,7 @@
 import { getHealthChecks } from "@/lib/production-readiness";
 
+export const dynamic = "force-dynamic";
+
 export default async function StatusPage() {
   const checks = getHealthChecks();
   const health = {

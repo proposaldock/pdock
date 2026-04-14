@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { BILLING_PLAN_COPY } from "@/lib/billing-plans";
+import { hasPaidBillingAccess } from "@/lib/entitlements";
 import {
   updateUserBillingFromStripe,
   updateUserStripeCustomerId,
@@ -109,8 +110,20 @@ export async function createCheckoutSession(input: {
     email: string;
     name: string;
     stripeCustomerId: string | null;
+    billing: UserBillingSummary;
   };
 }) {
+  if (
+    input.user.billing.stripeCustomerId &&
+    input.user.billing.stripeSubscriptionId &&
+    hasPaidBillingAccess(input.user.billing.status)
+  ) {
+    return createBillingPortalSession({
+      origin: input.origin,
+      customerId: input.user.billing.stripeCustomerId,
+    });
+  }
+
   const stripe = getStripeClient();
   const customerId = await ensureStripeCustomer(input.user);
   const session = await stripe.checkout.sessions.create({
@@ -191,4 +204,19 @@ export async function clearStripeSubscription(customerId: string, subscriptionId
     stripeSubscriptionStatus: "canceled",
     stripeCurrentPeriodEnd: null,
   });
+}
+
+export async function syncStripeCheckoutSession(session: Stripe.Checkout.Session) {
+  const subscriptionId =
+    typeof session.subscription === "string"
+      ? session.subscription
+      : session.subscription?.id;
+
+  if (!subscriptionId) {
+    return;
+  }
+
+  const stripe = getStripeClient();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  await syncStripeSubscription(subscription);
 }

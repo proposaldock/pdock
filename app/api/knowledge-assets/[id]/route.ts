@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
 import { parseUploadedDocument } from "@/lib/document-parser";
+import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import { storeUploadedFile } from "@/lib/file-storage";
-import { deleteKnowledgeAsset, updateKnowledgeAsset } from "@/lib/store";
+import {
+  deleteKnowledgeAsset,
+  getUserAccountById,
+  updateKnowledgeAsset,
+} from "@/lib/store";
 
 export const runtime = "nodejs";
 
@@ -13,6 +18,17 @@ export async function PATCH(
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
+
+    if (!getPlanEntitlements(account.billing).canUseKnowledgeBase) {
+      return NextResponse.json(
+        { error: getPlanGuardMessage("knowledge_base") },
+        { status: 403 },
+      );
+    }
 
     const { id } = await params;
     const contentType = request.headers.get("content-type") || "";
@@ -98,6 +114,17 @@ export async function DELETE(
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
+
+    if (!getPlanEntitlements(account.billing).canUseKnowledgeBase) {
+      return NextResponse.json(
+        { error: getPlanGuardMessage("knowledge_base") },
+        { status: 403 },
+      );
+    }
 
     const { id } = await params;
     await deleteKnowledgeAsset(id, user.id);

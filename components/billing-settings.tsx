@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BILLING_PLAN_COPY } from "@/lib/billing-plans";
+import { getEffectivePlan, hasPaidBillingAccess } from "@/lib/entitlements";
 import type { BillingPlan, UserBillingSummary } from "@/lib/types";
 import { formatDate, formatDateTime } from "@/lib/utils";
 
@@ -36,13 +38,22 @@ export function BillingSettings({
   isConfigured,
   memberSince,
 }: BillingSettingsProps) {
+  const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const hasAutoOpened = useRef(false);
+  const billingIntent = searchParams.get("plan");
+  const billingResult = searchParams.get("billing");
+  const effectivePlan = useMemo(
+    () => getEffectivePlan(billing.plan, billing.status),
+    [billing.plan, billing.status],
+  );
+  const hasPaidPlan = hasPaidBillingAccess(billing.status) && billing.plan !== "free";
 
-  async function redirectToBilling(
+  const redirectToBilling = useCallback(async (
     action: "checkout" | "portal",
     plan?: Exclude<BillingPlan, "free">,
-  ) {
+  ) => {
     setError("");
     setBusyAction(plan ? `${action}:${plan}` : action);
 
@@ -66,7 +77,17 @@ export function BillingSettings({
       setError(caught instanceof Error ? caught.message : "Billing action failed.");
       setBusyAction(null);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (hasAutoOpened.current || !isConfigured) return;
+    if (billingResult === "success" || billingResult === "cancel") return;
+    if (billingIntent !== "pro" && billingIntent !== "team") return;
+    if (hasPaidPlan && billing.plan === billingIntent) return;
+
+    hasAutoOpened.current = true;
+    void redirectToBilling("checkout", billingIntent);
+  }, [billing.plan, billingIntent, billingResult, hasPaidPlan, isConfigured, redirectToBilling]);
 
   return (
     <div className="grid gap-6">
@@ -76,13 +97,13 @@ export function BillingSettings({
         </CardHeader>
         <CardContent className="grid gap-5">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="teal">{billing.plan.toUpperCase()}</Badge>
+            <Badge tone="teal">{effectivePlan.toUpperCase()}</Badge>
             <Badge tone={statusTone(billing.status)}>{billing.status.replaceAll("_", " ")}</Badge>
           </div>
           <div className="grid gap-3 text-sm text-zinc-600 md:grid-cols-2">
             <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
               <p className="font-semibold text-zinc-900">Current plan</p>
-              <p className="mt-2">{BILLING_PLAN_COPY[billing.plan].label}</p>
+              <p className="mt-2">{BILLING_PLAN_COPY[effectivePlan].label}</p>
               <p className="mt-1 text-xs text-zinc-500">
                 Member since {formatDate(memberSince)}
               </p>
@@ -117,16 +138,28 @@ export function BillingSettings({
           <div className="flex flex-wrap gap-3">
             <Button
               onClick={() => redirectToBilling("checkout", "pro")}
-              disabled={!isConfigured || busyAction !== null}
+              disabled={!isConfigured || busyAction !== null || effectivePlan === "pro"}
             >
-              {busyAction === "checkout:pro" ? "Opening checkout..." : "Upgrade to Pro"}
+              {busyAction === "checkout:pro"
+                ? "Opening checkout..."
+                : effectivePlan === "pro"
+                  ? "Current plan"
+                  : hasPaidPlan
+                    ? "Manage Pro in billing"
+                    : "Upgrade to Pro"}
             </Button>
             <Button
               variant="secondary"
               onClick={() => redirectToBilling("checkout", "team")}
-              disabled={!isConfigured || busyAction !== null}
+              disabled={!isConfigured || busyAction !== null || effectivePlan === "team"}
             >
-              {busyAction === "checkout:team" ? "Opening checkout..." : "Upgrade to Team"}
+              {busyAction === "checkout:team"
+                ? "Opening checkout..."
+                : effectivePlan === "team"
+                  ? "Current plan"
+                  : hasPaidPlan
+                    ? "Manage Team in billing"
+                    : "Upgrade to Team"}
             </Button>
             <Button
               variant="ghost"
@@ -155,7 +188,7 @@ export function BillingSettings({
             <div
               key={plan}
               className={`rounded-lg border p-4 ${
-                billing.plan === plan ? "border-emerald-400 bg-emerald-50" : "border-zinc-200"
+                effectivePlan === plan ? "border-emerald-400 bg-emerald-50" : "border-zinc-200"
               }`}
             >
               <p className="font-semibold text-zinc-900">{BILLING_PLAN_COPY[plan].label}</p>

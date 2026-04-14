@@ -4,6 +4,7 @@ import {
   clearStripeSubscription,
   getStripeClient,
   getStripeWebhookSecret,
+  syncStripeCheckoutSession,
   syncStripeSubscription,
 } from "@/lib/billing";
 
@@ -25,6 +26,9 @@ export async function POST(request: Request) {
     );
 
     switch (event.type) {
+      case "checkout.session.completed":
+        await syncStripeCheckoutSession(event.data.object as Stripe.Checkout.Session);
+        break;
       case "customer.subscription.created":
       case "customer.subscription.updated":
         await syncStripeSubscription(event.data.object as Stripe.Subscription);

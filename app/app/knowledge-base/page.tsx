@@ -1,18 +1,21 @@
 import { KnowledgeBaseManager } from "@/components/knowledge-base-manager";
 import { Badge } from "@/components/ui/badge";
 import { requireCurrentUser } from "@/lib/auth";
+import { getPlanEntitlements } from "@/lib/entitlements";
 import { getUserAccountById, listKnowledgeAssetsForUser } from "@/lib/store";
 
 export default async function KnowledgeBasePage() {
   const sessionUser = await requireCurrentUser();
-  const [user, assets] = await Promise.all([
-    getUserAccountById(sessionUser.id),
-    listKnowledgeAssetsForUser(sessionUser.id),
-  ]);
+  const user = await getUserAccountById(sessionUser.id);
 
   if (!user) {
     return null;
   }
+
+  const entitlements = getPlanEntitlements(user.billing);
+  const assets = entitlements.canUseKnowledgeBase
+    ? await listKnowledgeAssetsForUser(sessionUser.id)
+    : [];
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-8 lg:px-10">
@@ -27,7 +30,10 @@ export default async function KnowledgeBasePage() {
         Build a reusable library of approved material for the active team and attach the right assets to each proposal workspace.
       </p>
       <div className="mt-8">
-        <KnowledgeBaseManager initialAssets={assets} />
+        <KnowledgeBaseManager
+          initialAssets={assets}
+          canManage={entitlements.canUseKnowledgeBase}
+        />
       </div>
     </div>
   );

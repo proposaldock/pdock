@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
-import { appendWorkspaceActivity, createActivityEntry, getWorkspace } from "@/lib/store";
+import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
+import {
+  appendWorkspaceActivity,
+  createActivityEntry,
+  getUserAccountById,
+  getWorkspace,
+} from "@/lib/store";
 import { buildWorkspaceExportDocx, getExportFilename } from "@/lib/workspace-export";
 
 export const runtime = "nodejs";
@@ -11,6 +17,14 @@ export async function GET(
 ) {
   const { user, response } = await requireApiUser();
   if (!user) return response;
+  const account = await getUserAccountById(user.id);
+  if (!account) {
+    return NextResponse.json({ error: "Account not found." }, { status: 404 });
+  }
+
+  if (!getPlanEntitlements(account.billing).canExport) {
+    return NextResponse.json({ error: getPlanGuardMessage("exports") }, { status: 403 });
+  }
 
   const { id } = await params;
   const workspace = await getWorkspace(id, user.id);

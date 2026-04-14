@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
+import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import {
   deleteWorkspaceForUser,
+  getUserAccountById,
   getWorkspace,
   updateWorkspaceMetadataForUser,
 } from "@/lib/store";
@@ -32,6 +34,10 @@ export async function PATCH(
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
 
     const { id } = await params;
     const body = (await request.json()) as {
@@ -56,6 +62,14 @@ export async function PATCH(
       visibility !== "selected"
     ) {
       return NextResponse.json({ error: "Invalid visibility." }, { status: 400 });
+    }
+
+    if (
+      visibility &&
+      visibility !== "private" &&
+      !getPlanEntitlements(account.billing).canUseTeamFeatures
+    ) {
+      return NextResponse.json({ error: getPlanGuardMessage("team") }, { status: 403 });
     }
 
     const workspace = await updateWorkspaceMetadataForUser(

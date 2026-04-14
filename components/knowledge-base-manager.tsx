@@ -23,8 +23,10 @@ const emptyValues: FormValues = {
 
 export function KnowledgeBaseManager({
   initialAssets,
+  canManage,
 }: {
   initialAssets: KnowledgeAsset[];
+  canManage: boolean;
 }) {
   const [assets, setAssets] = useState(initialAssets);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -34,6 +36,7 @@ export function KnowledgeBaseManager({
   const [file, setFile] = useState<File | null>(null);
 
   function startCreate() {
+    if (!canManage) return;
     setEditingId("new");
     setValues(emptyValues);
     setFile(null);
@@ -41,6 +44,7 @@ export function KnowledgeBaseManager({
   }
 
   function startEdit(asset: KnowledgeAsset) {
+    if (!canManage) return;
     setEditingId(asset.id);
     setValues({
       title: asset.title,
@@ -57,6 +61,7 @@ export function KnowledgeBaseManager({
   }, [file]);
 
   async function save() {
+    if (!canManage) return;
     setError("");
     setIsSaving(true);
 
@@ -99,6 +104,7 @@ export function KnowledgeBaseManager({
   }
 
   async function remove(id: string) {
+    if (!canManage) return;
     const confirmed = window.confirm("Delete this knowledge asset?");
     if (!confirmed) return;
 
@@ -130,11 +136,18 @@ export function KnowledgeBaseManager({
               Save approved proof points, case studies, delivery notes, and boilerplate.
             </p>
           </div>
-          <Button variant="accent" onClick={startCreate}>
+          <Button variant="accent" onClick={startCreate} disabled={!canManage}>
             <Plus className="size-4" />
             New asset
           </Button>
         </CardHeader>
+        {!canManage ? (
+          <CardContent>
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+              Knowledge Base is available on Pro and Team plans.
+            </div>
+          </CardContent>
+        ) : null}
         {editingId ? (
           <CardContent className="grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
@@ -235,11 +248,21 @@ export function KnowledgeBaseManager({
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => startEdit(asset)}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={!canManage}
+                    onClick={() => startEdit(asset)}
+                  >
                     <Pencil className="size-4" />
                     Edit
                   </Button>
-                  <Button variant="secondary" size="sm" onClick={() => remove(asset.id)}>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={!canManage}
+                    onClick={() => remove(asset.id)}
+                  >
                     <Trash2 className="size-4" />
                     Delete
                   </Button>

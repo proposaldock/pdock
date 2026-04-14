@@ -58,7 +58,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
           <div className="flex items-center gap-2">
             <Badge tone="green">{billingIntent.toUpperCase()}</Badge>
-            <span className="font-medium">We will take you to billing after signup.</span>
+            <span className="font-medium">We will open the matching checkout after signup.</span>
           </div>
         </div>
       ) : null}

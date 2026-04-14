@@ -4,23 +4,31 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { OrganizationTeam, TeamRole } from "@/lib/types";
+import type { BillingPlan, OrganizationTeam, TeamRole } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
 const roles: TeamRole[] = ["owner", "admin", "member"];
 
 type TeamSettingsProps = {
   initialTeam: OrganizationTeam;
+  canUseTeamFeatures: boolean;
+  effectivePlan: BillingPlan;
 };
 
-export function TeamSettings({ initialTeam }: TeamSettingsProps) {
+export function TeamSettings({
+  initialTeam,
+  canUseTeamFeatures,
+  effectivePlan,
+}: TeamSettingsProps) {
   const [team, setTeam] = useState(initialTeam);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<TeamRole>("member");
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const canManage = team.currentUserRole === "owner" || team.currentUserRole === "admin";
+  const canManage =
+    canUseTeamFeatures &&
+    (team.currentUserRole === "owner" || team.currentUserRole === "admin");
 
   async function addMember() {
     setError("");
@@ -114,6 +122,13 @@ export function TeamSettings({ initialTeam }: TeamSettingsProps) {
             Team members with active accounts can see organization-shared workspaces and
             knowledge assets immediately.
           </div>
+
+          {!canUseTeamFeatures ? (
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
+              Team sharing is available on the Team plan. Your current access level is{" "}
+              <span className="font-semibold">{effectivePlan.toUpperCase()}</span>.
+            </div>
+          ) : null}
 
           {error ? (
             <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-800">

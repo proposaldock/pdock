@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
-import { removeOrganizationMember, updateOrganizationMemberRole } from "@/lib/store";
+import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
+import {
+  getUserAccountById,
+  removeOrganizationMember,
+  updateOrganizationMemberRole,
+} from "@/lib/store";
 import type { TeamRole } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -12,6 +17,14 @@ export async function PATCH(
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
+
+    if (!getPlanEntitlements(account.billing).canUseTeamFeatures) {
+      return NextResponse.json({ error: getPlanGuardMessage("team") }, { status: 403 });
+    }
 
     const { membershipId } = await params;
     const body = (await request.json()) as { role?: TeamRole };
@@ -42,6 +55,14 @@ export async function DELETE(
   try {
     const { user, response } = await requireApiUser();
     if (!user) return response;
+    const account = await getUserAccountById(user.id);
+    if (!account) {
+      return NextResponse.json({ error: "Account not found." }, { status: 404 });
+    }
+
+    if (!getPlanEntitlements(account.billing).canUseTeamFeatures) {
+      return NextResponse.json({ error: getPlanGuardMessage("team") }, { status: 403 });
+    }
 
     const { membershipId } = await params;
     const team = await removeOrganizationMember({

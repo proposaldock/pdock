@@ -1,6 +1,12 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireCurrentUser } from "@/lib/auth";
-import { appendWorkspaceActivity, createActivityEntry, getWorkspace } from "@/lib/store";
+import { getPlanEntitlements } from "@/lib/entitlements";
+import {
+  appendWorkspaceActivity,
+  createActivityEntry,
+  getUserAccountById,
+  getWorkspace,
+} from "@/lib/store";
 
 function ReviewedAnswers({ workspaceId }: { workspaceId: Awaited<ReturnType<typeof getWorkspace>> }) {
   if (!workspaceId) return null;
@@ -56,10 +62,17 @@ export default async function PrintableWorkspacePackPage({
 }) {
   const { id } = await params;
   const user = await requireCurrentUser();
-  const workspace = await getWorkspace(id, user.id);
+  const [account, workspace] = await Promise.all([
+    getUserAccountById(user.id),
+    getWorkspace(id, user.id),
+  ]);
 
-  if (!workspace) {
+  if (!account || !workspace) {
     notFound();
+  }
+
+  if (!getPlanEntitlements(account.billing).canExport) {
+    redirect("/app/settings?plan=pro");
   }
 
   await appendWorkspaceActivity(id, [

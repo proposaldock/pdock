@@ -8,6 +8,7 @@ import { PublicLeadsSettings } from "@/components/public-leads-settings";
 import { TeamSettings } from "@/components/team-settings";
 import { requireCurrentUser } from "@/lib/auth";
 import { isBillingConfigured } from "@/lib/billing";
+import { getPlanEntitlements } from "@/lib/entitlements";
 import { getMarketingSummary } from "@/lib/marketing-analytics";
 import { getProductionReadinessSummary } from "@/lib/production-readiness";
 import {
@@ -29,6 +30,8 @@ export default async function SettingsPage() {
   if (!user) {
     notFound();
   }
+
+  const entitlements = getPlanEntitlements(user.billing);
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8 lg:px-10">
@@ -65,7 +68,11 @@ export default async function SettingsPage() {
       </div>
 
       <div className="mt-8" id="team-settings">
-        <TeamSettings initialTeam={team} />
+        <TeamSettings
+          initialTeam={team}
+          canUseTeamFeatures={entitlements.canUseTeamFeatures}
+          effectivePlan={entitlements.effectivePlan}
+        />
       </div>
 
       <div className="mt-8" id="marketing-analytics">

@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         email: account.email,
         name: account.name,
         stripeCustomerId: account.billing.stripeCustomerId,
+        billing: account.billing,
       },
     });
 
