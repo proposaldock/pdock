@@ -7,6 +7,17 @@ import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
 const MAX_DOCUMENT_CHARS = 18_000;
 const require = createRequire(import.meta.url);
 
+function ensurePdfRuntimePolyfills() {
+  if (globalThis.DOMMatrix && globalThis.DOMPoint && globalThis.DOMRect) {
+    return;
+  }
+
+  const geometryModule = require("../node_modules/@napi-rs/canvas/geometry.js");
+  globalThis.DOMMatrix ??= geometryModule.DOMMatrix;
+  globalThis.DOMPoint ??= geometryModule.DOMPoint;
+  globalThis.DOMRect ??= geometryModule.DOMRect;
+}
+
 function normalizeWhitespace(value: string) {
   return value.replace(/\u0000/g, "").replace(/\s+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
 }
@@ -21,6 +32,7 @@ export function getAcceptedUploadText() {
 
 async function parsePdfBuffer(buffer: Buffer, filename: string) {
   try {
+    ensurePdfRuntimePolyfills();
     const pdfParseModule = require("../node_modules/pdf-parse/dist/pdf-parse/cjs/index.cjs") as {
       PDFParse: {
         setWorker: (workerUrl: string) => string;
