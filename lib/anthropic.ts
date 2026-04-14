@@ -5,7 +5,10 @@ import type {
   MessageCreateParamsNonStreaming,
 } from "@anthropic-ai/sdk/resources";
 import type { ParseableMessageCreateParams, ParsedMessage } from "@anthropic-ai/sdk/lib/parser";
-import { proposalAnalysisSchema } from "@/lib/analysis-schema";
+import {
+  proposalAnalysisSchema,
+  type ProposalAnalysisModelOutput,
+} from "@/lib/analysis-schema";
 import { buildSourceChunks } from "@/lib/source-chunks";
 import type {
   ProposalAnalysis,
@@ -266,15 +269,7 @@ async function analyzeProposalFromTextJson(input: {
   },
   "sources": [
     {
-      "id": "string",
-      "label": "string",
-      "excerpt": "string",
-      "content": "string",
-      "sourceType": "document | knowledge_asset",
-      "documentId": "string",
-      "documentLabel": "string",
-      "assetId": "string",
-      "assetTitle": "string"
+      "id": "string"
     }
   ]
 }
@@ -290,7 +285,7 @@ Rules:
 - Risks must include sourceRefs.
 - Draft must include sourceRefs for the evidence behind the executive summary and strategy.
 - Return only cited sources in the sources array.
-- Preserve cited source ids, labels, excerpts, content, sourceType, documentId, documentLabel, assetId, and assetTitle exactly from the source catalog.
+- Each sources entry must contain only the cited source id, for example {"id":"SRC-001"}.
 
 Source catalog:
 ${input.sourceCatalog}
@@ -383,10 +378,10 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
     )
     .join("\n");
 
-  let parsed: ProposalAnalysis;
+  let parsed: ProposalAnalysisModelOutput;
 
   try {
-    const message = await createParsedMessageWithRetry<ProposalAnalysis>(anthropic, {
+    const message = await createParsedMessageWithRetry<ProposalAnalysisModelOutput>(anthropic, {
       model,
       max_tokens: 4200,
       temperature: 0.2,
@@ -419,7 +414,7 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
 - Risks must include sourceRefs.
 - Draft must include sourceRefs for the evidence behind the executive summary and strategy.
 - Return only cited sources in the sources array.
-- Preserve cited source ids, labels, excerpts, content, sourceType, documentId, documentLabel, assetId, and assetTitle exactly from the source catalog.
+- Each sources entry must contain only the cited source id, for example {"id":"SRC-001"}.
 
 Source catalog:
 ${sourceCatalog}

@@ -37,14 +37,8 @@ export const proposalAnalysisSchema = z.object({
   sources: z.array(
     z.object({
       id: z.string(),
-      label: z.string(),
-      excerpt: z.string(),
-      content: z.string().optional(),
-      sourceType: z.enum(["document", "knowledge_asset"]).optional(),
-      documentId: z.string().optional(),
-      documentLabel: z.string().optional(),
-      assetId: z.string().optional(),
-      assetTitle: z.string().optional(),
     }),
-  ),
+  ).default([]),
 });
+
+export type ProposalAnalysisModelOutput = z.infer<typeof proposalAnalysisSchema>;
