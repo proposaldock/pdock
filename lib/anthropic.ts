@@ -66,7 +66,11 @@ function compactMaterial(input: WorkspaceInput) {
 }
 
 function extractJson(text: string) {
-  const trimmed = text.trim();
+  const trimmed = text
+    .trim()
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/, "");
   if (trimmed.startsWith("{") && trimmed.endsWith("}")) return trimmed;
 
   const match = trimmed.match(/\{[\s\S]*\}/);
@@ -75,6 +79,24 @@ function extractJson(text: string) {
   }
 
   return match[0];
+}
+
+function normalizeJsonForRetry(rawJson: string) {
+  return rawJson
+    .replace(/\uFEFF/g, "")
+    .replace(/,\s*([}\]])/g, "$1")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'");
+}
+
+function parseModelJson(text: string) {
+  const extracted = extractJson(text);
+
+  try {
+    return JSON.parse(extracted);
+  } catch {
+    return JSON.parse(normalizeJsonForRetry(extracted));
+  }
 }
 
 function getAnthropicClient() {
@@ -314,7 +336,7 @@ ${material}`,
     .map((block) => block.text)
     .join("\n");
 
-  const json = JSON.parse(extractJson(text));
+  const json = parseModelJson(text);
   const parsed = proposalAnalysisSchema.parse(json);
   const sourceMap = new Map(
     sourceChunks.map((source) => [
@@ -449,7 +471,7 @@ Return strict JSON only:
     .map((block) => block.text)
     .join("\n");
 
-  const json = JSON.parse(extractJson(text)) as {
+  const json = parseModelJson(text) as {
     content?: string;
     sourceRefs?: string[];
   };
@@ -582,7 +604,7 @@ Return strict JSON only:
     .map((block) => block.text)
     .join("\n");
 
-  const json = JSON.parse(extractJson(text)) as {
+  const json = parseModelJson(text) as {
     content?: string;
     sourceRefs?: string[];
   };
