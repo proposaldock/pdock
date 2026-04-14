@@ -30,6 +30,13 @@ export default async function WorkspacePage({
         <ArrowLeft className="size-4" />
         Back to dashboard
       </Link>
+      <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-4 text-sm leading-6 text-zinc-600">
+        Start in <span className="font-semibold text-zinc-900">Overview</span> for the big picture,
+        move to <span className="font-semibold text-zinc-900">Requirements</span> and{" "}
+        <span className="font-semibold text-zinc-900">Draft</span> to review the analysis, then use{" "}
+        <span className="font-semibold text-zinc-900">Proposal</span> and{" "}
+        <span className="font-semibold text-zinc-900">Export</span> when you are ready to shape the response.
+      </div>
       <WorkspaceResults workspace={workspace} team={team} />
     </div>
   );

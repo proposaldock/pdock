@@ -223,9 +223,7 @@ export function BillingSettings({
                 ? "Opening checkout..."
                 : effectivePlan === "team"
                   ? "Current plan"
-                  : hasPaidPlan
-                    ? "Manage Team in billing"
-                    : "Upgrade to Team"}
+                  : "Upgrade to Team"}
             </Button>
             <Button
               variant="ghost"
@@ -234,9 +232,30 @@ export function BillingSettings({
                 !isConfigured || !billingState.stripeCustomerId || busyAction !== null
               }
             >
-              {busyAction === "portal" ? "Opening portal..." : "Manage billing"}
+              {busyAction === "portal" ? "Opening portal..." : "Manage or cancel billing"}
             </Button>
           </div>
+
+          {isConfigured ? (
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600">
+              {effectivePlan === "pro" ? (
+                <p>
+                  You can stay on Pro, upgrade to Team, or open the billing portal to update
+                  payment details or cancel the subscription.
+                </p>
+              ) : effectivePlan === "team" ? (
+                <p>
+                  Team is your current plan. Open the billing portal to update billing details
+                  or cancel the subscription.
+                </p>
+              ) : (
+                <p>
+                  Start with Pro for premium solo features, or choose Team if you need shared
+                  workspaces and team operations from day one.
+                </p>
+              )}
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 

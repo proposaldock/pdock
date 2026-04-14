@@ -38,6 +38,23 @@ export default async function NewWorkspacePage() {
           structured analysis package for the bid team inside the active team space.
         </p>
       </div>
+      <div className="mt-6 rounded-lg border border-zinc-200 bg-white p-5">
+        <p className="text-sm font-semibold text-zinc-900">How this flow works</p>
+        <div className="mt-3 grid gap-3 text-sm leading-6 text-zinc-600 md:grid-cols-3">
+          <p>
+            <span className="font-semibold text-zinc-900">1. Add the brief</span><br />
+            Upload source files or paste the client request directly.
+          </p>
+          <p>
+            <span className="font-semibold text-zinc-900">2. Attach trusted knowledge</span><br />
+            Add reusable company context from the Knowledge Base or paste deal-specific notes.
+          </p>
+          <p>
+            <span className="font-semibold text-zinc-900">3. Run analysis</span><br />
+            ProposalDock builds requirements, risks, draft language, and evidence-linked source chunks.
+          </p>
+        </div>
+      </div>
       <div className="mt-8">
         <WorkspaceForm knowledgeAssets={knowledgeAssets} />
       </div>

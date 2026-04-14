@@ -129,6 +129,10 @@ export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeA
           <CardTitle>RFP or brief material</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5">
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600">
+            Use one of these paths: upload files, paste the brief, or start with sample demo data.
+            Pasted text is the fastest way to test a live workflow.
+          </div>
           <label className="grid min-h-36 cursor-pointer place-items-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-6 text-center hover:border-emerald-400">
             <FileUp className="mb-3 size-8 text-emerald-600" />
             <span className="max-w-xl text-sm font-semibold text-zinc-800">
@@ -192,6 +196,10 @@ export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeA
           <CardTitle>Approved company knowledge</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5">
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600">
+            Keep this grounded. Add reusable company facts, delivery approach, support model,
+            differentiators, and constraints you actually want the draft to rely on.
+          </div>
           <div className="grid gap-3">
             <div className="flex items-center justify-between gap-4">
               <label className="text-sm font-semibold">Attach knowledge base assets</label>
