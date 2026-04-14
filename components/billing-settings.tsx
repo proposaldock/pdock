@@ -49,6 +49,7 @@ export function BillingSettings({
   const billingIntent = searchParams.get("plan");
   const billingResult = searchParams.get("billing");
   const sessionId = searchParams.get("session_id");
+  const upgradedPlan = searchParams.get("upgraded");
   const effectivePlan = useMemo(
     () => getEffectivePlan(billingState.plan, billingState.status),
     [billingState.plan, billingState.status],
@@ -100,7 +101,7 @@ export function BillingSettings({
   }, [billingIntent, billingResult, billingState.plan, hasPaidPlan, isConfigured, redirectToBilling]);
 
   useEffect(() => {
-    if (billingResult !== "success" || !sessionId || hasSyncedSuccess.current) return;
+    if (billingResult !== "success" || hasSyncedSuccess.current) return;
 
     hasSyncedSuccess.current = true;
     setBusyAction("confirming");
@@ -108,9 +109,10 @@ export function BillingSettings({
 
     void (async () => {
       try {
-        const response = await fetch(
-          `/api/billing/summary?session_id=${encodeURIComponent(sessionId)}`,
-        );
+        const query = sessionId
+          ? `?session_id=${encodeURIComponent(sessionId)}`
+          : "";
+        const response = await fetch(`/api/billing/summary${query}`);
         const payload = await response.json();
 
         if (!response.ok) {
@@ -134,7 +136,7 @@ export function BillingSettings({
         setBusyAction(null);
       }
     })();
-  }, [billingResult, router, sessionId]);
+  }, [billingResult, router, sessionId, upgradedPlan]);
 
   return (
     <div className="grid gap-6">

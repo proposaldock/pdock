@@ -118,6 +118,21 @@ export async function createCheckoutSession(input: {
     input.user.billing.stripeSubscriptionId &&
     hasPaidBillingAccess(input.user.billing.status)
   ) {
+    if (input.user.billing.plan === input.plan) {
+      return createBillingPortalSession({
+        origin: input.origin,
+        customerId: input.user.billing.stripeCustomerId,
+      });
+    }
+
+    if (input.user.billing.plan === "pro" && input.plan === "team") {
+      return upgradeSubscriptionPlan({
+        origin: input.origin,
+        subscriptionId: input.user.billing.stripeSubscriptionId,
+        nextPlan: input.plan,
+      });
+    }
+
     return createBillingPortalSession({
       origin: input.origin,
       customerId: input.user.billing.stripeCustomerId,
@@ -149,6 +164,34 @@ export async function createCheckoutSession(input: {
   }
 
   return session.url;
+}
+
+async function upgradeSubscriptionPlan(input: {
+  origin: string;
+  subscriptionId: string;
+  nextPlan: Exclude<BillingPlan, "free">;
+}) {
+  const stripe = getStripeClient();
+  const subscription = await stripe.subscriptions.retrieve(input.subscriptionId);
+  const item = subscription.items.data[0];
+
+  if (!item) {
+    throw new BillingError("Active subscription could not be updated.", 500);
+  }
+
+  const updatedSubscription = await stripe.subscriptions.update(input.subscriptionId, {
+    items: [
+      {
+        id: item.id,
+        price: getPlanPriceId(input.nextPlan),
+      },
+    ],
+    proration_behavior: "create_prorations",
+  });
+
+  await syncStripeSubscription(updatedSubscription);
+
+  return `${input.origin}/app/settings?billing=success&upgraded=${input.nextPlan}`;
 }
 
 export async function createBillingPortalSession(input: {
