@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/postgres-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Workspace {
+  id               String   @id
+  workspaceName    String
+  clientName       String
+  companyKnowledge String
+  instructions     String?
+  ownerId          String?
+  organizationId   String?
+  visibility       String?
+  payload          Json
+  knowledgeAssets  Json?
+  analysis         Json
+  reviewState      Json?
+  proposalState    Json?
+  activityLog      Json?
+  createdAt        DateTime
+  updatedAt        DateTime
+
+  owner        User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  accesses     WorkspaceAccess[]
+}
+
+model KnowledgeAsset {
+  id              String   @id
+  title           String
+  category        String
+  content         String
+  excerpt         String
+  ownerId         String?
+  organizationId  String?
+  fileSize        Int?
+  sourceFilename  String?
+  sourceMimeType  String?
+  sourceKind      String?
+  storageProvider String?
+  storagePath     String?
+  storageUrl      String?
+  createdAt       DateTime
+  updatedAt       DateTime
+
+  owner        User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  organization Organization?  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                       String    @id
+  email                    String    @unique
+  name                     String
+  passwordHash             String
+  stripeCustomerId         String?   @unique
+  stripeSubscriptionId     String?   @unique
+  stripePriceId            String?
+  stripeSubscriptionStatus String?
+  stripeCurrentPeriodEnd   DateTime?
+  activeOrganizationId     String?
+  createdAt                DateTime
+  updatedAt                DateTime
+
+  workspaces              Workspace[]
+  knowledgeAssets         KnowledgeAsset[]
+  organizationMemberships OrganizationMembership[]
+  workspaceAccesses       WorkspaceAccess[]
+}
+
+model WorkspaceAccess {
+  id          String   @id
+  workspaceId String
+  userId      String
+  createdAt   DateTime
+  updatedAt   DateTime
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+}
+
+model Organization {
+  id              String   @id
+  name            String
+  betaOpsNotes    String?
+  betaOpsTimeline Json?
+  createdAt       DateTime
+  updatedAt       DateTime
+
+  memberships     OrganizationMembership[]
+  workspaces      Workspace[]
+  knowledgeAssets KnowledgeAsset[]
+}
+
+model OrganizationMembership {
+  id             String   @id
+  organizationId String
+  userId         String
+  role           String
+  status         String
+  createdAt      DateTime
+  updatedAt      DateTime
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+model PublicLead {
+  id               String   @id
+  type             String
+  status           String
+  name             String
+  email            String
+  company          String
+  teamSize         String?
+  plan             String?
+  source           String?
+  message          String?
+  internalNotes    String?
+  assignedUserId   String?
+  assignedUserName String?
+  nextFollowUpAt   DateTime?
+  activityLog      Json?
+  createdAt        DateTime
+  updatedAt        DateTime
+}
+
+model MarketingEvent {
+  id        String   @id
+  eventType String
+  page      String?
+  path      String?
+  visitorId String?
+  email     String?
+  plan      String?
+  createdAt DateTime
+}
