@@ -1,12 +1,9 @@
-import { readFileSync } from "node:fs";
 import mammoth from "mammoth";
 import { createRequire } from "node:module";
-import path from "node:path";
 import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
 
 const MAX_DOCUMENT_CHARS = 18_000;
 const require = createRequire(import.meta.url);
-let cachedPdfWorkerDataUrl: string | null = null;
 
 function ensurePdfRuntimePolyfills() {
   if (globalThis.DOMMatrix && globalThis.DOMPoint && globalThis.DOMRect) {
@@ -17,26 +14,6 @@ function ensurePdfRuntimePolyfills() {
   globalThis.DOMMatrix ??= geometryModule.DOMMatrix;
   globalThis.DOMPoint ??= geometryModule.DOMPoint;
   globalThis.DOMRect ??= geometryModule.DOMRect;
-}
-
-function getPdfWorkerDataUrl() {
-  if (cachedPdfWorkerDataUrl) {
-    return cachedPdfWorkerDataUrl;
-  }
-
-  const workerSource = readFileSync(
-    path.join(
-      process.cwd(),
-      "node_modules",
-      "pdfjs-dist",
-      "legacy",
-      "build",
-      "pdf.worker.min.mjs",
-    ),
-    "utf8",
-  );
-  cachedPdfWorkerDataUrl = `data:text/javascript;base64,${Buffer.from(workerSource).toString("base64")}`;
-  return cachedPdfWorkerDataUrl;
 }
 
 function normalizeWhitespace(value: string) {
@@ -54,21 +31,41 @@ export function getAcceptedUploadText() {
 async function parsePdfBuffer(buffer: Buffer, filename: string) {
   try {
     ensurePdfRuntimePolyfills();
-    const pdfParseModule = require("../node_modules/pdf-parse/dist/pdf-parse/cjs/index.cjs") as {
-      PDFParse: {
-        setWorker: (workerUrl: string) => string;
-        new (options: { data: Buffer }): {
-          getText: () => Promise<{ text: string }>;
-          destroy: () => Promise<void>;
-        };
-      };
+    const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const pdfjsWorker = await import("pdfjs-dist/legacy/build/pdf.worker.mjs");
+    const runtimeGlobal = globalThis as typeof globalThis & {
+      pdfjsWorker?: typeof pdfjsWorker;
     };
-    const { PDFParse } = pdfParseModule;
-    PDFParse.setWorker(getPdfWorkerDataUrl());
-    const parser = new PDFParse({ data: buffer });
-    const result = await parser.getText();
-    await parser.destroy();
-    return result.text;
+
+    runtimeGlobal.pdfjsWorker ??= pdfjsWorker;
+
+    const loadingTask = pdfjs.getDocument({
+      data: new Uint8Array(buffer),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      disableFontFace: true,
+      stopAtErrors: false,
+    });
+    const pdfDocument = await loadingTask.promise;
+    const pageTexts: string[] = [];
+
+    for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+      const page = await pdfDocument.getPage(pageNumber);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ")
+        .trim();
+
+      if (pageText) {
+        pageTexts.push(pageText);
+      }
+
+      page.cleanup();
+    }
+
+    await loadingTask.destroy();
+    return pageTexts.join("\n\n");
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Unknown PDF parsing failure.";
