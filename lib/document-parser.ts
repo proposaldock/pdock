@@ -19,7 +19,19 @@ export function getAcceptedUploadText() {
 
 async function parsePdfBuffer(buffer: Buffer, filename: string) {
   try {
-    const { PDFParse } = await import("pdf-parse");
+    const pdfParseModuleUrl = pathToFileURL(
+      path.join(
+        process.cwd(),
+        "node_modules",
+        "pdf-parse",
+        "dist",
+        "pdf-parse",
+        "cjs",
+        "index.cjs",
+      ),
+    ).href;
+    const pdfParseModule = await import(pdfParseModuleUrl);
+    const { PDFParse } = pdfParseModule;
     PDFParse.setWorker(
       pathToFileURL(
         path.join(
