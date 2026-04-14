@@ -1,9 +1,11 @@
 import mammoth from "mammoth";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
 
 const MAX_DOCUMENT_CHARS = 18_000;
+const require = createRequire(import.meta.url);
 
 function normalizeWhitespace(value: string) {
   return value.replace(/\u0000/g, "").replace(/\s+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
@@ -19,32 +21,28 @@ export function getAcceptedUploadText() {
 
 async function parsePdfBuffer(buffer: Buffer, filename: string) {
   try {
-    const pdfParseModuleUrl = pathToFileURL(
+    const pdfParseModule = require("../node_modules/pdf-parse/dist/pdf-parse/cjs/index.cjs") as {
+      PDFParse: {
+        setWorker: (workerUrl: string) => string;
+        new (options: { data: Buffer }): {
+          getText: () => Promise<{ text: string }>;
+          destroy: () => Promise<void>;
+        };
+      };
+    };
+    const workerUrl = pathToFileURL(
       path.join(
         process.cwd(),
         "node_modules",
         "pdf-parse",
         "dist",
         "pdf-parse",
-        "cjs",
-        "index.cjs",
+        "esm",
+        "pdf.worker.mjs",
       ),
     ).href;
-    const pdfParseModule = await import(pdfParseModuleUrl);
     const { PDFParse } = pdfParseModule;
-    PDFParse.setWorker(
-      pathToFileURL(
-        path.join(
-          process.cwd(),
-          "node_modules",
-          "pdf-parse",
-          "dist",
-          "pdf-parse",
-          "esm",
-          "pdf.worker.mjs",
-        ),
-      ).href,
-    );
+    PDFParse.setWorker(workerUrl);
     const parser = new PDFParse({ data: buffer });
     const result = await parser.getText();
     await parser.destroy();
