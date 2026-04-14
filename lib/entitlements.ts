@@ -15,11 +15,24 @@ const BILLING_ACCESS_STATUSES = new Set<BillingStatus>([
   "unpaid",
 ]);
 
+function getForcedPlanOverride(): BillingPlan | null {
+  const value = process.env.BETA_UNLOCK_PLAN?.trim().toLowerCase();
+
+  if (value === "pro" || value === "team") {
+    return value;
+  }
+
+  return null;
+}
+
 export function hasPaidBillingAccess(status: BillingStatus) {
   return BILLING_ACCESS_STATUSES.has(status);
 }
 
 export function getEffectivePlan(plan: BillingPlan, status: BillingStatus): BillingPlan {
+  const forcedPlan = getForcedPlanOverride();
+  if (forcedPlan) return forcedPlan;
+
   if (plan === "free") return "free";
   return hasPaidBillingAccess(status) ? plan : "free";
 }
