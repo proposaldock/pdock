@@ -1,11 +1,12 @@
+import { readFileSync } from "node:fs";
 import mammoth from "mammoth";
 import { createRequire } from "node:module";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
 
 const MAX_DOCUMENT_CHARS = 18_000;
 const require = createRequire(import.meta.url);
+let cachedPdfWorkerDataUrl: string | null = null;
 
 function ensurePdfRuntimePolyfills() {
   if (globalThis.DOMMatrix && globalThis.DOMPoint && globalThis.DOMRect) {
@@ -16,6 +17,26 @@ function ensurePdfRuntimePolyfills() {
   globalThis.DOMMatrix ??= geometryModule.DOMMatrix;
   globalThis.DOMPoint ??= geometryModule.DOMPoint;
   globalThis.DOMRect ??= geometryModule.DOMRect;
+}
+
+function getPdfWorkerDataUrl() {
+  if (cachedPdfWorkerDataUrl) {
+    return cachedPdfWorkerDataUrl;
+  }
+
+  const workerSource = readFileSync(
+    path.join(
+      process.cwd(),
+      "node_modules",
+      "pdfjs-dist",
+      "legacy",
+      "build",
+      "pdf.worker.min.mjs",
+    ),
+    "utf8",
+  );
+  cachedPdfWorkerDataUrl = `data:text/javascript;base64,${Buffer.from(workerSource).toString("base64")}`;
+  return cachedPdfWorkerDataUrl;
 }
 
 function normalizeWhitespace(value: string) {
@@ -42,19 +63,8 @@ async function parsePdfBuffer(buffer: Buffer, filename: string) {
         };
       };
     };
-    const workerUrl = pathToFileURL(
-      path.join(
-        process.cwd(),
-        "node_modules",
-        "pdf-parse",
-        "dist",
-        "pdf-parse",
-        "esm",
-        "pdf.worker.mjs",
-      ),
-    ).href;
     const { PDFParse } = pdfParseModule;
-    PDFParse.setWorker(workerUrl);
+    PDFParse.setWorker(getPdfWorkerDataUrl());
     const parser = new PDFParse({ data: buffer });
     const result = await parser.getText();
     await parser.destroy();
