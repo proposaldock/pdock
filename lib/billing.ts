@@ -58,6 +58,13 @@ export function getStripeClient() {
   return new Stripe(getStripeSecretKey());
 }
 
+function isMissingStripeResource(error: unknown) {
+  return (
+    error instanceof Stripe.errors.StripeInvalidRequestError &&
+    error.code === "resource_missing"
+  );
+}
+
 function getPlanPriceId(plan: Exclude<BillingPlan, "free">) {
   const priceId = BILLING_PLANS[plan].priceId;
   if (!priceId) {
@@ -85,11 +92,19 @@ export async function ensureStripeCustomer(user: {
   name: string;
   stripeCustomerId: string | null;
 }) {
+  const stripe = getStripeClient();
+
   if (user.stripeCustomerId) {
-    return user.stripeCustomerId;
+    try {
+      await stripe.customers.retrieve(user.stripeCustomerId);
+      return user.stripeCustomerId;
+    } catch (error) {
+      if (!isMissingStripeResource(error)) {
+        throw error;
+      }
+    }
   }
 
-  const stripe = getStripeClient();
   const customer = await stripe.customers.create({
     email: user.email,
     name: user.name,
