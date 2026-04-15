@@ -73,15 +73,25 @@ export function AppShell({
               <p className="truncate text-xs text-zinc-500">Proposal operating system</p>
             </div>
           </Link>
-          <button
-            type="button"
-            onClick={() => setIsMobileNavOpen((current) => !current)}
-            className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white text-zinc-700"
-            aria-expanded={isMobileNavOpen}
-            aria-label={isMobileNavOpen ? "Close navigation" : "Open navigation"}
-          >
-            {isMobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <form action="/api/auth/logout" method="post">
+              <button
+                className="inline-flex h-10 items-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-700"
+                aria-label="Sign out"
+              >
+                Sign out
+              </button>
+            </form>
+            <button
+              type="button"
+              onClick={() => setIsMobileNavOpen((current) => !current)}
+              className="grid size-10 place-items-center rounded-lg border border-zinc-200 bg-white text-zinc-700"
+              aria-expanded={isMobileNavOpen}
+              aria-label={isMobileNavOpen ? "Close navigation" : "Open navigation"}
+            >
+              {isMobileNavOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto border-t border-zinc-100 px-4 py-3">
@@ -122,7 +132,7 @@ export function AppShell({
               <p className="font-semibold text-zinc-950">{user.name}</p>
               <p className="mt-1 text-sm text-zinc-500">{user.email}</p>
               <form action="/api/auth/logout" method="post" className="mt-4">
-                <button className="text-sm font-semibold text-emerald-700">
+                <button className="inline-flex h-10 items-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-emerald-700">
                   Sign out
                 </button>
               </form>
@@ -177,7 +187,7 @@ export function AppShell({
             method="post"
             className="mt-4"
           >
-            <button className="text-sm font-semibold text-emerald-700">
+            <button className="inline-flex h-10 items-center rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-emerald-700">
               Sign out
             </button>
           </form>

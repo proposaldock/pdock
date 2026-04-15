@@ -119,8 +119,8 @@ export function TeamSettings({
           </div>
 
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
-            Team members with active accounts can see organization-shared workspaces and
-            knowledge assets immediately.
+            Invite teammates by email. Existing ProposalDock users are added right away, and
+            everyone else will see the team as soon as they sign up with the same email.
           </div>
 
           {!canUseTeamFeatures ? (
@@ -156,12 +156,78 @@ export function TeamSettings({
                 ))}
               </select>
               <Button onClick={addMember} disabled={isSaving || !email.trim()}>
-                {isSaving ? "Saving..." : "Add member"}
+                {isSaving ? "Saving..." : "Invite teammate"}
               </Button>
             </div>
           ) : null}
         </CardContent>
       </Card>
+
+      {team.pendingInvites.length ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Pending invites</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            {team.pendingInvites.map((invite) => (
+              <div
+                key={invite.inviteId}
+                className="grid gap-3 rounded-lg border border-zinc-200 p-4 md:grid-cols-[1fr_auto]"
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold text-zinc-900">{invite.email}</p>
+                    <Badge tone="yellow">pending</Badge>
+                    <Badge tone="zinc">{invite.role}</Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-zinc-600">
+                    Invited by {invite.invitedByName}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Sent {formatDate(invite.invitedAt)}
+                  </p>
+                </div>
+
+                {canManage ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={isSaving}
+                    onClick={async () => {
+                      setError("");
+                      setIsSaving(true);
+
+                      try {
+                        const response = await fetch(
+                          `/api/team/invites/${invite.inviteId}`,
+                          { method: "DELETE" },
+                        );
+                        const payload = await response.json();
+
+                        if (!response.ok) {
+                          throw new Error(payload.error || "Could not cancel invite.");
+                        }
+
+                        setTeam(payload.team);
+                      } catch (caught) {
+                        setError(
+                          caught instanceof Error
+                            ? caught.message
+                            : "Could not cancel invite.",
+                        );
+                      } finally {
+                        setIsSaving(false);
+                      }
+                    }}
+                  >
+                    Cancel invite
+                  </Button>
+                ) : null}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader>

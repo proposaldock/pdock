@@ -14,6 +14,7 @@ type BillingSettingsProps = {
   billing: UserBillingSummary;
   isConfigured: boolean;
   memberSince: string;
+  showStorageAndData?: boolean;
 };
 
 function statusTone(status: UserBillingSummary["status"]) {
@@ -37,6 +38,7 @@ export function BillingSettings({
   billing,
   isConfigured,
   memberSince,
+  showStorageAndData = false,
 }: BillingSettingsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -292,21 +294,23 @@ export function BillingSettings({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Storage and data</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 text-sm text-zinc-600">
-          <p>
-            Uploaded files are stored in Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set.
-            Without that token, ProposalDock keeps a local file copy under `data/uploads`.
-          </p>
-          <p>
-            This keeps local development simple while giving us a clean path to production
-            cloud storage without rewriting the upload flow.
-          </p>
-        </CardContent>
-      </Card>
+      {showStorageAndData ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Storage and data</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm text-zinc-600">
+            <p>
+              Uploaded files are stored in Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set.
+              Without that token, ProposalDock keeps a local file copy under `data/uploads`.
+            </p>
+            <p>
+              This keeps local development simple while giving us a clean path to production
+              cloud storage without rewriting the upload flow.
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

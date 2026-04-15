@@ -120,6 +120,15 @@ export type TeamMember = {
   joinedAt: string;
 };
 
+export type TeamInvite = {
+  inviteId: string;
+  email: string;
+  role: TeamRole;
+  status: "pending";
+  invitedByName: string;
+  invitedAt: string;
+};
+
 export type OrganizationTeam = {
   organizationId: string;
   organizationName: string;
@@ -132,6 +141,7 @@ export type OrganizationTeam = {
     authorName: string;
   }>;
   members: TeamMember[];
+  pendingInvites: TeamInvite[];
 };
 
 export type PublicLead = {

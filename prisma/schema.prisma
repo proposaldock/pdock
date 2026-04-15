@@ -94,6 +94,7 @@ model Organization {
   updatedAt       DateTime
 
   memberships     OrganizationMembership[]
+  invites         OrganizationInvite[]
   workspaces      Workspace[]
   knowledgeAssets KnowledgeAsset[]
 }
@@ -111,6 +112,21 @@ model OrganizationMembership {
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, userId])
+}
+
+model OrganizationInvite {
+  id             String       @id
+  organizationId String
+  email          String
+  role           String
+  status         String
+  invitedByUserId String
+  createdAt      DateTime
+  updatedAt      DateTime
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, email])
 }
 
 model PublicLead {

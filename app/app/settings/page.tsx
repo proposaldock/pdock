@@ -72,6 +72,7 @@ export default async function SettingsPage() {
           billing={user.billing}
           isConfigured={isBillingConfigured()}
           memberSince={user.createdAt.toISOString()}
+          showStorageAndData={isPlatformAdmin}
         />
       </div>
 
@@ -97,11 +98,7 @@ export default async function SettingsPage() {
             teamMembers={team.members}
           />
         </div>
-      ) : (
-        <div className="mt-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
-          Internal operating panels are only visible to the ProposalDock platform admin.
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import type {
   OrganizationTeam,
   PublicLead,
   ProposalSection,
+  TeamInvite,
   TeamMember,
   TeamRole,
   UserBillingSummary,
@@ -231,6 +232,17 @@ type OrganizationMembershipRecord = {
     name: string;
     email: string;
   };
+};
+
+type OrganizationInviteRecord = {
+  id: string;
+  organizationId: string;
+  email: string;
+  role: string;
+  status: string;
+  invitedByUserId: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 type BetaOpsTimelineEntry = {
@@ -1379,6 +1391,62 @@ export async function createUser(input: {
   });
 }
 
+export async function acceptPendingOrganizationInvitesForEmail(input: {
+  userId: string;
+  email: string;
+}) {
+  await ensureStore();
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const invites = (await prisma.organizationInvite.findMany({
+    where: {
+      email: normalizedEmail,
+      status: "pending",
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  })) as OrganizationInviteRecord[];
+
+  if (!invites.length) {
+    return [];
+  }
+
+  const now = new Date();
+  for (const invite of invites) {
+    await prisma.organizationMembership.upsert({
+      where: {
+        organizationId_userId: {
+          organizationId: invite.organizationId,
+          userId: input.userId,
+        },
+      },
+      create: {
+        id: crypto.randomUUID(),
+        organizationId: invite.organizationId,
+        userId: input.userId,
+        role: invite.role,
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+      update: {
+        role: invite.role,
+        status: "active",
+        updatedAt: now,
+      },
+    });
+  }
+
+  await prisma.organizationInvite.deleteMany({
+    where: {
+      email: normalizedEmail,
+      status: "pending",
+    },
+  });
+
+  return invites.map((invite) => invite.organizationId);
+}
+
 export async function ensureUserOrganization(userId: string, fallbackName?: string) {
   const membership = await ensurePrimaryOrganizationForUser(userId, fallbackName);
   return {
@@ -1572,6 +1640,20 @@ export async function listOrganizationTeamForUser(userId: string): Promise<Organ
     orderBy: [{ role: "asc" }, { createdAt: "asc" }],
   })) as OrganizationMembershipRecord[];
 
+  const pendingInvites = (await prisma.organizationInvite.findMany({
+    where: {
+      organizationId: activeOrganizationId,
+      status: "pending",
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  })) as OrganizationInviteRecord[];
+
+  const inviterById = new Map(
+    memberships.map((membership) => [membership.user.id, membership.user.name]),
+  );
+
   return {
     organizationId: activeOrganizationId,
     organizationName: activeMembership.organization.name,
@@ -1593,6 +1675,14 @@ export async function listOrganizationTeamForUser(userId: string): Promise<Organ
       role: normalizeTeamRole(membership.role),
       status: "active",
       joinedAt: membership.createdAt.toISOString(),
+    })),
+    pendingInvites: pendingInvites.map((invite): TeamInvite => ({
+      inviteId: invite.id,
+      email: invite.email,
+      role: normalizeTeamRole(invite.role),
+      status: "pending",
+      invitedByName: inviterById.get(invite.invitedByUserId) ?? "ProposalDock",
+      invitedAt: invite.createdAt.toISOString(),
     })),
   };
 }
@@ -1780,37 +1870,106 @@ export async function addOrganizationMemberByEmail(input: {
     throw new Error("You do not have permission to manage this team.");
   }
 
-  const user = await getUserByEmail(input.email.trim().toLowerCase());
-  if (!user) {
-    throw new Error("That person needs a ProposalDock account before you can add them.");
-  }
+  const normalizedEmail = input.email.trim().toLowerCase();
+  const user = await getUserByEmail(normalizedEmail);
 
-  if (user.id === input.currentUserId) {
+  if (user?.id === input.currentUserId) {
     throw new Error("You are already part of this team.");
   }
 
   const now = new Date();
-  await prisma.organizationMembership.upsert({
-    where: {
-      organizationId_userId: {
+  if (user) {
+    await prisma.organizationMembership.upsert({
+      where: {
+        organizationId_userId: {
+          organizationId: managerMembership.organizationId,
+          userId: user.id,
+        },
+      },
+      create: {
+        id: crypto.randomUUID(),
         organizationId: managerMembership.organizationId,
         userId: user.id,
+        role: input.role,
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+      },
+      update: {
+        role: input.role,
+        status: "active",
+        updatedAt: now,
+      },
+    });
+
+    await prisma.organizationInvite.deleteMany({
+      where: {
+        organizationId: managerMembership.organizationId,
+        email: normalizedEmail,
+      },
+    });
+  } else {
+    await prisma.organizationInvite.upsert({
+      where: {
+        organizationId_email: {
+          organizationId: managerMembership.organizationId,
+          email: normalizedEmail,
+        },
+      },
+      create: {
+        id: crypto.randomUUID(),
+        organizationId: managerMembership.organizationId,
+        email: normalizedEmail,
+        role: input.role,
+        status: "pending",
+        invitedByUserId: input.currentUserId,
+        createdAt: now,
+        updatedAt: now,
+      },
+      update: {
+        role: input.role,
+        status: "pending",
+        invitedByUserId: input.currentUserId,
+        updatedAt: now,
+      },
+    });
+  }
+
+  return listOrganizationTeamForUser(input.currentUserId);
+}
+
+export async function removeOrganizationInvite(input: {
+  currentUserId: string;
+  inviteId: string;
+}) {
+  await ensureStore();
+  await ensurePrimaryOrganizationForUser(input.currentUserId);
+  const activeOrganizationId = await getActiveOrganizationIdForUser(input.currentUserId);
+  const managerMembership = await prisma.organizationMembership.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: activeOrganizationId,
+        userId: input.currentUserId,
       },
     },
-    create: {
-      id: crypto.randomUUID(),
-      organizationId: managerMembership.organizationId,
-      userId: user.id,
-      role: input.role,
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-    },
-    update: {
-      role: input.role,
-      status: "active",
-      updatedAt: now,
-    },
+  });
+  if (!managerMembership) {
+    throw new Error("Active organization not found.");
+  }
+  const managerRole = normalizeTeamRole(managerMembership.role);
+  if (managerRole !== "owner" && managerRole !== "admin") {
+    throw new Error("You do not have permission to manage this team.");
+  }
+
+  const invite = await prisma.organizationInvite.findUnique({
+    where: { id: input.inviteId },
+  });
+  if (!invite || invite.organizationId !== managerMembership.organizationId) {
+    throw new Error("Invite not found.");
+  }
+
+  await prisma.organizationInvite.delete({
+    where: { id: input.inviteId },
   });
 
   return listOrganizationTeamForUser(input.currentUserId);

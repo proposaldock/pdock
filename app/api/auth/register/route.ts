@@ -3,11 +3,13 @@ import { createUserSession, hashPassword } from "@/lib/auth";
 import { createMarketingEvent } from "@/lib/marketing-analytics";
 import { applyRateLimit } from "@/lib/rate-limit";
 import {
+  acceptPendingOrganizationInvitesForEmail,
   adoptOrphanedResources,
   countUsers,
   createUser,
   ensureUserOrganization,
   getUserByEmail,
+  setActiveOrganizationForUser,
 } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -73,6 +75,13 @@ export async function POST(request: Request) {
     }
 
     await ensureUserOrganization(user.id, name);
+    const invitedOrganizationIds = await acceptPendingOrganizationInvitesForEmail({
+      userId: user.id,
+      email,
+    });
+    if (invitedOrganizationIds.length) {
+      await setActiveOrganizationForUser(user.id, invitedOrganizationIds[0]);
+    }
     await createMarketingEvent({
       eventType: "signup_completed",
       email,
