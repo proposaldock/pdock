@@ -71,6 +71,44 @@ const tabs = [
 ] as const;
 type Tab = (typeof tabs)[number];
 
+const tabDescriptions: Record<
+  Tab,
+  { title: string; body: string }
+> = {
+  Overview: {
+    title: "See the shape of the brief",
+    body: "This view gives you the fastest read on the workspace: summary, complexity, deadline, and the current review posture before you dive into the details.",
+  },
+  Requirements: {
+    title: "Review what the client is asking for",
+    body: "Use this section to inspect extracted requirements, accept or reject them, add internal notes, and draft answer fragments your team can build on.",
+  },
+  Risks: {
+    title: "Spot proposal risk before it spreads",
+    body: "This section highlights unclear asks, missing evidence, and risky assumptions so the team can decide what needs escalation, clarification, or careful wording.",
+  },
+  Draft: {
+    title: "Shape the first response direction",
+    body: "This is where you refine the executive summary and response strategy that will guide the proposal before the full section drafting begins.",
+  },
+  Proposal: {
+    title: "Assemble the response pack",
+    body: "Use Proposal to generate, rewrite, approve, assign, and comment on the sections that will turn into your final client-facing response.",
+  },
+  Activity: {
+    title: "Track what changed and who touched it",
+    body: "Activity gives you the running timeline for analysis runs, saves, approvals, comments, exports, and follow-up updates across the workspace.",
+  },
+  Sources: {
+    title: "Check the grounding behind the output",
+    body: "This section lets you inspect the cited chunks and source material behind the analysis so the team can verify what the AI is leaning on.",
+  },
+  Export: {
+    title: "Get the response out cleanly",
+    body: "Export shows readiness, final checks, and the output actions for generating a print view or response pack once the proposal is ready to ship.",
+  },
+};
+
 function priorityTone(value: string) {
   if (value === "high") return "red";
   if (value === "medium") return "yellow";
@@ -146,6 +184,7 @@ export function WorkspaceResults({
 
     return { accepted, rejected, pending };
   }, [reviewState.requirements]);
+  const activeTabDescription = tabDescriptions[activeTab];
 
   async function rerun() {
     setError("");
@@ -448,17 +487,27 @@ export function WorkspaceResults({
         ))}
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Badge tone="teal">{workspace.documents.length} source files</Badge>
-        <Badge tone="teal">{workspace.knowledgeAssets?.length ?? 0} knowledge assets</Badge>
-        <Badge tone="zinc">
-          {workspace.documents.reduce((sum, document) => sum + document.characterCount, 0)} chars
-          parsed
-        </Badge>
-        <Badge tone="yellow">{analysis.sources.length} cited chunks</Badge>
-        <Badge tone="green">{reviewSummary.accepted} accepted</Badge>
-        <Badge tone="red">{reviewSummary.rejected} rejected</Badge>
-        <Badge tone="yellow">{reviewSummary.pending} pending</Badge>
+      <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+        <p className="text-sm font-semibold text-zinc-950">{activeTabDescription.title}</p>
+        <p className="mt-2 text-sm leading-6 text-zinc-600">{activeTabDescription.body}</p>
+      </div>
+
+      <div className="mt-4 rounded-lg border border-zinc-200 bg-white p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-500">
+          Workspace snapshot
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Badge tone="teal">{workspace.documents.length} source files</Badge>
+          <Badge tone="teal">{workspace.knowledgeAssets?.length ?? 0} knowledge assets</Badge>
+          <Badge tone="zinc">
+            {workspace.documents.reduce((sum, document) => sum + document.characterCount, 0)} chars
+            parsed
+          </Badge>
+          <Badge tone="yellow">{analysis.sources.length} cited chunks</Badge>
+          <Badge tone="green">{reviewSummary.accepted} accepted</Badge>
+          <Badge tone="red">{reviewSummary.rejected} rejected</Badge>
+          <Badge tone="yellow">{reviewSummary.pending} pending</Badge>
+        </div>
       </div>
 
       <div className="mt-6">
