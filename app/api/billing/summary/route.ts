@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
 import {
   BillingError,
+  syncStripeCustomerBilling,
   syncStripeCheckoutSessionById,
 } from "@/lib/billing";
 import { getUserAccountById } from "@/lib/store";
@@ -15,6 +16,7 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url);
     const sessionId = url.searchParams.get("session_id");
+    const refresh = url.searchParams.get("refresh");
 
     let account = await getUserAccountById(user.id);
     if (!account) {
@@ -36,6 +38,14 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: "Billing session mismatch." }, { status: 403 });
       }
 
+      account = await getUserAccountById(user.id);
+      if (!account) {
+        return NextResponse.json({ error: "Account not found." }, { status: 404 });
+      }
+    }
+
+    if (!sessionId && refresh === "1" && account.billing.stripeCustomerId) {
+      await syncStripeCustomerBilling(account.billing.stripeCustomerId);
       account = await getUserAccountById(user.id);
       if (!account) {
         return NextResponse.json({ error: "Account not found." }, { status: 404 });

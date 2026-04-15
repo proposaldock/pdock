@@ -113,7 +113,9 @@ export function BillingSettings({
       try {
         const query = sessionId
           ? `?session_id=${encodeURIComponent(sessionId)}`
-          : "";
+          : upgradedPlan
+            ? "?refresh=1"
+            : "";
         const response = await fetch(`/api/billing/summary${query}`);
         const payload = await response.json();
 

@@ -288,3 +288,32 @@ export async function syncStripeCheckoutSessionById(sessionId: string) {
   await syncStripeCheckoutSession(session);
   return session;
 }
+
+export async function syncStripeCustomerBilling(customerId: string) {
+  const stripe = getStripeClient();
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+    status: "all",
+    limit: 10,
+  });
+
+  const preferredStatuses = new Set([
+    "active",
+    "trialing",
+    "past_due",
+    "unpaid",
+    "incomplete",
+  ]);
+
+  const currentSubscription =
+    subscriptions.data.find((subscription) => preferredStatuses.has(subscription.status)) ??
+    subscriptions.data[0] ??
+    null;
+
+  if (!currentSubscription) {
+    return null;
+  }
+
+  await syncStripeSubscription(currentSubscription);
+  return currentSubscription;
+}
