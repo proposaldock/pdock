@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { createUserSession, hashPassword } from "@/lib/auth";
+import {
+  isBlockedRegistrationEmail,
+  isValidEmailFormat,
+} from "@/lib/email-policy";
 import { createMarketingEvent } from "@/lib/marketing-analytics";
 import { applyRateLimit } from "@/lib/rate-limit";
 import {
@@ -48,6 +52,23 @@ export async function POST(request: Request) {
     if (!name || !email || !password) {
       return NextResponse.json(
         { error: "Name, email, and password are required." },
+        { status: 400 },
+      );
+    }
+
+    if (!isValidEmailFormat(email)) {
+      return NextResponse.json(
+        { error: "Enter a valid email address." },
+        { status: 400 },
+      );
+    }
+
+    if (isBlockedRegistrationEmail(email)) {
+      return NextResponse.json(
+        {
+          error:
+            "Please sign up with a real working email address. Disposable inbox services are not accepted.",
+        },
         { status: 400 },
       );
     }
