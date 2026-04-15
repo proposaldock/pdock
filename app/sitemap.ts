@@ -1,15 +1,5 @@
 import type { MetadataRoute } from "next";
-
-function resolveAppUrl() {
-  return (
-    process.env.APP_URL?.trim() ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.trim()}`
-      : "") ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL.trim()}` : "") ||
-    "http://localhost:3000"
-  );
-}
+import { resolveAppUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const appUrl = resolveAppUrl();
@@ -23,6 +13,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${appUrl}/contact`,
       changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${appUrl}/about`,
+      changeFrequency: "monthly",
       priority: 0.8,
     },
     {

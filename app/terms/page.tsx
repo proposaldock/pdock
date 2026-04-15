@@ -1,5 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
+import { buildCanonical } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description:
+    "Read the ProposalDock beta terms covering accounts, acceptable use, billing, AI-generated output, cancellations, and service changes.",
+  alternates: {
+    canonical: buildCanonical("/terms"),
+  },
+};
 
 export default function TermsPage() {
   return (

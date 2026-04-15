@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   ArrowLeft,
   Bot,
@@ -12,6 +13,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { buildCanonical, getOrganizationJsonLd } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "About ProposalDock",
+  description:
+    "Learn what ProposalDock offers, how it uses AI to accelerate proposal work, and how teams stay in control of review, signoff, and final export.",
+  alternates: {
+    canonical: buildCanonical("/about"),
+  },
+};
 
 const offeringAreas = [
   {
@@ -79,8 +90,16 @@ const outcomes = [
 ] as const;
 
 export default function AboutPage() {
+  const organizationJsonLd = getOrganizationJsonLd();
+
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd),
+        }}
+      />
       <div className="mx-auto max-w-6xl">
         <Link
           href="/"

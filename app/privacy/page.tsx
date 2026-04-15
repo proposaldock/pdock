@@ -1,5 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
+import { buildCanonical } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Read how ProposalDock handles account data, proposal materials, analytics, billing, and beta operations during product use.",
+  alternates: {
+    canonical: buildCanonical("/privacy"),
+  },
+};
 
 export default function PrivacyPage() {
   return (

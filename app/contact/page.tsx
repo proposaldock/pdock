@@ -1,7 +1,18 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
 import { PublicLeadForm } from "@/components/public-lead-form";
+import { buildCanonical } from "@/lib/site";
+
+export const metadata: Metadata = {
+  title: "Contact ProposalDock",
+  description:
+    "Talk to ProposalDock about team rollout, beta access, pricing, or joining the waitlist for AI-powered proposal workflow software.",
+  alternates: {
+    canonical: buildCanonical("/contact"),
+  },
+};
 
 export default async function ContactPage({
   searchParams,

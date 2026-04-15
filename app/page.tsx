@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   ArrowRight,
   CheckCircle2,
@@ -14,6 +15,11 @@ import { AnalyticsBeacon } from "@/components/analytics-beacon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth";
+import {
+  buildCanonical,
+  getOrganizationJsonLd,
+  getSoftwareApplicationJsonLd,
+} from "@/lib/site";
 
 const featureCards = [
   {
@@ -162,15 +168,38 @@ const faqs = [
   },
 ] as const;
 
+export const metadata: Metadata = {
+  title: "AI Proposal Software for B2B Service Teams",
+  description:
+    "ProposalDock helps B2B service teams analyze briefs, review requirements, reuse approved knowledge, and assemble grounded proposal drafts faster.",
+  alternates: {
+    canonical: buildCanonical("/"),
+  },
+};
+
 export default async function LandingPage() {
   const user = await getCurrentUser();
   const primaryCtaHref = user ? "/app" : "/register?plan=free";
   const primaryCtaLabel = user ? "Open dashboard" : "Start free";
   const secondaryCtaHref = user ? "/app/new" : "/contact?intent=contact_sales&plan=team";
   const secondaryCtaLabel = user ? "Create workspace" : "Talk to us";
+  const organizationJsonLd = getOrganizationJsonLd();
+  const softwareJsonLd = getSoftwareApplicationJsonLd();
 
   return (
     <main className="bg-white text-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(softwareJsonLd),
+        }}
+      />
       <AnalyticsBeacon page="landing" path="/" />
       <section className="relative min-h-[82vh] overflow-hidden">
         <Image
