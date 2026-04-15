@@ -83,6 +83,21 @@ async function createFreshStripeCustomer(user: {
   return customer.id;
 }
 
+async function canUseExistingCustomerForCurrentStripeMode(customerId: string) {
+  const stripe = getStripeClient();
+
+  try {
+    const customer = await stripe.customers.retrieve(customerId);
+    return !("deleted" in customer && customer.deleted === true);
+  } catch (error) {
+    if (isMissingStripeResource(error)) {
+      return false;
+    }
+
+    throw error;
+  }
+}
+
 function getPlanPriceId(plan: Exclude<BillingPlan, "free">) {
   const priceId = BILLING_PLANS[plan].priceId;
   if (!priceId) {
@@ -110,18 +125,12 @@ export async function ensureStripeCustomer(user: {
   name: string;
   stripeCustomerId: string | null;
 }) {
-  const stripe = getStripeClient();
-
   if (user.stripeCustomerId) {
-    try {
-      const customer = await stripe.customers.retrieve(user.stripeCustomerId);
-      if (!("deleted" in customer) || customer.deleted !== true) {
-        return user.stripeCustomerId;
-      }
-    } catch (error) {
-      if (!isMissingStripeResource(error)) {
-        throw error;
-      }
+    const isUsable = await canUseExistingCustomerForCurrentStripeMode(
+      user.stripeCustomerId,
+    );
+    if (isUsable) {
+      return user.stripeCustomerId;
     }
   }
 
@@ -139,9 +148,14 @@ export async function createCheckoutSession(input: {
     billing: UserBillingSummary;
   };
 }) {
+  const hasUsableCustomer = input.user.billing.stripeCustomerId
+    ? await canUseExistingCustomerForCurrentStripeMode(input.user.billing.stripeCustomerId)
+    : false;
+
   if (
-    input.user.billing.stripeCustomerId &&
+    hasUsableCustomer &&
     input.user.billing.stripeSubscriptionId &&
+    input.user.billing.plan !== "free" &&
     hasPaidBillingAccess(input.user.billing.status)
   ) {
     if (input.user.billing.plan === input.plan) {
