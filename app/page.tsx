@@ -111,19 +111,54 @@ const plans = [
 
 const faqs = [
   {
-    question: "Is ProposalDock a chatbot?",
+    question: "What does ProposalDock actually help with?",
     answer:
-      "No. It is built around the proposal workflow itself: upload, analyze, review, assemble, and export.",
+      "ProposalDock helps teams take an incoming brief or RFP, turn it into structured requirements and risks, review the output with source grounding, draft proposal sections, and export a response pack without juggling the work across several disconnected tools.",
   },
   {
-    question: "Can teams reuse approved company material?",
+    question: "How is this different from using ChatGPT or Claude in a browser?",
     answer:
-      "Yes. The knowledge base lets teams carry approved capability statements, case studies, and support content across workspaces.",
+      "ProposalDock is built around the proposal workflow itself, not around freeform prompting. It keeps the brief, knowledge base, analysis, review decisions, section approvals, ownership, and export flow inside one workspace so the team can actually operate the response together.",
+  },
+  {
+    question: "How does AI fit into the workflow?",
+    answer:
+      "AI helps read the brief, surface requirements, flag risks, and generate grounded draft content. The team still reviews the output, approves sections, adds comments, assigns follow-up, and decides what is safe to send. The goal is faster proposal work, not blind automation.",
+  },
+  {
+    question: "Can we reuse approved company material across proposals?",
+    answer:
+      "Yes. ProposalDock includes a knowledge base where you can keep approved case studies, support language, delivery approach, security content, and other reusable material, then attach the relevant assets to a live workspace when you need them.",
+  },
+  {
+    question: "Do we have to upload PDFs?",
+    answer:
+      "No. You can start with pasted text, TXT, DOCX, or your own working notes. In beta, pasted text and text-based document flows are the safest way to get moving quickly if a client brief arrives in an awkward format.",
+  },
+  {
+    question: "How does ProposalDock handle sensitive proposal material?",
+    answer:
+      "ProposalDock is designed to keep work inside authenticated workspaces with role-based access, shared organization controls, and managed storage. Teams should still treat beta software with appropriate care, but the product is built for real proposal work rather than public or disposable content.",
+  },
+  {
+    question: "Which plan should we start with?",
+    answer:
+      "Free is best for evaluating the workflow. Pro fits solo consultants and bid leads who need more room to work. Team is the right starting point when several people need shared workspaces, ownership, review visibility, and teammate access.",
+  },
+  {
+    question: "Can ProposalDock work for both solo operators and teams?",
+    answer:
+      "Yes. A solo user can run the full proposal workflow alone, while a team can layer on shared workspaces, teammate access, review coordination, approvals, and follow-up ownership without changing the core process.",
   },
   {
     question: "What happens after signup?",
     answer:
-      "You land in the app, create your first workspace, and can move into billing from Settings when you want a paid plan.",
+      "You land in the app, create your first workspace, add the brief, run analysis, and move into review and proposal drafting from there. If you later need more capacity or team features, you can upgrade from Settings.",
+  },
+  {
+    question: "Who is ProposalDock best suited for right now?",
+    answer:
+      "It is best suited for consultants, agencies, and B2B service teams who regularly respond to client briefs and want a cleaner way to go from intake to proposal draft without losing context, evidence, or review control.",
   },
 ] as const;
 
