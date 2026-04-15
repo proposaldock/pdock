@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { FileText, Pencil, Plus, Trash2, Upload } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { KnowledgeAsset } from "@/lib/types";
+import type { BillingPlan, KnowledgeAsset } from "@/lib/types";
 import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
 import { formatDate, truncate } from "@/lib/utils";
 
@@ -24,9 +25,11 @@ const emptyValues: FormValues = {
 export function KnowledgeBaseManager({
   initialAssets,
   canManage,
+  effectivePlan,
 }: {
   initialAssets: KnowledgeAsset[];
   canManage: boolean;
+  effectivePlan: BillingPlan;
 }) {
   const [assets, setAssets] = useState(initialAssets);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -143,8 +146,21 @@ export function KnowledgeBaseManager({
         </CardHeader>
         {!canManage ? (
           <CardContent>
-            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
-              Knowledge Base is available on Pro and Team plans.
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+              <p className="text-sm font-semibold text-yellow-950">
+                Knowledge Base is unlocked on Pro and Team.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-yellow-900">
+                Your current plan is {effectivePlan.toUpperCase()}. Upgrade when you want a reusable
+                library of approved company material that can be attached across proposal workspaces.
+              </p>
+              <div className="mt-4">
+                <Link href="/app/settings#billing">
+                  <Button size="sm" variant="secondary">
+                    View plans
+                  </Button>
+                </Link>
+              </div>
             </div>
           </CardContent>
         ) : null}
@@ -274,7 +290,9 @@ export function KnowledgeBaseManager({
         {assets.length === 0 ? (
           <Card>
             <CardContent className="p-10 text-center text-sm text-zinc-600">
-              No assets yet. Start with case studies, capability statements, or delivery model notes.
+              {canManage
+                ? "No assets yet. Start with case studies, capability statements, or delivery model notes."
+                : "Knowledge Base is ready when you upgrade. Start with Pro if you want reusable approved material across proposals."}
             </CardContent>
           </Card>
         ) : null}

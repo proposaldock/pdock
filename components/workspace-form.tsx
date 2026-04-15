@@ -8,13 +8,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
-import type { KnowledgeAsset } from "@/lib/types";
+import type { BillingPlan, KnowledgeAsset } from "@/lib/types";
 
 const sampleBrief = `Client seeks a partner to design and launch a customer portal within 12 weeks. Response must include implementation approach, data security model, migration plan, support coverage, accessibility standards, and three relevant case studies. Deadline: May 17, 2026.`;
 
 const sampleKnowledge = `We are a B2B product studio specializing in secure customer portals, workflow automation, and systems integration. We have delivered SOC 2 aligned portals for SaaS and professional services clients. Our standard team includes product strategy, UX, engineering, QA, and delivery leadership. We offer post-launch support during business hours with optional extended coverage.`;
 
-export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeAsset[] }) {
+export function WorkspaceForm({
+  knowledgeAssets,
+  canUseKnowledgeBase,
+  workspaceLimitReached,
+  effectivePlan,
+}: {
+  knowledgeAssets: KnowledgeAsset[];
+  canUseKnowledgeBase: boolean;
+  workspaceLimitReached: boolean;
+  effectivePlan: BillingPlan;
+}) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -90,6 +100,25 @@ export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeA
 
   return (
     <form onSubmit={submit} className="grid gap-6">
+      {workspaceLimitReached ? (
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <p className="text-sm font-semibold text-yellow-950">
+            Free accounts can keep one workspace.
+          </p>
+          <p className="mt-2 text-sm leading-6 text-yellow-900">
+            You have reached the Free workspace limit. Upgrade to Pro to create additional
+            proposal workspaces.
+          </p>
+          <div className="mt-4">
+            <Link href="/app/settings#billing">
+              <Button size="sm" variant="secondary">
+                View plans
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : null}
+
       <Card>
         <CardHeader>
           <CardTitle>Workspace details</CardTitle>
@@ -203,14 +232,30 @@ export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeA
           <div className="grid gap-3">
             <div className="flex items-center justify-between gap-4">
               <label className="text-sm font-semibold">Attach knowledge base assets</label>
-              <Link
-                href="/app/knowledge-base"
-                className="text-sm font-semibold text-emerald-700 hover:text-emerald-900"
-              >
-                Manage library
-              </Link>
+              {canUseKnowledgeBase ? (
+                <Link
+                  href="/app/knowledge-base"
+                  className="text-sm font-semibold text-emerald-700 hover:text-emerald-900"
+                >
+                  Manage library
+                </Link>
+              ) : (
+                <Link
+                  href="/app/settings#billing"
+                  className="text-sm font-semibold text-emerald-700 hover:text-emerald-900"
+                >
+                  Upgrade for library access
+                </Link>
+              )}
             </div>
-            {knowledgeAssets.length ? (
+            {!canUseKnowledgeBase ? (
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm leading-6 text-yellow-900">
+                Knowledge Base is available on Pro and Team. Your current plan is{" "}
+                <span className="font-semibold">{effectivePlan.toUpperCase()}</span>, so this
+                workspace can still use pasted company knowledge below, but not reusable library
+                assets yet.
+              </div>
+            ) : knowledgeAssets.length ? (
               <div className="grid gap-2">
                 {knowledgeAssets.map((asset) => {
                   const selected = selectedKnowledgeAssetIds.includes(asset.id);
@@ -289,9 +334,9 @@ export function WorkspaceForm({ knowledgeAssets }: { knowledgeAssets: KnowledgeA
           <Wand2 className="size-4" />
           Add sample demo data
         </Button>
-        <Button type="submit" variant="accent" disabled={isLoading}>
+        <Button type="submit" variant="accent" disabled={isLoading || workspaceLimitReached}>
           {isLoading ? <Loader2 className="size-4 animate-spin" /> : null}
-          {isLoading ? "Analyzing..." : "Analyze"}
+          {isLoading ? "Analyzing..." : workspaceLimitReached ? "Workspace limit reached" : "Analyze"}
         </Button>
       </div>
     </form>

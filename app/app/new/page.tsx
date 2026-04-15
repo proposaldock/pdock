@@ -3,18 +3,31 @@ import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { WorkspaceForm } from "@/components/workspace-form";
 import { requireCurrentUser } from "@/lib/auth";
-import { getUserAccountById, listKnowledgeAssetsForUser } from "@/lib/store";
+import { getPlanEntitlements } from "@/lib/entitlements";
+import {
+  getUserAccountById,
+  listKnowledgeAssetsForUser,
+  listWorkspacesForUser,
+} from "@/lib/store";
 
 export default async function NewWorkspacePage() {
   const sessionUser = await requireCurrentUser();
-  const [user, knowledgeAssets] = await Promise.all([
+  const [user, allKnowledgeAssets, workspaces] = await Promise.all([
     getUserAccountById(sessionUser.id),
     listKnowledgeAssetsForUser(sessionUser.id),
+    listWorkspacesForUser(sessionUser.id),
   ]);
 
   if (!user) {
     return null;
   }
+
+  const entitlements = getPlanEntitlements(user.billing);
+  const knowledgeAssets = entitlements.canUseKnowledgeBase ? allKnowledgeAssets : [];
+  const ownedWorkspaceCount = workspaces.filter(
+    (workspace) => workspace.ownerId === sessionUser.id,
+  ).length;
+  const workspaceLimitReached = ownedWorkspaceCount >= entitlements.workspaceLimit;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
@@ -56,7 +69,12 @@ export default async function NewWorkspacePage() {
         </div>
       </div>
       <div className="mt-8">
-        <WorkspaceForm knowledgeAssets={knowledgeAssets} />
+        <WorkspaceForm
+          knowledgeAssets={knowledgeAssets}
+          canUseKnowledgeBase={entitlements.canUseKnowledgeBase}
+          workspaceLimitReached={workspaceLimitReached}
+          effectivePlan={entitlements.effectivePlan}
+        />
       </div>
     </div>
   );

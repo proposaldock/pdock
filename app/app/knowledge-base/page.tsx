@@ -33,6 +33,7 @@ export default async function KnowledgeBasePage() {
         <KnowledgeBaseManager
           initialAssets={assets}
           canManage={entitlements.canUseKnowledgeBase}
+          effectivePlan={entitlements.effectivePlan}
         />
       </div>
     </div>

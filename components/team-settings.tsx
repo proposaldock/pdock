@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -124,9 +125,22 @@ export function TeamSettings({
           </div>
 
           {!canUseTeamFeatures ? (
-            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
-              Team sharing is available on the Team plan. Your current access level is{" "}
-              <span className="font-semibold">{effectivePlan.toUpperCase()}</span>.
+            <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+              <p className="text-sm font-semibold text-yellow-950">
+                Team sharing is available on the Team plan.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-yellow-900">
+                Your current access level is{" "}
+                <span className="font-semibold">{effectivePlan.toUpperCase()}</span>. Upgrade to
+                Team when you want teammate invites, shared workspaces, and collaborative review.
+              </p>
+              <div className="mt-4">
+                <Link href="/app/settings#billing">
+                  <Button size="sm" variant="secondary">
+                    View Team plan
+                  </Button>
+                </Link>
+              </div>
             </div>
           ) : null}
 
