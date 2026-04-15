@@ -65,6 +65,24 @@ function isMissingStripeResource(error: unknown) {
   );
 }
 
+async function createFreshStripeCustomer(user: {
+  id: string;
+  email: string;
+  name: string;
+}) {
+  const stripe = getStripeClient();
+  const customer = await stripe.customers.create({
+    email: user.email,
+    name: user.name,
+    metadata: {
+      userId: user.id,
+    },
+  });
+
+  await updateUserStripeCustomerId(user.id, customer.id);
+  return customer.id;
+}
+
 function getPlanPriceId(plan: Exclude<BillingPlan, "free">) {
   const priceId = BILLING_PLANS[plan].priceId;
   if (!priceId) {
@@ -96,8 +114,10 @@ export async function ensureStripeCustomer(user: {
 
   if (user.stripeCustomerId) {
     try {
-      await stripe.customers.retrieve(user.stripeCustomerId);
-      return user.stripeCustomerId;
+      const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+      if (!("deleted" in customer) || customer.deleted !== true) {
+        return user.stripeCustomerId;
+      }
     } catch (error) {
       if (!isMissingStripeResource(error)) {
         throw error;
@@ -105,16 +125,7 @@ export async function ensureStripeCustomer(user: {
     }
   }
 
-  const customer = await stripe.customers.create({
-    email: user.email,
-    name: user.name,
-    metadata: {
-      userId: user.id,
-    },
-  });
-
-  await updateUserStripeCustomerId(user.id, customer.id);
-  return customer.id;
+  return createFreshStripeCustomer(user);
 }
 
 export async function createCheckoutSession(input: {
@@ -157,23 +168,50 @@ export async function createCheckoutSession(input: {
 
   const stripe = getStripeClient();
   const customerId = await ensureStripeCustomer(input.user);
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer: customerId,
-    line_items: [
-      {
-        price: getPlanPriceId(input.plan),
-        quantity: 1,
+  let session: Stripe.Checkout.Session;
+
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: customerId,
+      line_items: [
+        {
+          price: getPlanPriceId(input.plan),
+          quantity: 1,
+        },
+      ],
+      allow_promotion_codes: true,
+      success_url: `${input.origin}/app/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${input.origin}/app/settings?billing=cancel`,
+      metadata: {
+        plan: input.plan,
+        userId: input.user.id,
       },
-    ],
-    allow_promotion_codes: true,
-    success_url: `${input.origin}/app/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${input.origin}/app/settings?billing=cancel`,
-    metadata: {
-      plan: input.plan,
-      userId: input.user.id,
-    },
-  });
+    });
+  } catch (error) {
+    if (!isMissingStripeResource(error)) {
+      throw error;
+    }
+
+    const freshCustomerId = await createFreshStripeCustomer(input.user);
+    session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: freshCustomerId,
+      line_items: [
+        {
+          price: getPlanPriceId(input.plan),
+          quantity: 1,
+        },
+      ],
+      allow_promotion_codes: true,
+      success_url: `${input.origin}/app/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${input.origin}/app/settings?billing=cancel`,
+      metadata: {
+        plan: input.plan,
+        userId: input.user.id,
+      },
+    });
+  }
 
   if (!session.url) {
     throw new BillingError("Stripe checkout session did not return a redirect URL.", 500);
