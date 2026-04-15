@@ -126,8 +126,9 @@ export async function createCheckoutSession(input: {
     }
 
     if (input.user.billing.plan === "pro" && input.plan === "team") {
-      return upgradeSubscriptionPlan({
+      return createSubscriptionUpgradeConfirmationSession({
         origin: input.origin,
+        customerId: input.user.billing.stripeCustomerId,
         subscriptionId: input.user.billing.stripeSubscriptionId,
         nextPlan: input.plan,
       });
@@ -166,11 +167,16 @@ export async function createCheckoutSession(input: {
   return session.url;
 }
 
-async function upgradeSubscriptionPlan(input: {
+async function createSubscriptionUpgradeConfirmationSession(input: {
   origin: string;
+  customerId: string | null;
   subscriptionId: string;
   nextPlan: Exclude<BillingPlan, "free">;
 }) {
+  if (!input.customerId) {
+    throw new BillingError("This account does not have a Stripe customer yet.", 400);
+  }
+
   const stripe = getStripeClient();
   const subscription = await stripe.subscriptions.retrieve(input.subscriptionId);
   const item = subscription.items.data[0];
@@ -179,19 +185,31 @@ async function upgradeSubscriptionPlan(input: {
     throw new BillingError("Active subscription could not be updated.", 500);
   }
 
-  const updatedSubscription = await stripe.subscriptions.update(input.subscriptionId, {
-    items: [
-      {
-        id: item.id,
-        price: getPlanPriceId(input.nextPlan),
+  const session = await stripe.billingPortal.sessions.create({
+    customer: input.customerId,
+    return_url: `${input.origin}/app/settings`,
+    flow_data: {
+      type: "subscription_update_confirm",
+      after_completion: {
+        type: "redirect",
+        redirect: {
+          return_url: `${input.origin}/app/settings?billing=success&upgraded=${input.nextPlan}`,
+        },
       },
-    ],
-    proration_behavior: "create_prorations",
+      subscription_update_confirm: {
+        subscription: input.subscriptionId,
+        items: [
+          {
+            id: item.id,
+            price: getPlanPriceId(input.nextPlan),
+            quantity: 1,
+          },
+        ],
+      },
+    },
   });
 
-  await syncStripeSubscription(updatedSubscription);
-
-  return `${input.origin}/app/settings?billing=success&upgraded=${input.nextPlan}`;
+  return session.url;
 }
 
 export async function createBillingPortalSession(input: {
