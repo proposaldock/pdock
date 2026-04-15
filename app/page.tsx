@@ -24,19 +24,19 @@ import {
 const featureCards = [
   {
     icon: FileSearch,
-    title: "Requirement matrix in minutes",
+    title: "AI requirement analysis in minutes",
     body:
-      "Turn long briefs into a structured requirement list with coverage status, SME flags, and source refs your team can trust.",
+      "Turn long RFPs and client briefs into a structured requirement list with coverage status, SME flags, and source refs your team can trust.",
   },
   {
     icon: ShieldCheck,
-    title: "Risk review before the scramble",
+    title: "Risk review before the scramble starts",
     body:
       "Flag red lines, unclear asks, missing evidence, and risky assumptions before they leak into the response.",
   },
   {
     icon: Sparkles,
-    title: "Drafts that stay grounded",
+    title: "AI draft support that stays grounded",
     body:
       "Build executive summaries, response plans, and proposal sections that stay tied to approved company knowledge.",
   },
@@ -46,7 +46,7 @@ const workflowSteps = [
   {
     title: "Dock the brief",
     body:
-      "Upload the RFP, add client context, and pull in approved knowledge assets from your team library.",
+      "Upload the RFP or paste the brief, add client context, and pull in approved knowledge assets from your team library.",
     image:
       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
   },
@@ -67,10 +67,10 @@ const workflowSteps = [
 ] as const;
 
 const proofPoints = [
-  "Requirement extraction with conservative grounding",
+  "AI proposal analysis with conservative grounding",
   "Human review, approvals, and section ownership",
-  "Knowledge base reuse across client responses",
-  "DOCX exports and print-ready response packs",
+  "Knowledge base reuse across RFP responses",
+  "DOCX exports and print-ready proposal packs",
 ] as const;
 
 const plans = [
@@ -81,7 +81,7 @@ const plans = [
     points: [
       "Core proposal workflow",
       "Local workspace history",
-      "Knowledge base access",
+      "Try the AI proposal analysis flow",
     ],
     href: "/register?plan=free",
     cta: "Start free",
@@ -93,7 +93,7 @@ const plans = [
     detail: "For individual consultants and bid leads.",
     points: [
       "Unlimited proposal workspaces",
-      "Stripe billing and export flow",
+      "Knowledge base and export flow",
       "Faster reuse of approved knowledge",
     ],
     href: "/register?plan=pro",
@@ -169,9 +169,9 @@ const faqs = [
 ] as const;
 
 export const metadata: Metadata = {
-  title: "AI Proposal Software for B2B Service Teams",
+  title: "AI Proposal Software for RFP Responses and Client Briefs",
   description:
-    "ProposalDock helps B2B service teams analyze briefs, review requirements, reuse approved knowledge, and assemble grounded proposal drafts faster.",
+    "ProposalDock is AI proposal software for B2B service teams. Analyze RFPs and client briefs, review requirements and risks, reuse approved knowledge, and build grounded proposal drafts faster.",
   alternates: {
     canonical: buildCanonical("/"),
   },
@@ -240,15 +240,15 @@ export default async function LandingPage() {
           <div className="flex flex-1 items-center py-16 sm:py-20">
             <div className="max-w-3xl">
               <p className="inline-flex rounded-md bg-white/12 px-3 py-1 text-sm font-semibold text-emerald-200 ring-1 ring-white/15 backdrop-blur">
-                Proposal work, with evidence and review built in
+                AI proposal software, with evidence and review built in
               </p>
               <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-                Move from incoming brief to proposal-ready draft without the usual scramble.
+                Turn RFPs and client briefs into proposal-ready drafts without the usual scramble.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-100">
-                ProposalDock helps B2B service teams respond faster with requirement
-                extraction, risk review, grounded draft content, and a real workspace for
-                human signoff.
+                ProposalDock helps B2B service teams run a cleaner RFP response workflow with
+                AI requirement extraction, risk review, grounded draft content, and a real
+                workspace for human signoff.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href={primaryCtaHref}>
@@ -289,7 +289,7 @@ export default async function LandingPage() {
               Why teams switch
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight">
-              Built for the proposal workflow, not generic prompting.
+              Built for proposal work and RFP response, not generic prompting.
             </h2>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
@@ -314,7 +314,7 @@ export default async function LandingPage() {
             Workflow
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight">
-            A cleaner path from intake to final response pack.
+            A cleaner path from RFP intake to final response pack.
           </h2>
         </div>
 
@@ -351,7 +351,7 @@ export default async function LandingPage() {
               Pricing
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight">
-              Start free, then move into Pro or Team when the process sticks.
+              Start free, then move into Pro or Team when the proposal process sticks.
             </h2>
           </div>
 
@@ -399,10 +399,10 @@ export default async function LandingPage() {
             </div>
             <div className="mt-5 grid gap-4">
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-                <p className="font-semibold text-zinc-900">Shared proposal workspaces</p>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">
-                  Keep analysis, approvals, snapshots, and exports in one place instead of spreading the response across docs and chat.
-                </p>
+              <p className="font-semibold text-zinc-900">Shared proposal workspaces</p>
+              <p className="mt-2 text-sm leading-6 text-zinc-600">
+                  Keep analysis, approvals, snapshots, and exports in one place instead of spreading the RFP response across docs and chat.
+              </p>
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
                 <p className="font-semibold text-zinc-900">Knowledge that stays approved</p>
@@ -437,12 +437,12 @@ export default async function LandingPage() {
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
                 Beta access
               </p>
-              <h2 className="mt-3 text-3xl font-black tracking-tight">
-                Need a team rollout or just want updates while ProposalDock opens up?
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
-                Use contact sales for team rollout conversations, or join the waitlist if you want product updates without starting a workspace yet.
-              </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              Need a team rollout or just want updates while ProposalDock opens up?
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
+                Use contact sales for team rollout conversations, or join the waitlist if you want updates on AI proposal workflow improvements without starting a workspace yet.
+            </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
               <Card className="border-zinc-200">
@@ -488,10 +488,10 @@ export default async function LandingPage() {
               Ready to try it
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-white">
-              Start with one live brief and see how much of the scramble disappears.
+              Start with one live brief and see how much of the proposal scramble disappears.
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-300">
-              Create an account, upload a real client request, and move from intake to grounded draft content inside one proposal workspace.
+              Create an account, upload a real client request, and move from intake to grounded draft content inside one AI-assisted proposal workspace.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href={primaryCtaHref}>

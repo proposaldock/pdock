@@ -16,9 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical, getOrganizationJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "About ProposalDock",
+  title: "About ProposalDock | AI Proposal Software",
   description:
-    "Learn what ProposalDock offers, how it uses AI to accelerate proposal work, and how teams stay in control of review, signoff, and final export.",
+    "Learn how ProposalDock works as AI proposal software for RFP responses, how it accelerates proposal work, and how teams stay in control of review, signoff, and final export.",
   alternates: {
     canonical: buildCanonical("/about"),
   },
@@ -115,7 +115,7 @@ export default function AboutPage() {
               About ProposalDock
             </p>
             <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl">
-              ProposalDock helps teams move from incoming brief to grounded proposal draft with less chaos.
+              ProposalDock is AI proposal software for teams that need a cleaner way to respond to briefs and RFPs.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
               ProposalDock is built for B2B service teams that need a more reliable way to analyze
