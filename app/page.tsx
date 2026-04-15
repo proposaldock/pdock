@@ -153,6 +153,9 @@ export default async function LandingPage() {
               ProposalDock
             </Link>
             <nav className="flex flex-wrap items-center gap-3 text-sm font-semibold text-white/88">
+              <Link href="/about" className="hover:text-white">
+                About
+              </Link>
               <a href="#workflow" className="hover:text-white">
                 Workflow
               </a>
@@ -441,6 +444,9 @@ export default async function LandingPage() {
             </div>
           </div>
           <div className="mt-10 flex flex-wrap gap-4 text-sm text-zinc-400">
+            <Link href="/about" className="hover:text-white">
+              About
+            </Link>
             <Link href="/privacy" className="hover:text-white">
               Privacy
             </Link>
