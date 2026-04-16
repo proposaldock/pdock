@@ -92,6 +92,12 @@ const seoResources = [
     body:
       "A practical guide for consultants who need a cleaner way to analyze briefs, reuse expertise, and draft proposals.",
   },
+  {
+    href: "/proposal-workflow-software",
+    title: "Proposal workflow software",
+    body:
+      "A closer look at how ProposalDock connects intake, analysis, review, drafting, and export in one workflow.",
+  },
 ] as const;
 
 const useCases = [
@@ -111,7 +117,7 @@ const useCases = [
     title: "B2B service teams",
     body:
       "Coordinate requirements, risks, knowledge, section ownership, and exports across the people responsible for winning client work.",
-    href: "/ai-proposal-software",
+    href: "/proposal-workflow-software",
   },
 ] as const;
 
