@@ -8,6 +8,7 @@ import {
 import { storeUploadedFile } from "@/lib/file-storage";
 import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import { createMarketingEvent } from "@/lib/marketing-analytics";
+import { getMaxWorkspaceDocuments } from "@/lib/upload-policy";
 import {
   createActivityEntry,
   getKnowledgeAssetsByIds,
@@ -27,10 +28,16 @@ async function readDocuments(
   formData: FormData,
 ): Promise<WorkspaceInput["documents"]> {
   const files = formData.getAll("documents").filter((value) => value instanceof File);
+  const nonEmptyFiles = files.filter((file) => file.size > 0);
+
+  if (nonEmptyFiles.length > getMaxWorkspaceDocuments()) {
+    throw new Error(
+      `Upload up to ${getMaxWorkspaceDocuments()} files per workspace. Combine extra context into fewer documents or paste the brief text.`,
+    );
+  }
 
   return Promise.all(
-    files
-      .filter((file) => file.size > 0)
+    nonEmptyFiles
       .map(async (file) => {
         const [parsed, stored] = await Promise.all([
           parseUploadedDocument(file),

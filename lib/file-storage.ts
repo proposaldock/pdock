@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { put } from "@vercel/blob";
+import { assertUploadFileAllowed } from "@/lib/upload-policy";
 
 type StoredFile = {
   fileSize: number;
@@ -21,6 +22,7 @@ export async function storeUploadedFile(
   file: File,
   options: { folder: "workspace-documents" | "knowledge-assets" },
 ): Promise<StoredFile> {
+  assertUploadFileAllowed(file);
   const buffer = Buffer.from(await file.arrayBuffer());
   const safeName = sanitizeFilename(file.name || "upload.bin") || "upload.bin";
   const datedPrefix = `${options.folder}/${new Date().toISOString().slice(0, 10)}`;

@@ -1,6 +1,7 @@
 import mammoth from "mammoth";
 import { createRequire } from "node:module";
 import { ACCEPTED_UPLOAD_TEXT } from "@/lib/document-constants";
+import { assertUploadFileAllowed } from "@/lib/upload-policy";
 
 const MAX_DOCUMENT_CHARS = 18_000;
 const require = createRequire(import.meta.url);
@@ -77,6 +78,7 @@ async function parsePdfBuffer(buffer: Buffer, filename: string) {
 }
 
 export async function parseUploadedDocument(file: File) {
+  assertUploadFileAllowed(file);
   const mimeType = file.type || "application/octet-stream";
   const lowerName = file.name.toLowerCase();
   const buffer = Buffer.from(await file.arrayBuffer());

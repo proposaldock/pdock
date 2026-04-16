@@ -1,9 +1,13 @@
+import { getCurrentUser } from "@/lib/auth";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import { getHealthChecks } from "@/lib/production-readiness";
 
 export const dynamic = "force-dynamic";
 
 export default async function StatusPage() {
   const checks = getHealthChecks();
+  const user = await getCurrentUser();
+  const canSeeDetails = isPlatformAdminEmail(user?.email);
   const health = {
     ok: checks.authSecret && checks.anthropic && checks.appUrl,
     app: "ProposalDock",
@@ -32,23 +36,29 @@ export default async function StatusPage() {
             Updated {new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(health.timestamp))}
           </span>
         </div>
-        <div className="mt-8 grid gap-3">
-          {Object.entries(health.checks).map(([key, value]) => (
-            <div
-              key={key}
-              className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
-            >
-              <p className="text-sm font-medium text-zinc-900">{labelForCheck(key)}</p>
-              <span
-                className={`rounded-lg px-3 py-1 text-xs font-semibold ${
-                  value ? "bg-emerald-100 text-emerald-800" : "bg-zinc-200 text-zinc-700"
-                }`}
+        {canSeeDetails ? (
+          <div className="mt-8 grid gap-3">
+            {Object.entries(health.checks).map(([key, value]) => (
+              <div
+                key={key}
+                className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
               >
-                {value ? "Ready" : "Pending"}
-              </span>
-            </div>
-          ))}
-        </div>
+                <p className="text-sm font-medium text-zinc-900">{labelForCheck(key)}</p>
+                <span
+                  className={`rounded-lg px-3 py-1 text-xs font-semibold ${
+                    value ? "bg-emerald-100 text-emerald-800" : "bg-zinc-200 text-zinc-700"
+                  }`}
+                >
+                  {value ? "Ready" : "Pending"}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-700">
+            Detailed launch checks are only visible to ProposalDock admins.
+          </p>
+        )}
       </div>
     </main>
   );

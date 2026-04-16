@@ -1873,67 +1873,46 @@ export async function addOrganizationMemberByEmail(input: {
   const normalizedEmail = input.email.trim().toLowerCase();
   const user = await getUserByEmail(normalizedEmail);
 
+  if (!user) {
+    throw new Error(
+      "That person needs a ProposalDock account before you can add them to the team.",
+    );
+  }
+
   if (user?.id === input.currentUserId) {
     throw new Error("You are already part of this team.");
   }
 
   const now = new Date();
-  if (user) {
-    await prisma.organizationMembership.upsert({
-      where: {
-        organizationId_userId: {
-          organizationId: managerMembership.organizationId,
-          userId: user.id,
-        },
-      },
-      create: {
-        id: crypto.randomUUID(),
+  await prisma.organizationMembership.upsert({
+    where: {
+      organizationId_userId: {
         organizationId: managerMembership.organizationId,
         userId: user.id,
-        role: input.role,
-        status: "active",
-        createdAt: now,
-        updatedAt: now,
       },
-      update: {
-        role: input.role,
-        status: "active",
-        updatedAt: now,
-      },
-    });
+    },
+    create: {
+      id: crypto.randomUUID(),
+      organizationId: managerMembership.organizationId,
+      userId: user.id,
+      role: input.role,
+      status: "active",
+      createdAt: now,
+      updatedAt: now,
+    },
+    update: {
+      role: input.role,
+      status: "active",
+      updatedAt: now,
+    },
+  });
 
-    await prisma.organizationInvite.deleteMany({
-      where: {
-        organizationId: managerMembership.organizationId,
-        email: normalizedEmail,
-      },
-    });
-  } else {
-    await prisma.organizationInvite.upsert({
-      where: {
-        organizationId_email: {
-          organizationId: managerMembership.organizationId,
-          email: normalizedEmail,
-        },
-      },
-      create: {
-        id: crypto.randomUUID(),
-        organizationId: managerMembership.organizationId,
-        email: normalizedEmail,
-        role: input.role,
-        status: "pending",
-        invitedByUserId: input.currentUserId,
-        createdAt: now,
-        updatedAt: now,
-      },
-      update: {
-        role: input.role,
-        status: "pending",
-        invitedByUserId: input.currentUserId,
-        updatedAt: now,
-      },
-    });
-  }
+  await prisma.organizationInvite.deleteMany({
+    where: {
+      organizationId: managerMembership.organizationId,
+      email: normalizedEmail,
+    },
+  });
 
   return listOrganizationTeamForUser(input.currentUserId);
 }

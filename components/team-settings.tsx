@@ -120,8 +120,8 @@ export function TeamSettings({
           </div>
 
           <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
-            Invite teammates by email. Existing ProposalDock users are added right away, and
-            everyone else will see the team as soon as they sign up with the same email.
+            Add teammates by email after they have created a ProposalDock account. This keeps team
+            access tied to a real account instead of an unverified address.
           </div>
 
           {!canUseTeamFeatures ? (
