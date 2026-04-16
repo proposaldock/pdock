@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
+  openGraph: {
+    title: "Proposal Software for Consultants",
+    description:
+      "ProposalDock helps consultants analyze client briefs, reuse approved expertise, draft stronger proposals, and keep review work organized.",
+    url: buildCanonical("/proposal-software-for-consultants"),
+  },
 };
 
 const consultantNeeds = [

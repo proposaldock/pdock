@@ -22,6 +22,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/about"),
   },
+  openGraph: {
+    title: "About ProposalDock | AI Proposal Software",
+    description:
+      "Learn how ProposalDock works as AI proposal software for RFP responses, how it accelerates proposal work, and how teams stay in control.",
+    url: buildCanonical("/about"),
+  },
 };
 
 const offeringAreas = [

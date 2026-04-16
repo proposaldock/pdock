@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/rfp-response-software"),
   },
+  openGraph: {
+    title: "RFP Response Software for Service Teams",
+    description:
+      "ProposalDock helps service teams manage RFP intake, requirements, risks, reusable knowledge, review, and proposal export in one workflow.",
+    url: buildCanonical("/rfp-response-software"),
+  },
 };
 
 const sections = [

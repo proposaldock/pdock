@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/privacy"),
   },
+  openGraph: {
+    title: "Privacy Policy",
+    description:
+      "Read how ProposalDock handles account data, proposal materials, analytics, billing, and beta operations during product use.",
+    url: buildCanonical("/privacy"),
+  },
 };
 
 export default function PrivacyPage() {

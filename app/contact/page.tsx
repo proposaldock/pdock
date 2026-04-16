@@ -12,6 +12,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/contact"),
   },
+  openGraph: {
+    title: "Contact ProposalDock",
+    description:
+      "Talk to ProposalDock about team rollout, beta access, pricing, or joining the waitlist for AI-powered proposal workflow software.",
+    url: buildCanonical("/contact"),
+  },
 };
 
 export default async function ContactPage({

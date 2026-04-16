@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/proposal-workflow-software"),
   },
+  openGraph: {
+    title: "Proposal Workflow Software for RFPs and Client Briefs",
+    description:
+      "ProposalDock helps teams manage brief intake, AI analysis, knowledge reuse, review, drafting, and export in one proposal workflow.",
+    url: buildCanonical("/proposal-workflow-software"),
+  },
 };
 
 const workflowPieces = [

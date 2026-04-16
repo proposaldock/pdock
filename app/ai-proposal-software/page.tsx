@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/ai-proposal-software"),
   },
+  openGraph: {
+    title: "AI Proposal Software for B2B Service Teams",
+    description:
+      "ProposalDock helps teams use AI for proposal analysis, grounded drafting, and review without turning the workflow into a black box.",
+    url: buildCanonical("/ai-proposal-software"),
+  },
 };
 
 const capabilities = [

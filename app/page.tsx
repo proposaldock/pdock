@@ -223,6 +223,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/"),
   },
+  openGraph: {
+    title: "AI Proposal Software for RFP Responses and Client Briefs",
+    description:
+      "ProposalDock helps B2B service teams analyze RFPs and client briefs, review requirements and risks, reuse approved knowledge, and build grounded proposal drafts faster.",
+    url: buildCanonical("/"),
+  },
 };
 
 export default async function LandingPage() {

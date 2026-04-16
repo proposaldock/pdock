@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: buildCanonical("/terms"),
   },
+  openGraph: {
+    title: "Terms of Service",
+    description:
+      "Read the ProposalDock beta terms covering accounts, acceptable use, billing, AI-generated output, cancellations, and service changes.",
+    url: buildCanonical("/terms"),
+  },
 };
 
 export default function TermsPage() {
