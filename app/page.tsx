@@ -363,21 +363,6 @@ export default async function LandingPage() {
                   Start free with one workspace. No credit card needed.
                 </p>
               ) : null}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {heroTrustPoints.map((point) => (
-                  <span
-                    key={point}
-                    className="rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur"
-                  >
-                    {point}
-                  </span>
-                ))}
-              </div>
-              <div className="mt-8 flex flex-wrap gap-2">
-                <Badge tone="green">Source-linked analysis</Badge>
-                <Badge tone="teal">Review and signoff</Badge>
-                <Badge tone="yellow">Export-ready proposal packs</Badge>
-              </div>
             </div>
           </div>
 
@@ -394,6 +379,14 @@ export default async function LandingPage() {
 
       <section id="how-it-works" className="border-b border-zinc-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+          <div className="mb-8 grid gap-3 rounded-lg border border-zinc-200 bg-[#f4f6f7] p-4 text-sm text-zinc-700 md:grid-cols-3">
+            {heroTrustPoints.map((point) => (
+              <div key={point} className="flex items-center gap-2">
+                <CheckCircle2 className="size-4 shrink-0 text-emerald-600" />
+                <span className="font-medium">{point}</span>
+              </div>
+            ))}
+          </div>
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
