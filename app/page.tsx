@@ -86,6 +86,33 @@ const seoResources = [
     body:
       "A focused page on how ProposalDock helps teams move from RFP intake to proposal draft with less chaos.",
   },
+  {
+    href: "/proposal-software-for-consultants",
+    title: "Proposal software for consultants",
+    body:
+      "A practical guide for consultants who need a cleaner way to analyze briefs, reuse expertise, and draft proposals.",
+  },
+] as const;
+
+const useCases = [
+  {
+    title: "Consultants",
+    body:
+      "Analyze client briefs, reuse approved expertise, and move into a grounded proposal draft without rebuilding the process from scratch.",
+    href: "/proposal-software-for-consultants",
+  },
+  {
+    title: "Agencies",
+    body:
+      "Keep RFP analysis, creative or technical response planning, review notes, and final proposal material in one shared workspace.",
+    href: "/rfp-response-software",
+  },
+  {
+    title: "B2B service teams",
+    body:
+      "Coordinate requirements, risks, knowledge, section ownership, and exports across the people responsible for winning client work.",
+    href: "/ai-proposal-software",
+  },
 ] as const;
 
 const plans = [
@@ -356,6 +383,39 @@ export default async function LandingPage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-zinc-200 bg-[#f4f6f7]">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+              Use cases
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              Built for teams that turn expertise into client-ready proposals.
+            </h2>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {useCases.map((useCase) => (
+              <Card key={useCase.title} className="border-zinc-200 bg-white">
+                <CardHeader>
+                  <CardTitle>{useCase.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <p className="text-sm leading-6 text-zinc-600">{useCase.body}</p>
+                  <Link
+                    href={useCase.href}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Learn more
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
