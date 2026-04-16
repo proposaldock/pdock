@@ -19,6 +19,12 @@ export function MarketingAnalyticsSettings({
     totalTeamLeadSubmissions: number;
     totalProSignups: number;
     totalTeamSignups: number;
+    totalStartFreeClicks: number;
+    totalFirstWorkspaceStarts: number;
+    totalFirstAnalysisCompleted: number;
+    recentStartFreeClicks: number;
+    recentFirstWorkspaceStarts: number;
+    recentFirstAnalysisCompleted: number;
     trends: Array<{
       date: string;
       landingVisits: number;
@@ -50,6 +56,42 @@ export function MarketingAnalyticsSettings({
     },
   ] as const;
 
+  const activationSteps = [
+    {
+      label: "Landing visit",
+      value: summary.totalLandingVisits,
+      recent: summary.recentLandingVisits,
+      conversionFromPrevious: null,
+    },
+    {
+      label: "Start free click",
+      value: summary.totalStartFreeClicks,
+      recent: summary.recentStartFreeClicks,
+      conversionFromPrevious: rate(summary.totalStartFreeClicks, summary.totalLandingVisits),
+    },
+    {
+      label: "Signup completed",
+      value: summary.totalSignups,
+      recent: summary.recentSignups,
+      conversionFromPrevious: rate(summary.totalSignups, summary.totalStartFreeClicks),
+    },
+    {
+      label: "First workspace started",
+      value: summary.totalFirstWorkspaceStarts,
+      recent: summary.recentFirstWorkspaceStarts,
+      conversionFromPrevious: rate(summary.totalFirstWorkspaceStarts, summary.totalSignups),
+    },
+    {
+      label: "First analysis completed",
+      value: summary.totalFirstAnalysisCompleted,
+      recent: summary.recentFirstAnalysisCompleted,
+      conversionFromPrevious: rate(
+        summary.totalFirstAnalysisCompleted,
+        summary.totalFirstWorkspaceStarts,
+      ),
+    },
+  ] as const;
+
   return (
     <Card>
       <CardHeader>
@@ -59,6 +101,29 @@ export function MarketingAnalyticsSettings({
         </p>
       </CardHeader>
       <CardContent className="grid gap-6">
+        <div className="grid gap-4 rounded-lg border border-emerald-200 bg-emerald-50 p-5">
+          <div>
+            <p className="text-sm font-semibold text-emerald-950">Activation funnel</p>
+            <p className="mt-1 text-sm leading-6 text-emerald-900">
+              Platform-admin only. Tracks the first user journey from public visit to first
+              completed analysis.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            {activationSteps.map((step) => (
+              <div key={step.label} className="rounded-lg border border-emerald-200 bg-white p-4">
+                <p className="text-sm text-zinc-500">{step.label}</p>
+                <p className="mt-2 text-2xl font-black text-zinc-950">{step.value}</p>
+                <p className="mt-2 text-xs text-zinc-500">{step.recent} last 30d</p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  {step.conversionFromPrevious === null
+                    ? "Top of activation funnel"
+                    : `${step.conversionFromPrevious}% from previous step`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-4">
           <div>
             <p className="text-sm font-semibold text-zinc-900">Conversion funnel</p>

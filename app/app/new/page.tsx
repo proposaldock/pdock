@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { ActivationBeacon } from "@/components/activation-beacon";
 import { Badge } from "@/components/ui/badge";
 import { WorkspaceForm } from "@/components/workspace-form";
 import { requireCurrentUser } from "@/lib/auth";
@@ -37,6 +38,7 @@ export default async function NewWorkspacePage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
+      {showWelcome ? <ActivationBeacon eventType="first_workspace_started" /> : null}
       <Link
         href="/app"
         className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 hover:text-zinc-950"

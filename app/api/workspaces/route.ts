@@ -7,6 +7,7 @@ import {
 } from "@/lib/document-parser";
 import { storeUploadedFile } from "@/lib/file-storage";
 import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
+import { createMarketingEvent } from "@/lib/marketing-analytics";
 import {
   createActivityEntry,
   getKnowledgeAssetsByIds,
@@ -198,6 +199,13 @@ export async function POST(request: Request) {
     };
 
     await saveWorkspace(workspace, user.id);
+    if (ownedWorkspaceCount === 0) {
+      await createMarketingEvent({
+        eventType: "first_analysis_completed",
+        page: "activation",
+        email: account.email,
+      });
+    }
     return NextResponse.json({ workspace }, { status: 201 });
   } catch (error) {
     console.error(error);

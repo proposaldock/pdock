@@ -20,11 +20,10 @@ import {
 
 export default async function SettingsPage() {
   const sessionUser = await requireCurrentUser();
-  const [user, team, leads, marketingSummary] = await Promise.all([
+  const [user, team, leads] = await Promise.all([
     getUserAccountById(sessionUser.id),
     listOrganizationTeamForUser(sessionUser.id),
     listPublicLeadsForUser(sessionUser.id),
-    getMarketingSummary(),
   ]);
   const readinessSummary = getProductionReadinessSummary();
 
@@ -34,6 +33,7 @@ export default async function SettingsPage() {
 
   const entitlements = getPlanEntitlements(user.billing);
   const isPlatformAdmin = isPlatformAdminEmail(user.email);
+  const marketingSummary = isPlatformAdmin ? await getMarketingSummary() : null;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
@@ -43,7 +43,7 @@ export default async function SettingsPage() {
         Manage your private beta account, Stripe billing, team access, and production-facing storage setup.
       </p>
 
-      {isPlatformAdmin ? (
+      {isPlatformAdmin && marketingSummary ? (
         <div className="mt-8">
           <BetaOpsOverview
             summary={marketingSummary}
@@ -84,7 +84,7 @@ export default async function SettingsPage() {
         />
       </div>
 
-      {isPlatformAdmin ? (
+      {isPlatformAdmin && marketingSummary ? (
         <div className="mt-8" id="marketing-analytics">
           <MarketingAnalyticsSettings summary={marketingSummary} />
         </div>

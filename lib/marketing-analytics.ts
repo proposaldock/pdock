@@ -45,8 +45,36 @@ export async function shouldTrackPageVisit(page: string) {
   return true;
 }
 
+export async function shouldTrackActivationEvent(eventType: string) {
+  const cookieStore = await cookies();
+  const key = `proposaldock_activation_${eventType}`;
+  const today = todayStamp();
+  const lastTracked = cookieStore.get(key)?.value;
+
+  if (lastTracked === today) {
+    return false;
+  }
+
+  cookieStore.set(key, today, {
+    httpOnly: false,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+
+  return true;
+}
+
 export async function createMarketingEvent(input: {
-  eventType: "landing_visit" | "contact_visit" | "lead_submitted" | "signup_completed";
+  eventType:
+    | "landing_visit"
+    | "contact_visit"
+    | "lead_submitted"
+    | "signup_completed"
+    | "start_free_clicked"
+    | "first_workspace_started"
+    | "first_analysis_completed";
   page?: string | null;
   path?: string | null;
   visitorId?: string | null;
@@ -92,6 +120,12 @@ export async function getMarketingSummary() {
     totalTeamLeadSubmissions,
     totalProSignups,
     totalTeamSignups,
+    totalStartFreeClicks,
+    totalFirstWorkspaceStarts,
+    totalFirstAnalysisCompleted,
+    recentStartFreeClicks,
+    recentFirstWorkspaceStarts,
+    recentFirstAnalysisCompleted,
     recentEvents,
   ] = await Promise.all([
     prisma.marketingEvent.count({ where: { eventType: "landing_visit" } }),
@@ -133,6 +167,24 @@ export async function getMarketingSummary() {
     }),
     prisma.marketingEvent.count({
       where: { eventType: "signup_completed", plan: "team" },
+    }),
+    prisma.marketingEvent.count({
+      where: { eventType: "start_free_clicked" },
+    }),
+    prisma.marketingEvent.count({
+      where: { eventType: "first_workspace_started" },
+    }),
+    prisma.marketingEvent.count({
+      where: { eventType: "first_analysis_completed" },
+    }),
+    prisma.marketingEvent.count({
+      where: { eventType: "start_free_clicked", createdAt: { gte: since } },
+    }),
+    prisma.marketingEvent.count({
+      where: { eventType: "first_workspace_started", createdAt: { gte: since } },
+    }),
+    prisma.marketingEvent.count({
+      where: { eventType: "first_analysis_completed", createdAt: { gte: since } },
     }),
     prisma.marketingEvent.findMany({
       where: {
@@ -187,6 +239,12 @@ export async function getMarketingSummary() {
     totalTeamLeadSubmissions,
     totalProSignups,
     totalTeamSignups,
+    totalStartFreeClicks,
+    totalFirstWorkspaceStarts,
+    totalFirstAnalysisCompleted,
+    recentStartFreeClicks,
+    recentFirstWorkspaceStarts,
+    recentFirstAnalysisCompleted,
     trends: [...trendMap.values()],
     leadToSignupConversionRate:
       totalLeadSubmissions > 0

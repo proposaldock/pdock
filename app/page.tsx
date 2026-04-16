@@ -20,6 +20,7 @@ import {
   getOrganizationJsonLd,
   getSoftwareApplicationJsonLd,
 } from "@/lib/site";
+import { ActivationLink } from "@/components/activation-link";
 
 const featureCards = [
   {
@@ -305,12 +306,21 @@ export default async function LandingPage() {
                 workspace for human signoff.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link href={primaryCtaHref}>
-                  <Button size="lg" variant="accent">
-                    {primaryCtaLabel}
-                    <ArrowRight className="size-4" />
-                  </Button>
-                </Link>
+                {user ? (
+                  <Link href={primaryCtaHref}>
+                    <Button size="lg" variant="accent">
+                      {primaryCtaLabel}
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <ActivationLink href={primaryCtaHref} eventType="start_free_clicked">
+                    <Button size="lg" variant="accent">
+                      {primaryCtaLabel}
+                      <ArrowRight className="size-4" />
+                    </Button>
+                  </ActivationLink>
+                )}
                 <Link href={secondaryCtaHref}>
                   <Button size="lg" variant="secondary">
                     {secondaryCtaLabel}
@@ -616,12 +626,21 @@ export default async function LandingPage() {
               Create an account, upload a real client request, and move from intake to grounded draft content inside one AI-assisted proposal workspace.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={primaryCtaHref}>
-                <Button size="lg" variant="accent">
-                  {primaryCtaLabel}
-                  <ArrowRight className="size-4" />
-                </Button>
-              </Link>
+              {user ? (
+                <Link href={primaryCtaHref}>
+                  <Button size="lg" variant="accent">
+                    {primaryCtaLabel}
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </Link>
+              ) : (
+                <ActivationLink href={primaryCtaHref} eventType="start_free_clicked">
+                  <Button size="lg" variant="accent">
+                    {primaryCtaLabel}
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </ActivationLink>
+              )}
               <Link href={user ? "/app/settings" : "/contact?intent=contact_sales&plan=team"}>
                 <Button size="lg" variant="secondary">
                   {user ? "Open pricing" : "Talk to sales"}
