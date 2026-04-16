@@ -88,6 +88,36 @@ const quickWorkflow = [
   },
 ] as const;
 
+const fitCards = [
+  {
+    title: "Best fit",
+    body:
+      "Consultants, agencies, and B2B service teams that need to turn messy client briefs into reviewed proposal drafts without a heavy rollout.",
+    points: [
+      "You respond to custom client requests",
+      "You need structure before writing",
+      "You want AI help with human review",
+    ],
+  },
+  {
+    title: "Not trying to replace",
+    body:
+      "Enterprise RFP factories with mature content governance, large response teams, and deep platform requirements.",
+    points: [
+      "Heavy implementation programs",
+      "Large-scale content library migrations",
+      "Complex enterprise procurement suites",
+    ],
+  },
+] as const;
+
+const fastPathSteps = [
+  "Paste or upload one real client brief",
+  "Review requirements, risks, and missing evidence",
+  "Attach lightweight company knowledge",
+  "Generate a first proposal-ready draft",
+] as const;
+
 const proofPoints = [
   "AI proposal analysis with conservative grounding",
   "Human review, approvals, and section ownership",
@@ -249,16 +279,16 @@ const faqs = [
 ] as const;
 
 export const metadata: Metadata = {
-  title: "AI Proposal Software for RFP Responses and Client Briefs",
+  title: "AI Proposal Workspace for Consultants and B2B Service Teams",
   description:
-    "ProposalDock is AI proposal software for B2B service teams. Analyze RFPs and client briefs, review requirements and risks, reuse approved knowledge, and build grounded proposal drafts faster.",
+    "ProposalDock is a lightweight AI proposal workspace for consultants, agencies, and B2B service teams. Turn client briefs and RFPs into reviewed, grounded proposal drafts faster.",
   alternates: {
     canonical: buildCanonical("/"),
   },
   openGraph: {
-    title: "AI Proposal Software for RFP Responses and Client Briefs",
+    title: "AI Proposal Workspace for Consultants and B2B Service Teams",
     description:
-      "ProposalDock helps B2B service teams analyze RFPs and client briefs, review requirements and risks, reuse approved knowledge, and build grounded proposal drafts faster.",
+      "ProposalDock helps consultants, agencies, and B2B service teams turn client briefs and RFPs into reviewed, grounded proposal drafts faster.",
     url: buildCanonical("/"),
   },
 };
@@ -326,15 +356,15 @@ export default async function LandingPage() {
           <div className="flex flex-1 items-center py-16 sm:py-20">
             <div className="max-w-3xl">
               <p className="inline-flex rounded-md bg-white/12 px-3 py-1 text-sm font-semibold text-emerald-200 ring-1 ring-white/15 backdrop-blur">
-                AI proposal software, with evidence and review built in
+                Lightweight AI proposal workspace for service teams
               </p>
               <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-                Turn RFPs and client briefs into proposal-ready drafts without the usual scramble.
+                Turn messy client briefs into reviewed proposal drafts without enterprise RFP overhead.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-100">
-                ProposalDock helps B2B service teams run a cleaner RFP response workflow with
-                AI requirement extraction, risk review, grounded draft content, and a real
-                workspace for human signoff.
+                ProposalDock helps consultants, agencies, and small B2B service teams analyze
+                briefs, review requirements and risks, reuse approved knowledge, and draft
+                responses inside one simple workspace.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {user ? (
@@ -439,6 +469,43 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      <section className="border-b border-zinc-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+              Positioning
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              Built for teams that need a proposal workflow today, not a six-month platform rollout.
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-zinc-600">
+              ProposalDock is intentionally lighter than enterprise RFP suites. It focuses on the
+              moment smaller service teams feel most pressure: turning a live client request into a
+              credible, reviewable proposal draft quickly.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-2">
+            {fitCards.map((card) => (
+              <Card key={card.title} className="border-zinc-200">
+                <CardHeader>
+                  <CardTitle>{card.title}</CardTitle>
+                  <p className="text-sm leading-6 text-zinc-600">{card.body}</p>
+                </CardHeader>
+                <CardContent className="grid gap-3">
+                  {card.points.map((point) => (
+                    <div key={point} className="flex items-start gap-3 text-sm text-zinc-700">
+                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+                      <span>{point}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="workflow" className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
@@ -472,6 +539,32 @@ export default async function LandingPage() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="border-y border-zinc-200 bg-zinc-950 text-white">
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">
+              Fast path
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              From brief to first proposal draft in one focused session.
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-zinc-300">
+              The first win should not require weeks of setup. ProposalDock is designed so a small
+              team can start with one real brief, see the structure, and decide whether the workflow
+              helps before investing in a bigger process.
+            </p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {fastPathSteps.map((step, index) => (
+              <div key={step} className="rounded-lg border border-white/15 bg-white/8 p-5">
+                <Badge tone="green">0{index + 1}</Badge>
+                <p className="mt-4 text-sm font-semibold leading-6 text-zinc-100">{step}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
