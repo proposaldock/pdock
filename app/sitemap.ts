@@ -21,6 +21,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: `${appUrl}/ai-proposal-software`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${appUrl}/rfp-response-software`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: `${appUrl}/privacy`,
       changeFrequency: "monthly",
       priority: 0.3,
