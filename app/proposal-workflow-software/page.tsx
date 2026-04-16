@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowLeft,
-  CheckCircle2,
   ClipboardCheck,
   FileSearch,
   Layers3,
@@ -57,6 +56,25 @@ const workflowOutcomes = [
   "A more reliable handoff from intake to export",
 ] as const;
 
+const operatingRhythm = [
+  {
+    phase: "Intake",
+    detail: "Capture the client request, add context, and keep source files tied to the workspace.",
+  },
+  {
+    phase: "Triage",
+    detail: "Review requirements, risks, missing evidence, and open questions before writing starts.",
+  },
+  {
+    phase: "Build",
+    detail: "Use approved knowledge and AI-assisted draft support to shape response sections.",
+  },
+  {
+    phase: "Ship",
+    detail: "Finalize decisions, confirm ownership, and export the proposal pack when the team is ready.",
+  },
+] as const;
+
 export default function ProposalWorkflowSoftwarePage() {
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
@@ -96,17 +114,38 @@ export default function ProposalWorkflowSoftwarePage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>What a better proposal workflow gives you</CardTitle>
+              <CardTitle>The operating rhythm ProposalDock supports</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3">
-              {workflowOutcomes.map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
-                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-600" />
-                  <span>{item}</span>
+              {operatingRhythm.map((item) => (
+                <div key={item.phase} className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                  <p className="font-semibold text-zinc-950">{item.phase}</p>
+                  <p className="mt-2 text-sm leading-6 text-zinc-600">{item.detail}</p>
                 </div>
               ))}
             </CardContent>
           </Card>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-zinc-950 p-8 text-white">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">
+            Operational clarity
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight">
+            The workflow matters because proposal work changes hands.
+          </h2>
+          <p className="mt-5 max-w-3xl text-sm leading-7 text-zinc-300">
+            A proposal may start with sales, move through a consultant or SME, touch delivery,
+            involve leadership review, and end in a polished client-facing document. ProposalDock
+            gives those handoffs a clearer place to happen.
+          </p>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {workflowOutcomes.map((item) => (
+              <div key={item} className="rounded-lg border border-white/15 bg-white/8 p-4">
+                <p className="text-sm leading-6 text-zinc-100">{item}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="mt-12">

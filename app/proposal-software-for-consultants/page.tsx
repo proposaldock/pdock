@@ -56,6 +56,21 @@ const fits = [
   "Consulting leads who need faster first-pass analysis before client follow-up",
 ] as const;
 
+const consultantBeforeAfter = [
+  {
+    before: "Starting every proposal from a blank document",
+    after: "Starting from analyzed requirements and reusable expertise",
+  },
+  {
+    before: "Digging through old decks for language you trust",
+    after: "Attaching approved knowledge directly to the workspace",
+  },
+  {
+    before: "Trying to remember what still needs follow-up",
+    after: "Seeing risks, pending items, and review decisions in one place",
+  },
+] as const;
+
 export default function ProposalSoftwareForConsultantsPage() {
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
@@ -95,10 +110,15 @@ export default function ProposalSoftwareForConsultantsPage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>Best fit for consultants</CardTitle>
+              <CardTitle>When consultants feel the pain most</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3">
-              {fits.map((item) => (
+              {[
+                "The brief is important, but messy.",
+                "The client expects a specific response, not a generic pitch.",
+                "You know you have good past material, but it is scattered.",
+                "You need to move quickly without sounding careless.",
+              ].map((item) => (
                 <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
                   <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-600" />
                   <span>{item}</span>
@@ -114,9 +134,10 @@ export default function ProposalSoftwareForConsultantsPage() {
               A cleaner way to manage consulting proposals
             </h2>
             <p className="mt-4 text-base leading-8 text-zinc-700">
-              ProposalDock is built for consultants who want AI help without losing control of the
-              work. The product keeps analysis, knowledge, review, draft content, and export inside
-              one flow instead of spreading the proposal across documents, chat, and ad hoc prompts.
+              ProposalDock is built for consultants who want AI help without losing the voice,
+              nuance, and judgment that make consulting proposals work. It helps with the heavy
+              lifting around analysis and structure, while leaving positioning and final judgment
+              with you.
             </p>
           </div>
 
@@ -133,6 +154,36 @@ export default function ProposalSoftwareForConsultantsPage() {
               </Card>
             ))}
           </div>
+        </section>
+
+        <section className="mt-12 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <Card className="border-zinc-200 bg-zinc-950 text-white">
+            <CardHeader>
+              <CardTitle>Best fit for consultants</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {fits.map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-200">
+                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-300" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="border-zinc-200 bg-white">
+            <CardHeader>
+              <CardTitle>From old proposal habits to a cleaner process</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              {consultantBeforeAfter.map((item) => (
+                <div key={item.before} className="grid gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-4 md:grid-cols-2">
+                  <p className="text-sm leading-6 text-zinc-500">{item.before}</p>
+                  <p className="text-sm font-semibold leading-6 text-zinc-900">{item.after}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </section>
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">

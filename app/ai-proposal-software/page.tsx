@@ -42,11 +42,25 @@ const capabilities = [
   },
 ] as const;
 
-const bestFor = [
-  "Consultants who respond to frequent client briefs",
-  "Agencies that need a cleaner proposal process",
-  "Bid leads who want faster first-pass analysis",
-  "B2B service teams that want AI help without losing control",
+const aiControls = [
+  {
+    label: "AI helps with",
+    items: [
+      "reading long briefs faster",
+      "turning asks into requirements",
+      "spotting risks and missing context",
+      "drafting first-pass response language",
+    ],
+  },
+  {
+    label: "The team controls",
+    items: [
+      "what is accepted or rejected",
+      "which claims are safe to make",
+      "how sections are rewritten",
+      "what gets exported or sent",
+    ],
+  },
 ] as const;
 
 export default function AiProposalSoftwarePage() {
@@ -86,15 +100,22 @@ export default function AiProposalSoftwarePage() {
             </div>
           </div>
 
-          <Card className="border-zinc-200">
+          <Card className="border-zinc-200 bg-zinc-950 text-white">
             <CardHeader>
-              <CardTitle>What teams usually want from AI proposal software</CardTitle>
+              <CardTitle>AI should speed up the work, not hide the judgment.</CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-3">
-              {bestFor.map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
-                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-600" />
-                  <span>{item}</span>
+            <CardContent className="grid gap-5">
+              {aiControls.map((group) => (
+                <div key={group.label}>
+                  <p className="text-sm font-semibold text-emerald-300">{group.label}</p>
+                  <div className="mt-3 grid gap-2">
+                    {group.items.map((item) => (
+                      <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-200">
+                        <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-300" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </CardContent>
@@ -104,13 +125,13 @@ export default function AiProposalSoftwarePage() {
         <section className="mt-12">
           <div className="max-w-3xl">
             <h2 className="text-3xl font-black tracking-tight text-zinc-950">
-              What ProposalDock actually does
+              What AI does inside ProposalDock
             </h2>
             <p className="mt-4 text-base leading-8 text-zinc-700">
-              Many teams try to use generic AI tools for proposal work, then end up rebuilding
-              structure, evidence, and review steps around them. ProposalDock gives that work a
-              home: one workspace for the brief, requirements, risks, knowledge, draft sections,
-              approvals, and exports.
+              Many teams already know that AI can draft text. The harder problem is making that
+              help reliable enough for real proposal work. ProposalDock uses AI inside a structured
+              workspace, so analysis and draft suggestions can be reviewed, challenged, and refined
+              before they become client-facing material.
             </p>
           </div>
 
@@ -127,6 +148,44 @@ export default function AiProposalSoftwarePage() {
               </Card>
             ))}
           </div>
+        </section>
+
+        <section className="mt-12 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <Card className="border-zinc-200 bg-white">
+            <CardHeader>
+              <CardTitle>Why generic AI chat is not enough</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4 text-sm leading-7 text-zinc-700">
+              <p>
+                Generic AI tools are useful for isolated drafting, but proposal work needs more
+                structure than a chat window. Teams need source material, requirements, risks,
+                approved knowledge, review decisions, and final export to stay connected.
+              </p>
+              <p>
+                ProposalDock is built around that operating reality. AI becomes part of the proposal
+                process instead of a separate place where context is easy to lose.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-zinc-200 bg-white">
+            <CardHeader>
+              <CardTitle>What makes the AI safer to use</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {[
+                "Outputs stay connected to uploaded brief material and company knowledge.",
+                "Requirements and risks can be accepted, rejected, or left pending.",
+                "Draft sections are treated as starting points, not final truth.",
+                "Human review remains visible before export.",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
+                  <ShieldCheck className="mt-1 size-4 shrink-0 text-emerald-600" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </section>
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">

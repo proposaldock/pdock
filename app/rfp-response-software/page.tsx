@@ -49,6 +49,14 @@ const benefits = [
   "AI assistance without losing review control",
 ] as const;
 
+const responseChecklist = [
+  "What exactly is the buyer asking for?",
+  "Which requirements can we answer with confidence?",
+  "Where do we need more evidence or SME input?",
+  "Which assumptions could create delivery or pricing risk?",
+  "What approved material should be reused in the response?",
+] as const;
+
 export default function RfpResponseSoftwarePage() {
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
@@ -88,10 +96,10 @@ export default function RfpResponseSoftwarePage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>Why teams look for RFP response software</CardTitle>
+              <CardTitle>The questions every RFP response has to answer</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3">
-              {benefits.map((item) => (
+              {responseChecklist.map((item) => (
                 <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
                   <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-600" />
                   <span>{item}</span>
@@ -107,9 +115,9 @@ export default function RfpResponseSoftwarePage() {
               What ProposalDock adds to the RFP process
             </h2>
             <p className="mt-4 text-base leading-8 text-zinc-700">
-              Good RFP response software does more than store files. It helps a team understand the
-              brief, coordinate the response, reuse trusted material, and keep decisions visible as
-              the proposal takes shape. That is the job ProposalDock is built for.
+              Good RFP response software does more than store files. It helps a team answer the
+              right questions in the right order: understand the request, identify risk, map
+              evidence, draft from approved knowledge, and review before the final push.
             </p>
           </div>
 
@@ -126,6 +134,27 @@ export default function RfpResponseSoftwarePage() {
               </Card>
             ))}
           </div>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-zinc-950 p-8 text-white">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">
+            RFP response checklist
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight">
+            ProposalDock helps teams slow down the right parts of the response.
+          </h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {benefits.map((item) => (
+              <div key={item} className="rounded-lg border border-white/15 bg-white/8 p-4">
+                <p className="text-sm leading-6 text-zinc-100">{item}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-7 text-zinc-300">
+            The fastest response is not always the best response. ProposalDock is useful when the
+            team needs to move quickly, but still wants visibility into requirements, risks,
+            reusable evidence, and review status before sending anything back to the buyer.
+          </p>
         </section>
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
