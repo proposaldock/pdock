@@ -359,7 +359,7 @@ export default async function LandingPage() {
                 Lightweight AI proposal workspace for service teams
               </p>
               <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-                Turn messy client briefs into reviewed proposal drafts without enterprise RFP overhead.
+                A faster way to turn client briefs into proposals your team can trust.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-100">
                 ProposalDock helps consultants, agencies, and small B2B service teams analyze
