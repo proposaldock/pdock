@@ -67,6 +67,27 @@ const workflowSteps = [
   },
 ] as const;
 
+const heroTrustPoints = [
+  "No credit card needed",
+  "Private proposal workspaces",
+  "Human review before export",
+] as const;
+
+const quickWorkflow = [
+  {
+    title: "Add the brief",
+    body: "Paste the client request or upload source material.",
+  },
+  {
+    title: "Review the analysis",
+    body: "See requirements, risks, draft direction, and source refs.",
+  },
+  {
+    title: "Draft and export",
+    body: "Refine the response and move toward a clean proposal pack.",
+  },
+] as const;
+
 const proofPoints = [
   "AI proposal analysis with conservative grounding",
   "Human review, approvals, and section ownership",
@@ -126,11 +147,11 @@ const plans = [
   {
     name: "Free",
     price: "$0",
-    detail: "For solo testing and early evaluation.",
+    detail: "Try the workflow with one real workspace.",
     points: [
-      "Core proposal workflow",
-      "Local workspace history",
+      "One proposal workspace",
       "Try the AI proposal analysis flow",
+      "No credit card needed",
     ],
     href: "/register?plan=free",
     cta: "Start free",
@@ -139,11 +160,11 @@ const plans = [
   {
     name: "Pro",
     price: "$49",
-    detail: "For individual consultants and bid leads.",
+    detail: "For serious solo proposal work.",
     points: [
       "Unlimited proposal workspaces",
       "Knowledge base and export flow",
-      "Faster reuse of approved knowledge",
+      "Reusable approved company knowledge",
     ],
     href: "/register?plan=pro",
     cta: "Choose Pro",
@@ -152,11 +173,11 @@ const plans = [
   {
     name: "Team",
     price: "$149",
-    detail: "For shared proposal operations across a delivery team.",
+    detail: "For shared proposal operations.",
     points: [
       "Organization workspaces",
       "Selected teammate sharing",
-      "Review, signoff, and workload visibility",
+      "Team access, review, and sharing",
     ],
     href: "/contact?intent=contact_sales&plan=team",
     cta: "Contact sales",
@@ -165,6 +186,16 @@ const plans = [
 ] as const;
 
 const faqs = [
+  {
+    question: "Do I need a credit card to start?",
+    answer:
+      "No. You can start on the Free plan with one workspace and test the core proposal workflow before choosing Pro or Team.",
+  },
+  {
+    question: "Can I cancel a paid plan?",
+    answer:
+      "Yes. Paid plans are managed through Stripe billing, where you can update or cancel your subscription from the billing portal.",
+  },
   {
     question: "What does ProposalDock actually help with?",
     answer:
@@ -236,8 +267,8 @@ export default async function LandingPage() {
   const user = await getCurrentUser();
   const primaryCtaHref = user ? "/app" : "/register?plan=free";
   const primaryCtaLabel = user ? "Open dashboard" : "Start free";
-  const secondaryCtaHref = user ? "/app/new" : "/contact?intent=contact_sales&plan=team";
-  const secondaryCtaLabel = user ? "Create workspace" : "Talk to us";
+  const secondaryCtaHref = user ? "/app/new" : "#how-it-works";
+  const secondaryCtaLabel = user ? "Create workspace" : "See how it works";
   const organizationJsonLd = getOrganizationJsonLd();
   const softwareJsonLd = getSoftwareApplicationJsonLd();
 
@@ -332,6 +363,16 @@ export default async function LandingPage() {
                   Start free with one workspace. No credit card needed.
                 </p>
               ) : null}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {heroTrustPoints.map((point) => (
+                  <span
+                    key={point}
+                    className="rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 backdrop-blur"
+                  >
+                    {point}
+                  </span>
+                ))}
+              </div>
               <div className="mt-8 flex flex-wrap gap-2">
                 <Badge tone="green">Source-linked analysis</Badge>
                 <Badge tone="teal">Review and signoff</Badge>
@@ -347,6 +388,34 @@ export default async function LandingPage() {
                 <p className="text-sm leading-6 text-white/92">{item}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="border-b border-zinc-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                How it works
+              </p>
+              <h2 className="mt-3 text-3xl font-black tracking-tight">
+                One simple path from messy brief to reviewable proposal draft.
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-zinc-600">
+                ProposalDock is easiest to understand by running one brief through the flow.
+                Start with sample data, pasted text, or a real client request.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {quickWorkflow.map((step, index) => (
+                <div key={step.title} className="rounded-lg border border-zinc-200 bg-[#f4f6f7] p-5">
+                  <Badge tone="teal">0{index + 1}</Badge>
+                  <p className="mt-4 font-semibold text-zinc-950">{step.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-zinc-600">{step.body}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -455,6 +524,10 @@ export default async function LandingPage() {
             <h2 className="mt-3 text-3xl font-black tracking-tight">
               Start free, then move into Pro or Team when the proposal process sticks.
             </h2>
+            <p className="mt-4 text-sm leading-6 text-zinc-600">
+              Free is for trying the workflow. Pro is for individual users doing serious
+              proposal work. Team is for collaboration, sharing, and multi-person review.
+            </p>
           </div>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
@@ -487,6 +560,27 @@ export default async function LandingPage() {
                   </Link>
                 </CardContent>
               </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-zinc-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+              Before you sign up
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              The common questions people ask before trying ProposalDock.
+            </h2>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {faqs.slice(0, 5).map((item) => (
+              <div key={item.question} className="rounded-lg border border-zinc-200 bg-[#f4f6f7] p-5">
+                <p className="font-semibold text-zinc-900">{item.question}</p>
+                <p className="mt-2 text-sm leading-6 text-zinc-600">{item.answer}</p>
+              </div>
             ))}
           </div>
         </div>
