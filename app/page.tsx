@@ -73,6 +73,21 @@ const proofPoints = [
   "DOCX exports and print-ready proposal packs",
 ] as const;
 
+const seoResources = [
+  {
+    href: "/ai-proposal-software",
+    title: "AI proposal software",
+    body:
+      "A clearer explanation of how ProposalDock uses AI for brief analysis, grounded drafting, and human review.",
+  },
+  {
+    href: "/rfp-response-software",
+    title: "RFP response software",
+    body:
+      "A focused page on how ProposalDock helps teams move from RFP intake to proposal draft with less chaos.",
+  },
+] as const;
+
 const plans = [
   {
     name: "Free",
@@ -426,6 +441,36 @@ export default async function LandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-zinc-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+              Learn more
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight">
+              More detailed guides on how ProposalDock fits proposal work.
+            </h2>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {seoResources.map((resource) => (
+              <Card key={resource.href} className="border-zinc-200 bg-[#f4f6f7]">
+                <CardHeader>
+                  <CardTitle>{resource.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <p className="text-sm leading-6 text-zinc-600">{resource.body}</p>
+                  <Link href={resource.href} className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+                    Read more
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
