@@ -168,7 +168,8 @@ export function WorkspaceForm({
               {fileLabel}
             </span>
             <span className="mt-1 text-xs text-zinc-500">
-              Supports PDF, DOCX, TXT, MD, and RTF.
+              Supports text-based PDF, DOCX, TXT, MD, and RTF. If a PDF is scanned or awkward,
+              paste the brief text instead.
             </span>
             <input
               name="documents"

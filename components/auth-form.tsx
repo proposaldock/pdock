@@ -40,8 +40,10 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       }
 
       router.push(
-        billingIntent && mode === "register"
-          ? `/app/settings?plan=${billingIntent}`
+        mode === "register"
+          ? billingIntent
+            ? `/app/settings?plan=${billingIntent}`
+            : "/app/new?welcome=1"
           : "/app",
       );
       router.refresh();
@@ -68,6 +70,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           <input
             value={name}
             onChange={(event) => setName(event.target.value)}
+            autoComplete="name"
             className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
             placeholder="Your name"
             required
@@ -80,6 +83,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
           className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
           placeholder="you@company.com"
           required
@@ -91,6 +95,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           type="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          autoComplete={mode === "login" ? "current-password" : "new-password"}
+          minLength={8}
           className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
           placeholder="At least 8 characters"
           required

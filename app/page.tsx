@@ -317,6 +317,11 @@ export default async function LandingPage() {
                   </Button>
                 </Link>
               </div>
+              {!user ? (
+                <p className="mt-3 text-sm font-medium text-zinc-200">
+                  Start free with one workspace. No credit card needed.
+                </p>
+              ) : null}
               <div className="mt-8 flex flex-wrap gap-2">
                 <Badge tone="green">Source-linked analysis</Badge>
                 <Badge tone="teal">Review and signoff</Badge>

@@ -10,12 +10,17 @@ import {
   listWorkspacesForUser,
 } from "@/lib/store";
 
-export default async function NewWorkspacePage() {
+export default async function NewWorkspacePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
   const sessionUser = await requireCurrentUser();
-  const [user, allKnowledgeAssets, workspaces] = await Promise.all([
+  const [user, allKnowledgeAssets, workspaces, resolvedSearchParams] = await Promise.all([
     getUserAccountById(sessionUser.id),
     listKnowledgeAssetsForUser(sessionUser.id),
     listWorkspacesForUser(sessionUser.id),
+    searchParams,
   ]);
 
   if (!user) {
@@ -28,6 +33,7 @@ export default async function NewWorkspacePage() {
     (workspace) => workspace.ownerId === sessionUser.id,
   ).length;
   const workspaceLimitReached = ownedWorkspaceCount >= entitlements.workspaceLimit;
+  const showWelcome = resolvedSearchParams.welcome === "1";
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
@@ -39,6 +45,18 @@ export default async function NewWorkspacePage() {
         Back to dashboard
       </Link>
       <div className="mt-6">
+        {showWelcome ? (
+          <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+            <p className="text-sm font-semibold text-emerald-950">
+              Welcome. Your first useful step is creating one proposal workspace.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-emerald-900">
+              You can use sample demo data, paste a client brief, or upload source material.
+              ProposalDock will then build the first requirements, risks, draft guidance, and
+              sources for review.
+            </p>
+          </div>
+        ) : null}
         <p className="text-sm font-semibold text-emerald-700">New workspace</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight">
           Create proposal workspace
