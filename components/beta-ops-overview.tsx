@@ -365,7 +365,7 @@ export function BetaOpsOverview({
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-zinc-950">{lead.company}</p>
                         <Badge tone={lead.type === "contact_sales" ? "teal" : "yellow"}>
-                          {lead.type === "contact_sales" ? "contact sales" : "waitlist"}
+                          {lead.type === "contact_sales" ? "contact sales" : "mailing list"}
                         </Badge>
                         <Badge
                           tone={
@@ -406,7 +406,7 @@ export function BetaOpsOverview({
               </div>
             ) : (
               <div className="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-4 text-sm text-zinc-600">
-                No leads yet. New contact and waitlist submissions will show up here.
+                No leads yet. New contact and mailing list submissions will show up here.
               </div>
             )}
           </div>
@@ -481,7 +481,7 @@ function buildWeeklyDigest({
               : `follow-up ${lead.nextFollowUpAt.slice(0, 10)}`
             : "no follow-up date";
 
-          return `- ${lead.company} (${lead.type === "contact_sales" ? "contact sales" : "waitlist"}, ${lead.status}, ${lead.assignedUserName ?? "unassigned"}, ${followUp})`;
+          return `- ${lead.company} (${lead.type === "contact_sales" ? "contact sales" : "mailing list"}, ${lead.status}, ${lead.assignedUserName ?? "unassigned"}, ${followUp})`;
         })
         .join("\n")
     : "- Lead details restricted to owners and admins";

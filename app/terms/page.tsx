@@ -6,14 +6,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "Read the ProposalDock beta terms covering accounts, acceptable use, billing, AI-generated output, cancellations, and service changes.",
+    "Read the ProposalDock terms covering accounts, acceptable use, billing, AI-generated output, cancellations, and service changes.",
   alternates: {
     canonical: buildCanonical("/terms"),
   },
   openGraph: {
     title: "Terms of Service",
     description:
-      "Read the ProposalDock beta terms covering accounts, acceptable use, billing, AI-generated output, cancellations, and service changes.",
+      "Read the ProposalDock terms covering accounts, acceptable use, billing, AI-generated output, cancellations, and service changes.",
     url: buildCanonical("/terms"),
   },
 };
@@ -40,7 +40,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-bold text-zinc-950">Beta use</h2>
             <p className="mt-2">
-              ProposalDock is currently offered as a beta workflow product for proposal and RFP response work.
+              ProposalDock is offered as a workflow product for proposal and RFP response work.
               Features may evolve as the product matures.
             </p>
           </section>
@@ -100,7 +100,7 @@ export default function TermsPage() {
             <h2 className="text-lg font-bold text-zinc-950">Availability</h2>
             <p className="mt-2">
               During beta, ProposalDock may experience changes, maintenance, or occasional interruptions.
-              We aim to keep the service reliable, but beta access is provided on an evolving basis.
+              We aim to keep the service reliable, but ProposalDock is provided on an evolving basis.
             </p>
           </section>
           <section>

@@ -273,8 +273,11 @@ export function BillingSettings({
           <div className="rounded-lg border border-zinc-200 p-4">
             <p className="font-semibold text-zinc-900">Free</p>
             <p className="mt-2 text-3xl font-black">$0</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              per month
+            </p>
             <p className="mt-3 text-sm text-zinc-600">
-              Single-user beta access and the core proposal workflow.
+              Single-user access and the core proposal workflow.
             </p>
           </div>
           {(["pro", "team"] as const).map((plan) => (
@@ -286,6 +289,9 @@ export function BillingSettings({
             >
               <p className="font-semibold text-zinc-900">{BILLING_PLAN_COPY[plan].label}</p>
               <p className="mt-2 text-3xl font-black">{BILLING_PLAN_COPY[plan].monthlyPriceLabel}</p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                per month
+              </p>
               <p className="mt-3 text-sm text-zinc-600">
                 {plan === "pro"
                   ? "Unlimited proposal workspaces with billing enabled for solo operators."

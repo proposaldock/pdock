@@ -8,14 +8,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Contact ProposalDock",
   description:
-    "Talk to ProposalDock about team rollout, beta access, pricing, or joining the waitlist for AI-powered proposal workflow software.",
+    "Talk to ProposalDock about team rollout, pricing, or product updates for AI-powered proposal workflow software.",
   alternates: {
     canonical: buildCanonical("/contact"),
   },
   openGraph: {
     title: "Contact ProposalDock",
     description:
-      "Talk to ProposalDock about team rollout, beta access, pricing, or joining the waitlist for AI-powered proposal workflow software.",
+      "Talk to ProposalDock about team rollout, pricing, or product updates for AI-powered proposal workflow software.",
     url: buildCanonical("/contact"),
   },
 };
@@ -26,7 +26,9 @@ export default async function ContactPage({
   searchParams: Promise<{ intent?: string; plan?: string }>;
 }) {
   const resolved = await searchParams;
-  const intent = resolved.intent === "waitlist" ? "waitlist" : "contact_sales";
+  const intent = resolved.intent === "mailing_list" || resolved.intent === "waitlist"
+    ? "waitlist"
+    : "contact_sales";
   const plan =
     resolved.plan === "free" || resolved.plan === "pro" || resolved.plan === "team"
       ? resolved.plan
@@ -47,7 +49,7 @@ export default async function ContactPage({
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-lg border border-zinc-200 bg-zinc-950 p-8 text-white">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">
-              ProposalDock beta
+              ProposalDock
             </p>
             <h2 className="mt-4 text-4xl font-black tracking-tight">
               Bring the right proposal workflow into the room early.

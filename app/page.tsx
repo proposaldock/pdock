@@ -47,23 +47,20 @@ const workflowSteps = [
   {
     title: "Dock the brief",
     body:
-      "Upload the RFP or paste the brief, add client context, and pull in approved knowledge assets from your team library.",
-    image:
-      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+      "Create a workspace, add the client name, paste the brief or upload files, then add company knowledge and any instructions for the AI.",
+    visual: "intake",
   },
   {
     title: "Review the evidence",
     body:
-      "See requirements, risks, and source-linked suggestions in one workspace so review moves faster and with less guesswork.",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+      "Open Requirements, Risks, Draft, and Sources to check what the AI found, what it cited, and what still needs human review.",
+    visual: "review",
   },
   {
     title: "Assemble the response",
     body:
-      "Refine sections, collect signoff, and export a clean proposal pack when the team is ready to ship.",
-    image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+      "Move accepted material into Proposal, refine sections, collect signoff, and export a clean response pack when it is ready.",
+    visual: "proposal",
   },
 ] as const;
 
@@ -173,10 +170,92 @@ const useCases = [
   },
 ] as const;
 
+function WorkflowMockup({
+  variant,
+}: {
+  variant: "intake" | "review" | "proposal";
+}) {
+  const config = {
+    intake: {
+      label: "Workspace setup",
+      title: "Customer Portal RFP",
+      left: ["Client name", "Brief material", "Company knowledge", "AI instructions"],
+      right: ["Paste brief", "Attach DOCX", "Add approved facts"],
+    },
+    review: {
+      label: "Analysis review",
+      title: "Requirements and risks",
+      left: ["12 requirements", "3 high-priority risks", "8 source citations", "4 SME flags"],
+      right: ["Accept", "Reject", "Add note"],
+    },
+    proposal: {
+      label: "Proposal assembly",
+      title: "Response pack",
+      left: ["Executive summary", "Implementation approach", "Security response", "Support model"],
+      right: ["Draft", "In review", "Approved"],
+    },
+  }[variant];
+
+  return (
+    <div className="min-h-[300px] bg-white p-4 sm:p-6">
+      <div className="rounded-lg border border-zinc-200 bg-[#f4f6f7] p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
+              {config.label}
+            </p>
+            <p className="mt-1 text-xl font-black text-zinc-950">{config.title}</p>
+          </div>
+          <Button size="sm" variant="accent">
+            {variant === "proposal" ? "Export" : "Continue"}
+          </Button>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-[1fr_0.75fr]">
+          <div className="grid gap-3">
+            {config.left.map((item, index) => (
+              <div key={item} className="rounded-lg border border-zinc-200 bg-white p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-zinc-900">{item}</p>
+                  <Badge tone={index === 0 ? "green" : index === 1 ? "teal" : "zinc"}>
+                    {index === 0 ? "ready" : index === 1 ? "active" : "queued"}
+                  </Badge>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-zinc-100">
+                  <div
+                    className="h-2 rounded-full bg-emerald-500"
+                    style={{ width: `${86 - index * 14}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="rounded-lg border border-zinc-200 bg-white p-4">
+            <p className="text-sm font-bold text-zinc-950">
+              {variant === "intake"
+                ? "Input panel"
+                : variant === "review"
+                  ? "Review actions"
+                  : "Export readiness"}
+            </p>
+            <div className="mt-4 grid gap-3">
+              {config.right.map((item) => (
+                <div key={item} className="rounded-lg bg-zinc-50 p-3 text-sm text-zinc-700">
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const plans = [
   {
     name: "Free",
     price: "$0",
+    cadence: "per month",
     detail: "Try the workflow with one real workspace.",
     points: [
       "One proposal workspace",
@@ -190,6 +269,7 @@ const plans = [
   {
     name: "Pro",
     price: "$49",
+    cadence: "per month",
     detail: "For serious solo proposal work.",
     points: [
       "Unlimited proposal workspaces",
@@ -203,6 +283,7 @@ const plans = [
   {
     name: "Team",
     price: "$149",
+    cadence: "per month",
     detail: "For shared proposal operations.",
     points: [
       "Organization workspaces",
@@ -328,7 +409,7 @@ export default async function LandingPage() {
         />
         <div className="absolute inset-0 bg-zinc-950/68" />
         <div className="relative mx-auto flex min-h-[82vh] max-w-7xl flex-col px-6 py-6 lg:px-8">
-          <header className="flex flex-wrap items-center justify-between gap-4">
+          <header className="sticky top-0 z-50 -mx-6 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 bg-zinc-950/72 px-6 py-4 backdrop-blur lg:-mx-8 lg:px-8">
             <Link href="/" className="text-lg font-black tracking-tight text-white">
               ProposalDock
             </Link>
@@ -350,6 +431,19 @@ export default async function LandingPage() {
                   {user ? "Dashboard" : "Sign in"}
                 </Button>
               </Link>
+              {user ? (
+                <Link href="/app">
+                  <Button variant="accent" size="sm">
+                    Open app
+                  </Button>
+                </Link>
+              ) : (
+                <ActivationLink href="/register?plan=free" eventType="start_free_clicked">
+                  <Button variant="accent" size="sm">
+                    Start free
+                  </Button>
+                </ActivationLink>
+              )}
             </nav>
           </header>
 
@@ -359,7 +453,7 @@ export default async function LandingPage() {
                 Lightweight AI proposal workspace for service teams
               </p>
               <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
-                A faster way to turn client briefs into proposals your team can trust.
+                Win the deal without the weekend scramble.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-100">
                 ProposalDock helps consultants, agencies, and small B2B service teams analyze
@@ -450,7 +544,7 @@ export default async function LandingPage() {
               Why teams switch
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight">
-              Built for proposal work and RFP response, not generic prompting.
+              Proposal work, with evidence and review built in.
             </h2>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
@@ -512,8 +606,11 @@ export default async function LandingPage() {
             Workflow
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight">
-            A cleaner path from RFP intake to final response pack.
+            What the workflow looks like inside ProposalDock.
           </h2>
+          <p className="mt-4 text-sm leading-6 text-zinc-600">
+            These are product-style views of the flow: setup, review, proposal assembly, and export.
+          </p>
         </div>
 
         <div className="mt-10 grid gap-8">
@@ -528,14 +625,7 @@ export default async function LandingPage() {
                 <p className="mt-3 max-w-lg text-base leading-7 text-zinc-600">{step.body}</p>
               </div>
               <div className="overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
-                <Image
-                  src={step.image}
-                  alt={step.title}
-                  width={1200}
-                  height={800}
-                  sizes="(min-width: 1024px) 60vw, 100vw"
-                  className="h-[280px] w-full object-cover sm:h-[340px]"
-                />
+                <WorkflowMockup variant={step.visual} />
               </div>
             </div>
           ))}
@@ -625,9 +715,20 @@ export default async function LandingPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between gap-3">
                     <CardTitle>{plan.name}</CardTitle>
-                    <Badge tone={plan.tone}>{plan.name === "Pro" ? "Most popular" : "Beta"}</Badge>
+                    <Badge tone={plan.tone}>
+                      {plan.name === "Pro"
+                        ? "Most popular"
+                        : plan.name === "Team"
+                          ? "For teams"
+                          : "Starter"}
+                    </Badge>
                   </div>
-                  <p className="text-4xl font-black">{plan.price}</p>
+                  <div>
+                    <p className="text-4xl font-black">{plan.price}</p>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                      {plan.cadence}
+                    </p>
+                  </div>
                   <p className="text-sm text-zinc-600">{plan.detail}</p>
                 </CardHeader>
                 <CardContent className="grid gap-4">
@@ -661,11 +762,24 @@ export default async function LandingPage() {
               The common questions people ask before trying ProposalDock.
             </h2>
           </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {faqs.slice(0, 5).map((item) => (
-              <div key={item.question} className="rounded-lg border border-zinc-200 bg-[#f4f6f7] p-5">
-                <p className="font-semibold text-zinc-900">{item.question}</p>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">{item.answer}</p>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                title: "Bring one real brief",
+                body: "You can paste text, upload source material, or start with sample data to see the workflow quickly.",
+              },
+              {
+                title: "Keep review human",
+                body: "AI creates structure and draft direction, but your team accepts, rejects, edits, and signs off.",
+              },
+              {
+                title: "Upgrade only when it fits",
+                body: "Free is for testing. Pro and Team unlock more capacity, knowledge reuse, and collaboration.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="rounded-lg border border-zinc-200 bg-[#f4f6f7] p-5">
+                <p className="font-semibold text-zinc-900">{item.title}</p>
+                <p className="mt-2 text-sm leading-6 text-zinc-600">{item.body}</p>
               </div>
             ))}
           </div>
@@ -747,13 +861,13 @@ export default async function LandingPage() {
           <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                Beta access
+                Stay in the loop
               </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight">
-              Need a team rollout or just want updates while ProposalDock opens up?
+              Need a team rollout or just want product updates?
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-zinc-600">
-                Use contact sales for team rollout conversations, or join the waitlist if you want updates on AI proposal workflow improvements without starting a workspace yet.
+                Use contact sales for team rollout conversations, or join the mailing list if you want updates on AI proposal workflow improvements without starting a workspace yet.
             </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
@@ -775,15 +889,15 @@ export default async function LandingPage() {
 
               <Card className="border-zinc-200">
                 <CardHeader>
-                  <CardTitle>Join waitlist</CardTitle>
+                  <CardTitle>Join mailing list</CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-4">
                   <p className="text-sm leading-6 text-zinc-600">
-                    Best if you want rollout updates before bringing ProposalDock into your process.
+                    Best if you want product updates before bringing ProposalDock deeper into your process.
                   </p>
-                  <Link href="/contact?intent=waitlist">
+                  <Link href="/contact?intent=mailing_list">
                     <Button className="w-full" variant="secondary">
-                      Join waitlist
+                      Join mailing list
                     </Button>
                   </Link>
                 </CardContent>

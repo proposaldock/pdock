@@ -162,7 +162,7 @@ export function PublicLeadsSettings({
       <CardHeader>
         <CardTitle>Inbound leads</CardTitle>
         <p className="text-sm text-zinc-600">
-          ProposalDock saves public contact-sales and waitlist submissions here for beta follow-up.
+          ProposalDock saves public contact-sales and mailing list submissions here for follow-up.
         </p>
       </CardHeader>
       <CardContent className="grid gap-4">
@@ -172,14 +172,14 @@ export function PublicLeadsSettings({
           </div>
         ) : leads.length === 0 ? (
           <div className="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-5 text-sm text-zinc-600">
-            No inbound leads yet. New contact-sales and waitlist submissions will appear here.
+            No inbound leads yet. New contact-sales and mailing list submissions will appear here.
           </div>
         ) : (
           <div className="grid gap-4">
             <div className="flex flex-wrap gap-2">
               <Badge tone="teal">{leads.length} total leads</Badge>
               <Badge tone="yellow">
-                {leads.filter((lead) => lead.type === "waitlist").length} waitlist
+                {leads.filter((lead) => lead.type === "waitlist").length} mailing list
               </Badge>
               <Badge tone="green">
                 {leads.filter((lead) => lead.type === "contact_sales").length} contact sales
@@ -202,7 +202,7 @@ export function PublicLeadsSettings({
               >
                 <option value="all">All lead types</option>
                 <option value="contact_sales">Contact sales</option>
-                <option value="waitlist">Waitlist</option>
+                <option value="waitlist">Mailing list</option>
               </select>
               <select
                 value={statusFilter}
@@ -284,7 +284,7 @@ function LeadCard({
       <div className="flex flex-wrap items-center gap-2">
         <p className="font-semibold text-zinc-950">{lead.name}</p>
         <Badge tone={leadTone(lead.type)}>
-          {lead.type === "contact_sales" ? "contact sales" : "waitlist"}
+          {lead.type === "contact_sales" ? "contact sales" : "mailing list"}
         </Badge>
         {lead.plan ? <Badge tone="zinc">{lead.plan}</Badge> : null}
         {lead.teamSize ? <Badge tone="zinc">{lead.teamSize} seats</Badge> : null}

@@ -152,6 +152,9 @@ export function WorkspaceResults({
   const [analysis, setAnalysis] = useState<ProposalAnalysis>(workspace.analysis);
   const [workspaceMeta, setWorkspaceMeta] = useState({
     workspaceName: workspace.workspaceName,
+    clientName: workspace.clientName,
+    companyKnowledge: workspace.companyKnowledge,
+    instructions: workspace.instructions ?? "",
     visibility:
       workspace.visibility === "organization" || workspace.visibility === "selected"
         ? workspace.visibility
@@ -160,12 +163,20 @@ export function WorkspaceResults({
     sharedUserIds: workspace.sharedWithUsers?.map((item) => item.userId) ?? [],
     sharedWithUsers: workspace.sharedWithUsers ?? [],
   });
+  const [savedWorkspaceSetup, setSavedWorkspaceSetup] = useState({
+    workspaceName: workspace.workspaceName,
+    clientName: workspace.clientName,
+    companyKnowledge: workspace.companyKnowledge,
+    instructions: workspace.instructions ?? "",
+  });
   const [reviewState, setReviewState] = useState<WorkspaceReviewState>(workspace.reviewState);
   const [proposalState, setProposalState] = useState<WorkspaceProposalState>(
     workspace.proposalState,
   );
   const [activityLog, setActivityLog] = useState<Workspace["activityLog"]>(workspace.activityLog);
+  const [isEditingSetup, setIsEditingSetup] = useState(false);
   const [isRerunning, setIsRerunning] = useState(false);
+  const [isSavingSetup, setIsSavingSetup] = useState(false);
   const [isSavingReview, setIsSavingReview] = useState(false);
   const [isSavingProposal, setIsSavingProposal] = useState(false);
   const [error, setError] = useState("");
@@ -230,8 +241,11 @@ export function WorkspaceResults({
         throw new Error(payload.error || "Failed to update workspace visibility.");
       }
 
-      setWorkspaceMeta({
+      const nextWorkspaceMeta = {
         workspaceName: payload.workspace.workspaceName,
+        clientName: payload.workspace.clientName,
+        companyKnowledge: payload.workspace.companyKnowledge,
+        instructions: payload.workspace.instructions ?? "",
         visibility:
           payload.workspace.visibility === "organization" ||
           payload.workspace.visibility === "selected"
@@ -240,13 +254,65 @@ export function WorkspaceResults({
         organizationName: payload.workspace.organizationName ?? null,
         sharedUserIds: payload.workspace.sharedWithUsers?.map((item: { userId: string }) => item.userId) ?? [],
         sharedWithUsers: payload.workspace.sharedWithUsers ?? [],
-      });
+      };
+      setWorkspaceMeta(nextWorkspaceMeta);
     } catch (caught) {
       setError(
         caught instanceof Error
           ? caught.message
           : "Failed to update workspace visibility.",
       );
+    }
+  }
+
+  async function saveWorkspaceSetup() {
+    setError("");
+    setIsSavingSetup(true);
+
+    try {
+      const response = await fetch(`/api/workspaces/${workspace.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workspaceName: workspaceMeta.workspaceName,
+          clientName: workspaceMeta.clientName,
+          companyKnowledge: workspaceMeta.companyKnowledge,
+          instructions: workspaceMeta.instructions,
+        }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to save workspace setup.");
+      }
+
+      const nextWorkspaceMeta = {
+        workspaceName: payload.workspace.workspaceName,
+        clientName: payload.workspace.clientName,
+        companyKnowledge: payload.workspace.companyKnowledge,
+        instructions: payload.workspace.instructions ?? "",
+        visibility:
+          payload.workspace.visibility === "organization" ||
+          payload.workspace.visibility === "selected"
+            ? payload.workspace.visibility
+            : "private",
+        organizationName: payload.workspace.organizationName ?? null,
+        sharedUserIds:
+          payload.workspace.sharedWithUsers?.map((item: { userId: string }) => item.userId) ?? [],
+        sharedWithUsers: payload.workspace.sharedWithUsers ?? [],
+      };
+      setWorkspaceMeta(nextWorkspaceMeta);
+      setSavedWorkspaceSetup({
+        workspaceName: nextWorkspaceMeta.workspaceName,
+        clientName: nextWorkspaceMeta.clientName,
+        companyKnowledge: nextWorkspaceMeta.companyKnowledge,
+        instructions: nextWorkspaceMeta.instructions,
+      });
+      setIsEditingSetup(false);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Failed to save workspace setup.");
+    } finally {
+      setIsSavingSetup(false);
     }
   }
 
@@ -346,7 +412,7 @@ export function WorkspaceResults({
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm font-semibold text-emerald-700">{workspace.clientName}</p>
+          <p className="text-sm font-semibold text-emerald-700">{workspaceMeta.clientName}</p>
           <h1 className="mt-1 text-3xl font-black tracking-tight">{workspaceMeta.workspaceName}</h1>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {workspaceMeta.organizationName ? (
@@ -418,6 +484,94 @@ export function WorkspaceResults({
             {isRerunning ? "Running..." : "Re-run analysis"}
           </Button>
         </div>
+      </div>
+
+      <div className="mt-5 rounded-lg border border-zinc-200 bg-white p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-zinc-950">Workspace setup</p>
+            <p className="mt-1 text-sm leading-6 text-zinc-600">
+              Review or edit the original client name, company knowledge, and AI instructions used
+              when this workspace was created.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => setIsEditingSetup((current) => !current)}
+          >
+            {isEditingSetup ? "Close setup" : "Edit setup"}
+          </Button>
+        </div>
+
+        {isEditingSetup ? (
+          <div className="mt-5 grid gap-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="grid gap-2 text-sm font-semibold">
+                Workspace name
+                <input
+                  value={workspaceMeta.workspaceName}
+                  onChange={(event) =>
+                    setWorkspaceMeta({ ...workspaceMeta, workspaceName: event.target.value })
+                  }
+                  className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold">
+                Client/company name
+                <input
+                  value={workspaceMeta.clientName}
+                  onChange={(event) =>
+                    setWorkspaceMeta({ ...workspaceMeta, clientName: event.target.value })
+                  }
+                  className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
+                />
+              </label>
+            </div>
+            <label className="grid gap-2 text-sm font-semibold">
+              Background material
+              <textarea
+                rows={6}
+                value={workspaceMeta.companyKnowledge}
+                onChange={(event) =>
+                  setWorkspaceMeta({ ...workspaceMeta, companyKnowledge: event.target.value })
+                }
+                className="rounded-lg border border-zinc-300 p-3 text-sm leading-6 outline-none focus:border-emerald-500"
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-semibold">
+              Special instructions / tone
+              <textarea
+                rows={4}
+                value={workspaceMeta.instructions}
+                onChange={(event) =>
+                  setWorkspaceMeta({ ...workspaceMeta, instructions: event.target.value })
+                }
+                className="rounded-lg border border-zinc-300 p-3 text-sm leading-6 outline-none focus:border-emerald-500"
+              />
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" onClick={saveWorkspaceSetup} disabled={isSavingSetup}>
+                <Save className="size-4" />
+                {isSavingSetup ? "Saving..." : "Save setup"}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setWorkspaceMeta({
+                    ...workspaceMeta,
+                    ...savedWorkspaceSetup,
+                  });
+                  setIsEditingSetup(false);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {error ? (

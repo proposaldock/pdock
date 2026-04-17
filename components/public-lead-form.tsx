@@ -27,7 +27,7 @@ export function PublicLeadForm({ intent, plan }: PublicLeadFormProps) {
         badge: "Contact sales",
         title: "Tell us how your proposal team works today.",
         body:
-          "We will use this to shape the right beta conversation and rollout path for your team.",
+          "We will use this to shape the right rollout conversation and path for your team.",
         button: "Send request",
         success:
           "Thanks. Your request is in, and ProposalDock has saved it locally for follow-up.",
@@ -35,13 +35,13 @@ export function PublicLeadForm({ intent, plan }: PublicLeadFormProps) {
     }
 
     return {
-      badge: "Join waitlist",
-      title: "Stay close to the ProposalDock beta.",
+      badge: "Mailing list",
+      title: "Get ProposalDock product updates.",
       body:
-        "Leave your details and we will keep your team in the loop as access opens up further.",
-      button: "Join waitlist",
+        "Leave your details and we will send occasional updates as the workflow improves.",
+      button: "Join mailing list",
       success:
-        "You are on the waitlist. ProposalDock has saved your interest locally for beta follow-up.",
+        "You are on the mailing list. ProposalDock has saved your interest for future updates.",
     };
   }, [intent]);
 

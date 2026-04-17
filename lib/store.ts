@@ -983,6 +983,9 @@ export async function updateWorkspaceMetadataForUser(
   id: string,
   input: {
     workspaceName?: string;
+    clientName?: string;
+    companyKnowledge?: string;
+    instructions?: string;
     visibility?: "private" | "organization" | "selected";
     sharedUserIds?: string[];
   },
@@ -1037,6 +1040,11 @@ export async function updateWorkspaceMetadataForUser(
     where: { id },
     data: {
       ...(input.workspaceName ? { workspaceName: input.workspaceName } : {}),
+      ...(input.clientName ? { clientName: input.clientName } : {}),
+      ...(input.companyKnowledge ? { companyKnowledge: input.companyKnowledge } : {}),
+      ...(input.instructions !== undefined
+        ? { instructions: input.instructions || null }
+        : {}),
       ...(input.visibility ? { visibility: input.visibility } : {}),
       updatedAt: new Date(),
     },

@@ -6,14 +6,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Read how ProposalDock handles account data, proposal materials, analytics, billing, and beta operations during product use.",
+    "Read how ProposalDock handles account data, proposal materials, analytics, billing, and product operations during use.",
   alternates: {
     canonical: buildCanonical("/privacy"),
   },
   openGraph: {
     title: "Privacy Policy",
     description:
-      "Read how ProposalDock handles account data, proposal materials, analytics, billing, and beta operations during product use.",
+      "Read how ProposalDock handles account data, proposal materials, analytics, billing, and product operations during use.",
     url: buildCanonical("/privacy"),
   },
 };
@@ -34,21 +34,21 @@ export default function PrivacyPage() {
           Privacy Policy
         </p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950">
-          Privacy for ProposalDock beta
+          Privacy for ProposalDock
         </h1>
         <div className="mt-8 grid gap-8 text-sm leading-7 text-zinc-700">
           <section>
             <h2 className="text-lg font-bold text-zinc-950">Who this policy applies to</h2>
             <p className="mt-2">
               This policy applies to visitors to the ProposalDock website, people who submit contact
-              or waitlist forms, and users who create accounts or work inside ProposalDock workspaces.
+              or mailing list forms, and users who create accounts or work inside ProposalDock workspaces.
             </p>
           </section>
           <section>
             <h2 className="text-lg font-bold text-zinc-950">What we collect</h2>
             <p className="mt-2">
               ProposalDock stores account details, team data, uploaded proposal materials,
-              approved knowledge assets, workspace analysis output, and inbound contact or waitlist submissions.
+              approved knowledge assets, workspace analysis output, and inbound contact or mailing list submissions.
             </p>
           </section>
           <section>
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-bold text-zinc-950">How we use it</h2>
             <p className="mt-2">
               We use this information to run the product, analyze proposal materials, support billing,
-              operate the beta program, and improve the workflow. Uploaded and pasted content is processed
+              operate the product, and improve the workflow. Uploaded and pasted content is processed
               server-side to generate analysis and drafts.
             </p>
           </section>
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
             <p className="mt-2">
               We process data to provide the service you ask us to provide, maintain account access,
               operate subscription billing, secure the product, respond to support requests, and understand
-              how the beta is being used so we can improve it.
+              how the product is being used so we can improve it.
             </p>
           </section>
           <section>
@@ -83,11 +83,11 @@ export default function PrivacyPage() {
             </p>
           </section>
           <section>
-            <h2 className="text-lg font-bold text-zinc-950">Analytics and beta operations data</h2>
+            <h2 className="text-lg font-bold text-zinc-950">Analytics and product operations data</h2>
             <p className="mt-2">
               ProposalDock tracks basic first-party product and marketing signals such as visits,
-              signup intent, inbound leads, and beta follow-up status. These signals are used to operate
-              the beta program and understand demand, not to expose customer pipeline information to regular users.
+              signup intent, inbound leads, and follow-up status. These signals are used to operate
+              the product and understand demand, not to expose customer pipeline information to regular users.
             </p>
           </section>
           <section>
@@ -101,7 +101,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-bold text-zinc-950">Retention and access</h2>
             <p className="mt-2">
-              Beta data is retained to support active workspaces, billing history, and product support.
+              Product data is retained to support active workspaces, billing history, and product support.
               Team owners and admins control access to shared team workspaces and internal lead views.
             </p>
           </section>
@@ -110,7 +110,7 @@ export default function PrivacyPage() {
             <p className="mt-2">
               We use access controls, authenticated sessions, hosted infrastructure, and managed providers
               to reduce risk. Even so, you should avoid uploading material you are not permitted to process
-              and should treat beta software as an evolving service rather than a final compliance product.
+              and should treat ProposalDock as an evolving service rather than a final compliance product.
             </p>
           </section>
           <section>

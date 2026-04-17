@@ -35,7 +35,7 @@ export async function createPublicLead(input: PublicLeadInput) {
           id: crypto.randomUUID(),
           type: "lead_created",
           title: "Lead created",
-          detail: `New ${input.type === "contact_sales" ? "contact sales" : "waitlist"} lead submitted by ${input.name.trim()}.`,
+          detail: `New ${input.type === "contact_sales" ? "contact sales" : "mailing list"} lead submitted by ${input.name.trim()}.`,
           createdAt: now.toISOString(),
           actorName: input.name.trim(),
         },

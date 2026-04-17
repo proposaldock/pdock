@@ -35,7 +35,7 @@ const sections = [
       "Verify signup and login on the production domain.",
       "Verify file upload, analysis, review, proposal assembly, and export.",
       "Verify team invite and workspace sharing behavior.",
-      "Verify contact-sales and waitlist forms save successfully.",
+      "Verify contact-sales and mailing list forms save successfully.",
       "Verify privacy policy and terms pages are reachable from the marketing site.",
     ],
   },

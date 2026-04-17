@@ -449,7 +449,7 @@ export function DashboardOverview({
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-zinc-950">{lead.company}</p>
                         <Badge tone={lead.type === "contact_sales" ? "teal" : "yellow"}>
-                          {lead.type === "contact_sales" ? "contact sales" : "waitlist"}
+                          {lead.type === "contact_sales" ? "contact sales" : "mailing list"}
                         </Badge>
                         <Badge
                           tone={
@@ -528,7 +528,7 @@ export function DashboardOverview({
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold text-zinc-950">{entry.title}</p>
                         <Badge tone={entry.leadType === "contact_sales" ? "teal" : "yellow"}>
-                          {entry.leadType === "contact_sales" ? "contact sales" : "waitlist"}
+                          {entry.leadType === "contact_sales" ? "contact sales" : "mailing list"}
                         </Badge>
                         <Badge
                           tone={

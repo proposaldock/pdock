@@ -220,10 +220,11 @@ export default function AiProposalSoftwarePage() {
                 Start free
               </Button>
             </Link>
-            <Link href="/contact?intent=contact_sales&plan=team">
-              <Button variant="secondary" size="lg">
-                Talk to sales
-              </Button>
+            <Link
+              href="/contact?intent=contact_sales&plan=team"
+              className="inline-flex h-12 items-center justify-center rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 ring-1 ring-zinc-200 transition hover:bg-zinc-50"
+            >
+              Talk to us
             </Link>
           </div>
         </section>

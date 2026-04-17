@@ -42,15 +42,33 @@ export async function PATCH(
     const { id } = await params;
     const body = (await request.json()) as {
       workspaceName?: string;
+      clientName?: string;
+      companyKnowledge?: string;
+      instructions?: string;
       visibility?: "private" | "organization" | "selected";
       sharedUserIds?: string[];
     };
     const workspaceName = body.workspaceName?.trim();
+    const clientName = body.clientName?.trim();
+    const companyKnowledge = body.companyKnowledge?.trim();
+    const instructions =
+      typeof body.instructions === "string" ? body.instructions.trim() : undefined;
     const visibility = body.visibility;
 
-    if (!workspaceName && !visibility) {
+    if (!workspaceName && !clientName && !companyKnowledge && instructions === undefined && !visibility) {
       return NextResponse.json(
-        { error: "Workspace name or visibility is required." },
+        { error: "Workspace details or visibility are required." },
+        { status: 400 },
+      );
+    }
+
+    if (body.clientName !== undefined && !clientName) {
+      return NextResponse.json({ error: "Client name is required." }, { status: 400 });
+    }
+
+    if (body.companyKnowledge !== undefined && !companyKnowledge) {
+      return NextResponse.json(
+        { error: "Approved company knowledge is required." },
         { status: 400 },
       );
     }
@@ -76,6 +94,9 @@ export async function PATCH(
       id,
       {
         workspaceName,
+        clientName,
+        companyKnowledge,
+        instructions,
         visibility,
         sharedUserIds: body.sharedUserIds,
       },
