@@ -280,6 +280,8 @@ Rules:
 - If a date is not explicit, use null.
 - Status should compare RFP needs with provided company knowledge.
 - Treat manual company knowledge and selected knowledge base assets as the only approved capability sources.
+- Manual company knowledge appears in the source catalog as Background material and must be considered when deciding covered, partially_covered, or missing.
+- If a requirement is covered or partially covered by approved company knowledge, cite the relevant Background material or knowledge base sourceRef alongside the RFP/client source when possible.
 - Missing or uncertain capabilities must be marked missing or partially_covered, never covered.
 - Keep 5-10 requirements unless the source material clearly needs fewer.
 - Risks must include sourceRefs.
@@ -409,6 +411,8 @@ export async function analyzeProposal(input: WorkspaceInput): Promise<ProposalAn
 - If a date is not explicit, use null.
 - Status should compare RFP needs with provided company knowledge.
 - Treat manual company knowledge and selected knowledge base assets as the only approved capability sources.
+- Manual company knowledge appears in the source catalog as Background material and must be considered when deciding covered, partially_covered, or missing.
+- If a requirement is covered or partially covered by approved company knowledge, cite the relevant Background material or knowledge base sourceRef alongside the RFP/client source when possible.
 - Missing or uncertain capabilities must be marked missing or partially_covered, never covered.
 - Keep 5-10 requirements unless the source material clearly needs fewer.
 - Risks must include sourceRefs.

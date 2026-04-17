@@ -57,7 +57,7 @@ export type ProposalAnalysis = {
     label: string;
     excerpt: string;
     content?: string;
-    sourceType?: "document" | "knowledge_asset";
+    sourceType?: "document" | "knowledge_asset" | "company_knowledge";
     documentId?: string;
     documentLabel?: string;
     assetId?: string;

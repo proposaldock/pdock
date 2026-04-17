@@ -1187,6 +1187,11 @@ function Sources({
                           <LibraryBig className="size-3.5" />
                           <span>{source.assetTitle}</span>
                         </>
+                      ) : source.sourceType === "company_knowledge" ? (
+                        <>
+                          <LibraryBig className="size-3.5" />
+                          <span>Background material</span>
+                        </>
                       ) : (
                         <>
                           <FileText className="size-3.5" />
@@ -2322,8 +2327,20 @@ function SourcePreview({
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge tone={source.sourceType === "knowledge_asset" ? "yellow" : "zinc"}>
-            {source.sourceType === "knowledge_asset" ? "Knowledge asset" : "Document"}
+          <Badge
+            tone={
+              source.sourceType === "knowledge_asset"
+                ? "yellow"
+                : source.sourceType === "company_knowledge"
+                  ? "teal"
+                  : "zinc"
+            }
+          >
+            {source.sourceType === "knowledge_asset"
+              ? "Knowledge asset"
+              : source.sourceType === "company_knowledge"
+                ? "Background material"
+                : "Document"}
           </Badge>
           {source.assetTitle ? <Badge tone="zinc">{source.assetTitle}</Badge> : null}
           {source.documentLabel ? <Badge tone="zinc">{source.documentLabel}</Badge> : null}

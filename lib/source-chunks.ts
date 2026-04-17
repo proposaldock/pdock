@@ -5,7 +5,7 @@ export type SourceChunk = {
   label: string;
   excerpt: string;
   content: string;
-  sourceType: "document" | "knowledge_asset";
+  sourceType: "document" | "knowledge_asset" | "company_knowledge";
   documentId?: string;
   documentLabel?: string;
   assetId?: string;
@@ -16,7 +16,7 @@ type ChunkableItem = {
   id: string;
   label: string;
   content: string;
-  sourceType: "document" | "knowledge_asset";
+  sourceType: "document" | "knowledge_asset" | "company_knowledge";
   documentId?: string;
   documentLabel?: string;
   assetId?: string;
@@ -49,6 +49,17 @@ function sliceLongParagraph(paragraph: string) {
 }
 
 function buildChunkableItems(input: WorkspaceInput): ChunkableItem[] {
+  const manualKnowledgeItems: ChunkableItem[] = input.companyKnowledge.trim()
+    ? [
+        {
+          id: "manual-company-knowledge",
+          label: "Background material",
+          content: input.companyKnowledge,
+          sourceType: "company_knowledge",
+        },
+      ]
+    : [];
+
   const documentItems: ChunkableItem[] = input.documents.map((document) => ({
     id: document.id,
     label: document.filename,
@@ -67,7 +78,7 @@ function buildChunkableItems(input: WorkspaceInput): ChunkableItem[] {
     assetTitle: asset.title,
   }));
 
-  return [...documentItems, ...knowledgeItems];
+  return [...manualKnowledgeItems, ...documentItems, ...knowledgeItems];
 }
 
 export function buildSourceChunks(input: WorkspaceInput) {
@@ -90,7 +101,7 @@ export function buildSourceChunks(input: WorkspaceInput) {
       if (current) {
         chunks.push({
           id: `SRC-${String(sourceIndex).padStart(3, "0")}`,
-          label: `${item.label} · Chunk ${chunkIndex}`,
+          label: `${item.label} - Chunk ${chunkIndex}`,
           excerpt: current.slice(0, 240).trim(),
           content: current,
           sourceType: item.sourceType,
@@ -120,7 +131,7 @@ export function buildSourceChunks(input: WorkspaceInput) {
       } else {
         chunks.push({
           id: `SRC-${String(sourceIndex).padStart(3, "0")}`,
-          label: `${item.label} · Chunk ${chunkIndex}`,
+          label: `${item.label} - Chunk ${chunkIndex}`,
           excerpt: current.slice(0, 240).trim(),
           content: current,
           sourceType: item.sourceType,
