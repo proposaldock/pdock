@@ -3,6 +3,7 @@ import { requireApiUser } from "@/lib/authz";
 import { parseUploadedDocument } from "@/lib/document-parser";
 import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import { storeUploadedFile } from "@/lib/file-storage";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import {
   deleteKnowledgeAsset,
   getUserAccountById,
@@ -37,7 +38,10 @@ export async function PATCH(
       return NextResponse.json({ error: "Account not found." }, { status: 404 });
     }
 
-    if (!getPlanEntitlements(account.billing).canUseKnowledgeBase) {
+    const canUseKnowledgeBase =
+      getPlanEntitlements(account.billing).canUseKnowledgeBase ||
+      isPlatformAdminEmail(account.email);
+    if (!canUseKnowledgeBase) {
       return NextResponse.json(
         { error: getPlanGuardMessage("knowledge_base") },
         { status: 403 },
@@ -153,7 +157,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Account not found." }, { status: 404 });
     }
 
-    if (!getPlanEntitlements(account.billing).canUseKnowledgeBase) {
+    const canUseKnowledgeBase =
+      getPlanEntitlements(account.billing).canUseKnowledgeBase ||
+      isPlatformAdminEmail(account.email);
+    if (!canUseKnowledgeBase) {
       return NextResponse.json(
         { error: getPlanGuardMessage("knowledge_base") },
         { status: 403 },

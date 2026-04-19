@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { WorkspaceForm } from "@/components/workspace-form";
 import { requireCurrentUser } from "@/lib/auth";
 import { getPlanEntitlements } from "@/lib/entitlements";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import {
   getUserAccountById,
   listKnowledgeAssetsForUser,
@@ -29,7 +30,8 @@ export default async function NewWorkspacePage({
   }
 
   const entitlements = getPlanEntitlements(user.billing);
-  const knowledgeAssets = entitlements.canUseKnowledgeBase ? allKnowledgeAssets : [];
+  const canUseKnowledgeBase = entitlements.canUseKnowledgeBase || isPlatformAdminEmail(user.email);
+  const knowledgeAssets = canUseKnowledgeBase ? allKnowledgeAssets : [];
   const ownedWorkspaceCount = workspaces.filter(
     (workspace) => workspace.ownerId === sessionUser.id,
   ).length;
@@ -91,7 +93,7 @@ export default async function NewWorkspacePage({
       <div className="mt-8">
         <WorkspaceForm
           knowledgeAssets={knowledgeAssets}
-          canUseKnowledgeBase={entitlements.canUseKnowledgeBase}
+          canUseKnowledgeBase={canUseKnowledgeBase}
           workspaceLimitReached={workspaceLimitReached}
           effectivePlan={entitlements.effectivePlan}
         />

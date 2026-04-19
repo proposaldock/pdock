@@ -2,6 +2,7 @@ import { KnowledgeBaseManager } from "@/components/knowledge-base-manager";
 import { Badge } from "@/components/ui/badge";
 import { requireCurrentUser } from "@/lib/auth";
 import { getPlanEntitlements } from "@/lib/entitlements";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import { getUserAccountById, listKnowledgeAssetsForUser } from "@/lib/store";
 
 export default async function KnowledgeBasePage() {
@@ -13,7 +14,8 @@ export default async function KnowledgeBasePage() {
   }
 
   const entitlements = getPlanEntitlements(user.billing);
-  const assets = entitlements.canUseKnowledgeBase
+  const canUseKnowledgeBase = entitlements.canUseKnowledgeBase || isPlatformAdminEmail(user.email);
+  const assets = canUseKnowledgeBase
     ? await listKnowledgeAssetsForUser(sessionUser.id)
     : [];
 
@@ -32,7 +34,7 @@ export default async function KnowledgeBasePage() {
       <div className="mt-8">
         <KnowledgeBaseManager
           initialAssets={assets}
-          canManage={entitlements.canUseKnowledgeBase}
+          canManage={canUseKnowledgeBase}
           effectivePlan={entitlements.effectivePlan}
         />
       </div>

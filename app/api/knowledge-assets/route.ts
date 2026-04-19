@@ -3,6 +3,7 @@ import { requireApiUser } from "@/lib/authz";
 import { parseUploadedDocument } from "@/lib/document-parser";
 import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
 import { storeUploadedFile } from "@/lib/file-storage";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import {
   createKnowledgeAsset,
   getUserAccountById,
@@ -35,7 +36,8 @@ export async function GET() {
   }
 
   const entitlements = getPlanEntitlements(account.billing);
-  if (!entitlements.canUseKnowledgeBase) {
+  const canUseKnowledgeBase = entitlements.canUseKnowledgeBase || isPlatformAdminEmail(account.email);
+  if (!canUseKnowledgeBase) {
     return NextResponse.json({ assets: [] });
   }
 
@@ -53,7 +55,8 @@ export async function POST(request: Request) {
     }
 
     const entitlements = getPlanEntitlements(account.billing);
-    if (!entitlements.canUseKnowledgeBase) {
+    const canUseKnowledgeBase = entitlements.canUseKnowledgeBase || isPlatformAdminEmail(account.email);
+    if (!canUseKnowledgeBase) {
       return NextResponse.json(
         { error: getPlanGuardMessage("knowledge_base") },
         { status: 403 },

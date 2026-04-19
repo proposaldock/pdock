@@ -3,7 +3,11 @@ function normalizeEmail(value: string) {
 }
 
 export function getPlatformAdminEmails() {
-  const configured = process.env.PLATFORM_ADMIN_EMAILS ?? process.env.ADMIN_EMAILS ?? "";
+  const configured =
+    process.env.PLATFORM_ADMIN_EMAILS ??
+    process.env.ADMIN_EMAILS ??
+    process.env.ADMIN_EMAIL ??
+    "";
 
   return configured
     .split(",")
