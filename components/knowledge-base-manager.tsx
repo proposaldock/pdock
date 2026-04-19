@@ -14,13 +14,38 @@ type FormValues = {
   title: string;
   category: string;
   content: string;
+  approvalStatus: NonNullable<KnowledgeAsset["approvalStatus"]>;
+  lastReviewedAt: string;
+  intendedUseCase: string;
+  proofNote: string;
 };
 
 const emptyValues: FormValues = {
   title: "",
   category: "",
   content: "",
+  approvalStatus: "approved",
+  lastReviewedAt: "",
+  intendedUseCase: "",
+  proofNote: "",
 };
+
+function toDateInputValue(value: string | null | undefined) {
+  return value ? value.slice(0, 10) : "";
+}
+
+function knowledgeStatusTone(status: KnowledgeAsset["approvalStatus"]) {
+  if (status === "approved") return "green";
+  if (status === "needs_review") return "yellow";
+  return "zinc";
+}
+
+function isStale(lastReviewedAt: string | null | undefined) {
+  if (!lastReviewedAt) return true;
+  const reviewed = new Date(lastReviewedAt).getTime();
+  if (Number.isNaN(reviewed)) return true;
+  return Date.now() - reviewed > 180 * 24 * 60 * 60 * 1000;
+}
 
 export function KnowledgeBaseManager({
   initialAssets,
@@ -53,6 +78,10 @@ export function KnowledgeBaseManager({
       title: asset.title,
       category: asset.category,
       content: asset.content,
+      approvalStatus: asset.approvalStatus ?? "approved",
+      lastReviewedAt: toDateInputValue(asset.lastReviewedAt),
+      intendedUseCase: asset.intendedUseCase ?? "",
+      proofNote: asset.proofNote ?? "",
     });
     setFile(null);
     setError("");
@@ -73,6 +102,10 @@ export function KnowledgeBaseManager({
       formData.append("title", values.title);
       formData.append("category", values.category);
       formData.append("content", values.content);
+      formData.append("approvalStatus", values.approvalStatus);
+      formData.append("lastReviewedAt", values.lastReviewedAt);
+      formData.append("intendedUseCase", values.intendedUseCase);
+      formData.append("proofNote", values.proofNote);
       if (file) formData.append("file", file);
 
       const response = await fetch(
@@ -186,6 +219,47 @@ export function KnowledgeBaseManager({
                 />
               </label>
             </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <label className="grid gap-2 text-sm font-semibold">
+                Approval status
+                <select
+                  value={values.approvalStatus}
+                  onChange={(event) =>
+                    setValues({
+                      ...values,
+                      approvalStatus: event.target.value as NonNullable<KnowledgeAsset["approvalStatus"]>,
+                    })
+                  }
+                  className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-emerald-500"
+                >
+                  <option value="approved">Approved</option>
+                  <option value="needs_review">Needs review</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </label>
+              <label className="grid gap-2 text-sm font-semibold">
+                Last reviewed
+                <input
+                  type="date"
+                  value={values.lastReviewedAt}
+                  onChange={(event) =>
+                    setValues({ ...values, lastReviewedAt: event.target.value })
+                  }
+                  className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold">
+                Intended use case
+                <input
+                  value={values.intendedUseCase}
+                  onChange={(event) =>
+                    setValues({ ...values, intendedUseCase: event.target.value })
+                  }
+                  className="h-11 rounded-lg border border-zinc-300 px-3 text-sm outline-none focus:border-emerald-500"
+                  placeholder="Security answers, case proof..."
+                />
+              </label>
+            </div>
             <label className="grid gap-2 text-sm font-semibold">
               Content
               <textarea
@@ -194,6 +268,16 @@ export function KnowledgeBaseManager({
                 rows={8}
                 className="rounded-lg border border-zinc-300 p-3 text-sm outline-none focus:border-emerald-500"
                 placeholder="Paste approved company information, or leave this light and upload a file below..."
+              />
+            </label>
+            <label className="grid gap-2 text-sm font-semibold">
+              Proof note
+              <textarea
+                value={values.proofNote}
+                onChange={(event) => setValues({ ...values, proofNote: event.target.value })}
+                rows={3}
+                className="rounded-lg border border-zinc-300 p-3 text-sm outline-none focus:border-emerald-500"
+                placeholder="Optional: where this claim came from, who approved it, or how it should be used."
               />
             </label>
             <label className="grid gap-2 text-sm font-semibold">
@@ -246,13 +330,34 @@ export function KnowledgeBaseManager({
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-bold">{asset.title}</h3>
                     <Badge tone="teal">{asset.category}</Badge>
+                    <Badge tone={knowledgeStatusTone(asset.approvalStatus)}>
+                      {(asset.approvalStatus ?? "approved").replace("_", " ")}
+                    </Badge>
+                    <Badge tone={isStale(asset.lastReviewedAt) ? "yellow" : "green"}>
+                      {isStale(asset.lastReviewedAt) ? "review needed" : "fresh"}
+                    </Badge>
                     <Badge tone={asset.sourceKind === "upload" ? "yellow" : "zinc"}>
                       {asset.sourceKind === "upload" ? "file-backed" : "manual"}
                     </Badge>
                   </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {asset.ownerName ? <Badge tone="zinc">Owner: {asset.ownerName}</Badge> : null}
+                    {asset.intendedUseCase ? (
+                      <Badge tone="teal">Use: {asset.intendedUseCase}</Badge>
+                    ) : null}
+                    {asset.lastReviewedAt ? (
+                      <Badge tone="zinc">Reviewed {formatDate(asset.lastReviewedAt)}</Badge>
+                    ) : null}
+                  </div>
                   <p className="mt-3 text-sm leading-6 text-zinc-600">
                     {truncate(asset.content, 240)}
                   </p>
+                  {asset.proofNote ? (
+                    <div className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm leading-6 text-zinc-600">
+                      <span className="font-semibold text-zinc-900">Proof note: </span>
+                      {asset.proofNote}
+                    </div>
+                  ) : null}
                   {asset.sourceFilename ? (
                     <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
                       <FileText className="size-3.5" />

@@ -298,6 +298,18 @@ async function reviewedAnswersDoc(workspace: Workspace) {
   return Packer.toBuffer(doc);
 }
 
+function sourceOriginLabel(source: Workspace["analysis"]["sources"][number]) {
+  if (source.sourceType === "knowledge_asset") {
+    return `Knowledge asset${source.assetTitle ? `: ${source.assetTitle}` : ""}`;
+  }
+
+  if (source.sourceType === "company_knowledge") {
+    return "Background material";
+  }
+
+  return `Document${source.documentLabel ? `: ${source.documentLabel}` : ""}`;
+}
+
 async function responsePackDoc(workspace: Workspace) {
   const acceptedAnswers = reviewedAnswers(workspace.analysis, workspace.reviewState);
 
@@ -337,14 +349,7 @@ async function responsePackDoc(workspace: Workspace) {
   children.push(sectionTitle("Evidence Sources"));
   for (const source of workspace.analysis.sources) {
     children.push(subsectionTitle(`${source.id} - ${source.label}`));
-    children.push(
-      metaLine(
-        "Origin",
-        source.sourceType === "knowledge_asset"
-          ? `Knowledge asset${source.assetTitle ? `: ${source.assetTitle}` : ""}`
-          : `Document${source.documentLabel ? `: ${source.documentLabel}` : ""}`,
-      ),
-    );
+    children.push(metaLine("Origin", sourceOriginLabel(source)));
     children.push(body(source.content || source.excerpt));
   }
 

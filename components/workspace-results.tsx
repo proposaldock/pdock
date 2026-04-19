@@ -34,10 +34,22 @@ import { cn, isOverdue } from "@/lib/utils";
 
 const proposalSectionTemplates = [
   {
+    id: "client-situation",
+    title: "Client Situation / Context",
+    content:
+      "Summarize the client's current situation, business context, urgency, constraints, and the reason this proposal matters now.",
+  },
+  {
     id: "implementation-approach",
     title: "Implementation Approach",
     content:
       "Describe the proposed delivery phases, governance model, assumptions, dependencies, and how the team will move from kickoff to launch.",
+  },
+  {
+    id: "scope-and-deliverables",
+    title: "Scope and Deliverables",
+    content:
+      "Define the proposed scope, included deliverables, exclusions, dependencies, and how success will be measured.",
   },
   {
     id: "project-team",
@@ -50,6 +62,24 @@ const proposalSectionTemplates = [
     title: "Timeline and Milestones",
     content:
       "Summarize the implementation timeline, critical milestones, decision gates, and any assumptions needed to support the plan.",
+  },
+  {
+    id: "assumptions-and-dependencies",
+    title: "Assumptions and Dependencies",
+    content:
+      "List the assumptions, client responsibilities, dependencies, and decisions needed to keep delivery realistic.",
+  },
+  {
+    id: "supporting-proof",
+    title: "Supporting Proof / Case References",
+    content:
+      "Add the proof points, case references, metrics, or approved knowledge that make the proposed approach credible.",
+  },
+  {
+    id: "next-steps",
+    title: "Next Steps",
+    content:
+      "Close with the recommended next actions, decision path, kickoff steps, and any clarification needed from the client.",
   },
   {
     id: "support-and-service-model",
@@ -131,6 +161,123 @@ function proposalStatusTone(value: "draft" | "in_review" | "approved") {
   if (value === "approved") return "green";
   if (value === "in_review") return "yellow";
   return "zinc";
+}
+
+type EvidenceStatus = "approved" | "needs_proof" | "unverified" | "stale" | "conflicted";
+
+function evidenceStatusTone(value: EvidenceStatus) {
+  if (value === "approved") return "green";
+  if (value === "needs_proof" || value === "stale") return "yellow";
+  if (value === "conflicted") return "red";
+  return "zinc";
+}
+
+function isKnowledgeAssetStale(asset: NonNullable<Workspace["knowledgeAssets"]>[number] | undefined) {
+  if (!asset) return false;
+  if (asset.approvalStatus && asset.approvalStatus !== "approved") return true;
+  if (!asset.lastReviewedAt) return false;
+
+  const reviewed = new Date(asset.lastReviewedAt).getTime();
+  if (Number.isNaN(reviewed)) return true;
+  return Date.now() - reviewed > 180 * 24 * 60 * 60 * 1000;
+}
+
+function sourceHasCompanyEvidence(source: ProposalAnalysis["sources"][number] | undefined) {
+  return source?.sourceType === "company_knowledge" || source?.sourceType === "knowledge_asset";
+}
+
+function getSectionEvidenceStatus(input: {
+  section: WorkspaceProposalState["sections"][number];
+  analysis: ProposalAnalysis;
+  reviewState?: WorkspaceReviewState;
+  knowledgeAssets?: Workspace["knowledgeAssets"];
+}): EvidenceStatus {
+  const linkedReviews = input.reviewState
+    ? input.section.sourceRequirementIds
+        .map((requirementId) =>
+          input.reviewState?.requirements.find((review) => review.requirementId === requirementId),
+        )
+        .filter(Boolean)
+    : [];
+
+  if (linkedReviews.some((review) => review?.decision === "rejected")) {
+    return "conflicted";
+  }
+
+  if (input.section.sourceRefs.length === 0) {
+    return "needs_proof";
+  }
+
+  const citedSources = input.section.sourceRefs
+    .map((ref) => input.analysis.sources.find((source) => source.id === ref))
+    .filter((source): source is ProposalAnalysis["sources"][number] => Boolean(source));
+  const hasStaleKnowledge = citedSources.some((source) =>
+    isKnowledgeAssetStale(
+      (input.knowledgeAssets ?? []).find((asset) => asset.id === source.assetId),
+    ),
+  );
+
+  if (hasStaleKnowledge) {
+    return "stale";
+  }
+
+  if (input.section.status === "approved" && input.section.reviewerName.trim()) {
+    return "approved";
+  }
+
+  return "unverified";
+}
+
+function getOpportunityAssessment(analysis: ProposalAnalysis) {
+  const deadlineTime = analysis.overview.submissionDeadline
+    ? new Date(analysis.overview.submissionDeadline).getTime()
+    : Number.NaN;
+  const daysUntilDeadline = Number.isNaN(deadlineTime)
+    ? null
+    : Math.ceil((deadlineTime - Date.now()) / (24 * 60 * 60 * 1000));
+  const deadlineRisk =
+    daysUntilDeadline === null
+      ? "unknown"
+      : daysUntilDeadline < 0
+        ? "passed"
+        : daysUntilDeadline <= 7
+          ? "high"
+          : daysUntilDeadline <= 14
+            ? "medium"
+            : "low";
+  const highRisks = analysis.risks.filter((risk) => risk.severity === "high");
+  const missingRequirements = analysis.requirements.filter(
+    (requirement) => requirement.status === "missing",
+  );
+  const unsupportedRequirements = analysis.requirements.filter((requirement) => {
+    if (requirement.status === "missing") return true;
+    return !requirement.sourceRefs.some((ref) =>
+      sourceHasCompanyEvidence(analysis.sources.find((source) => source.id === ref)),
+    );
+  });
+  const notableRisks = analysis.risks.filter(
+    (risk) => risk.severity === "high" || risk.severity === "medium",
+  );
+  const recommendation =
+    highRisks.length >= 2 || missingRequirements.filter((item) => item.priority === "high").length >= 2
+      ? "no_bid"
+      : highRisks.length ||
+          missingRequirements.length ||
+          unsupportedRequirements.length ||
+          analysis.draft.openQuestions.length ||
+          deadlineRisk === "high" ||
+          deadlineRisk === "passed"
+        ? "caution"
+        : "go";
+
+  return {
+    recommendation,
+    deadlineRisk,
+    missingRequirements,
+    unsupportedRequirements,
+    clarificationQuestions: analysis.draft.openQuestions,
+    notableRisks,
+  };
 }
 
 function StatusIcon({ status }: { status: string }) {
@@ -700,6 +847,8 @@ export function WorkspaceResults({
           <ProposalAssembly
             analysis={analysis}
             workspaceId={workspace.id}
+            reviewState={reviewState}
+            knowledgeAssets={workspace.knowledgeAssets ?? []}
             proposalState={proposalState}
             onChange={setProposalState}
             onActivityLogChange={setActivityLog}
@@ -722,6 +871,7 @@ export function WorkspaceResults({
             workspaceId={workspace.id}
             analysis={analysis}
             reviewState={reviewState}
+            knowledgeAssets={workspace.knowledgeAssets ?? []}
             proposalState={proposalState}
           />
         ) : null}
@@ -821,29 +971,134 @@ function Overview({
   analysis: ProposalAnalysis;
   reviewSummary: { accepted: number; rejected: number; pending: number };
 }) {
+  const assessment = getOpportunityAssessment(analysis);
+  const recommendationLabel =
+    assessment.recommendation === "go"
+      ? "Go"
+      : assessment.recommendation === "no_bid"
+        ? "No-bid"
+        : "Caution";
+  const recommendationTone =
+    assessment.recommendation === "go"
+      ? "green"
+      : assessment.recommendation === "no_bid"
+        ? "red"
+        : "yellow";
+
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_0.7fr]">
+    <div className="grid gap-5">
       <Card>
         <CardHeader>
-          <CardTitle>Executive view</CardTitle>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Bid assessment</CardTitle>
+              <p className="mt-1 text-sm text-zinc-600">
+                A lightweight go / caution / no-bid view derived from requirements, risks, open
+                questions, deadline, and cited evidence.
+              </p>
+            </div>
+            <Badge tone={recommendationTone}>{recommendationLabel}</Badge>
+          </div>
         </CardHeader>
-        <CardContent>
-          <p className="leading-7 text-zinc-700">{analysis.overview.summary}</p>
+        <CardContent className="grid gap-4 lg:grid-cols-3">
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-sm font-semibold text-zinc-950">Deadline risk</p>
+            <Badge
+              className="mt-3"
+              tone={
+                assessment.deadlineRisk === "high" || assessment.deadlineRisk === "passed"
+                  ? "red"
+                  : assessment.deadlineRisk === "medium" || assessment.deadlineRisk === "unknown"
+                    ? "yellow"
+                    : "green"
+              }
+            >
+              {assessment.deadlineRisk}
+            </Badge>
+          </div>
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-sm font-semibold text-zinc-950">Proof gaps</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-600">
+              {assessment.unsupportedRequirements.length
+                ? `${assessment.unsupportedRequirements.length} requirements need stronger company evidence.`
+                : "No obvious proof gaps in covered requirements."}
+            </p>
+          </div>
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+            <p className="text-sm font-semibold text-zinc-950">Missing information</p>
+            <p className="mt-2 text-sm leading-6 text-zinc-600">
+              {assessment.clarificationQuestions.length
+                ? `${assessment.clarificationQuestions.length} clarification questions to ask.`
+                : "No explicit clarification questions were raised."}
+            </p>
+          </div>
+          <div className="grid gap-4 lg:col-span-3 md:grid-cols-3">
+            <AssessmentList
+              title="Missing requirements"
+              items={
+                assessment.missingRequirements.length
+                  ? assessment.missingRequirements.slice(0, 3).map((item) => item.title)
+                  : ["No missing requirements flagged."]
+              }
+            />
+            <AssessmentList
+              title="Clarification questions"
+              items={
+                assessment.clarificationQuestions.length
+                  ? assessment.clarificationQuestions.slice(0, 3)
+                  : ["No open client questions yet."]
+              }
+            />
+            <AssessmentList
+              title="Notable risks"
+              items={
+                assessment.notableRisks.length
+                  ? assessment.notableRisks.slice(0, 3).map((risk) => risk.title)
+                  : ["No high or medium risks flagged."]
+              }
+            />
+          </div>
         </CardContent>
       </Card>
-      <div className="grid gap-4">
-        <Metric label="Document type" value={analysis.overview.documentType} />
-        <Metric
-          label="Deadline"
-          value={analysis.overview.submissionDeadline || "Not specified"}
-        />
-        <Metric
-          label="Complexity"
-          value={analysis.overview.estimatedComplexity}
-          tone={priorityTone(analysis.overview.estimatedComplexity)}
-        />
-        <Metric label="Accepted requirements" value={String(reviewSummary.accepted)} tone="green" />
+
+      <div className="grid gap-5 lg:grid-cols-[1fr_0.7fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>Executive view</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="leading-7 text-zinc-700">{analysis.overview.summary}</p>
+          </CardContent>
+        </Card>
+        <div className="grid gap-4">
+          <Metric label="Document type" value={analysis.overview.documentType} />
+          <Metric
+            label="Deadline"
+            value={analysis.overview.submissionDeadline || "Not specified"}
+          />
+          <Metric
+            label="Complexity"
+            value={analysis.overview.estimatedComplexity}
+            tone={priorityTone(analysis.overview.estimatedComplexity)}
+          />
+          <Metric label="Accepted requirements" value={String(reviewSummary.accepted)} tone="green" />
+        </div>
       </div>
+    </div>
+  );
+}
+
+function AssessmentList({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+        {title}
+      </p>
+      <ul className="mt-2 space-y-2 text-sm leading-6 text-zinc-600">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -1216,6 +1471,8 @@ function Sources({
 function ProposalAssembly({
   analysis,
   workspaceId,
+  reviewState,
+  knowledgeAssets,
   proposalState,
   onChange,
   onActivityLogChange,
@@ -1224,6 +1481,8 @@ function ProposalAssembly({
 }: {
   analysis: ProposalAnalysis;
   workspaceId: string;
+  reviewState: WorkspaceReviewState;
+  knowledgeAssets: NonNullable<Workspace["knowledgeAssets"]>;
   proposalState: WorkspaceProposalState;
   onChange: (state: WorkspaceProposalState) => void;
   onActivityLogChange: (activityLog: Workspace["activityLog"]) => void;
@@ -1248,12 +1507,32 @@ function ProposalAssembly({
         .map((ref) => analysis.sources.find((source) => source.id === ref))
         .filter((source): source is ProposalAnalysis["sources"][number] => Boolean(source))
     : [];
+  const selectedSectionEvidenceStatus = selectedSection
+    ? getSectionEvidenceStatus({
+        section: selectedSection,
+        analysis,
+        reviewState,
+        knowledgeAssets,
+      })
+    : null;
   const compareSnapshot =
     proposalState.snapshots.find((snapshot) => snapshot.id === compareSnapshotId) ?? null;
   const readiness = useMemo(() => {
     const approved = proposalState.sections.filter((section) => section.status === "approved");
     const missingContent = proposalState.sections.filter((section) => !section.content.trim());
-    const missingEvidence = proposalState.sections.filter((section) => section.sourceRefs.length === 0);
+    const evidenceBySection = proposalState.sections.map((section) => ({
+      section,
+      status: getSectionEvidenceStatus({
+        section,
+        analysis,
+        reviewState,
+        knowledgeAssets,
+      }),
+    }));
+    const missingEvidence = evidenceBySection.filter(({ status }) => status === "needs_proof");
+    const unverifiedEvidence = evidenceBySection.filter(({ status }) =>
+      ["unverified", "stale", "conflicted"].includes(status),
+    );
     const missingSignoff = proposalState.sections.filter(
       (section) => section.status === "approved" && !section.reviewerName.trim(),
     );
@@ -1265,13 +1544,15 @@ function ProposalAssembly({
         proposalState.sections.length > 0 &&
         missingContent.length === 0 &&
         missingEvidence.length === 0 &&
+        unverifiedEvidence.length === 0 &&
         missingSignoff.length === 0 &&
         approved.length === proposalState.sections.length,
       missingContent,
       missingEvidence,
+      unverifiedEvidence,
       missingSignoff,
     };
-  }, [proposalState.sections]);
+  }, [analysis, knowledgeAssets, proposalState.sections, reviewState]);
 
   function updateSection(
     sectionId: string,
@@ -1513,7 +1794,10 @@ function ProposalAssembly({
               {readiness.missingContent.length} empty sections
             </Badge>
             <Badge tone={readiness.missingEvidence.length ? "yellow" : "green"}>
-              {readiness.missingEvidence.length} without evidence
+              {readiness.missingEvidence.length} without proof
+            </Badge>
+            <Badge tone={readiness.unverifiedEvidence.length ? "yellow" : "green"}>
+              {readiness.unverifiedEvidence.length} evidence flags
             </Badge>
             <Badge tone={readiness.missingSignoff.length ? "yellow" : "green"}>
               {readiness.missingSignoff.length} missing signoff
@@ -1528,8 +1812,16 @@ function ProposalAssembly({
               ) : null}
               {readiness.missingEvidence.length ? (
                 <p>
-                  Missing evidence:{" "}
-                  {readiness.missingEvidence.map((section) => section.title).join(", ")}
+                  Missing proof:{" "}
+                  {readiness.missingEvidence.map(({ section }) => section.title).join(", ")}
+                </p>
+              ) : null}
+              {readiness.unverifiedEvidence.length ? (
+                <p>
+                  Evidence flags:{" "}
+                  {readiness.unverifiedEvidence
+                    .map(({ section, status }) => `${section.title} (${status.replace("_", " ")})`)
+                    .join(", ")}
                 </p>
               ) : null}
               {readiness.missingSignoff.length ? (
@@ -1646,73 +1938,84 @@ function ProposalAssembly({
 
       <div className="grid gap-5 xl:grid-cols-[1.1fr_0.72fr]">
         <div className="grid gap-5">
-          {proposalState.sections.map((section, index) => (
-            <div
-              key={section.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => setSelectedSectionId(section.id)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setSelectedSectionId(section.id);
-                }
-              }}
-              className="text-left"
-            >
-              <Card
-                className={cn(
-                  "transition hover:border-emerald-300",
-                  selectedSection?.id === section.id && "border-emerald-400 ring-1 ring-emerald-300",
-                )}
+          {proposalState.sections.map((section, index) => {
+            const evidenceStatus = getSectionEvidenceStatus({
+              section,
+              analysis,
+              reviewState,
+              knowledgeAssets,
+            });
+
+            return (
+              <div
+                key={section.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedSectionId(section.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedSectionId(section.id);
+                  }
+                }}
+                className="text-left"
               >
-                <CardContent className="grid gap-4 p-5">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <Badge tone="zinc">Section {index + 1}</Badge>
-                      {section.sourceRequirementIds.length ? (
-                        <Badge tone="teal">
-                          {section.sourceRequirementIds.length} source requirement
-                          {section.sourceRequirementIds.length > 1 ? "s" : ""}
+                <Card
+                  className={cn(
+                    "transition hover:border-emerald-300",
+                    selectedSection?.id === section.id && "border-emerald-400 ring-1 ring-emerald-300",
+                  )}
+                >
+                  <CardContent className="grid gap-4 p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Badge tone="zinc">Section {index + 1}</Badge>
+                        {section.sourceRequirementIds.length ? (
+                          <Badge tone="teal">
+                            {section.sourceRequirementIds.length} source requirement
+                            {section.sourceRequirementIds.length > 1 ? "s" : ""}
+                          </Badge>
+                        ) : null}
+                        {section.sourceRefs.length ? (
+                          <Badge tone="yellow">
+                            {section.sourceRefs.length} cited chunk
+                            {section.sourceRefs.length > 1 ? "s" : ""}
+                          </Badge>
+                        ) : null}
+                        <Badge tone={evidenceStatusTone(evidenceStatus)}>
+                          evidence: {evidenceStatus.replace("_", " ")}
                         </Badge>
-                      ) : null}
-                      {section.sourceRefs.length ? (
-                        <Badge tone="yellow">
-                          {section.sourceRefs.length} cited chunk
-                          {section.sourceRefs.length > 1 ? "s" : ""}
+                        <Badge tone={proposalStatusTone(section.status)}>
+                          {section.status.replace("_", " ")}
                         </Badge>
-                      ) : null}
-                      <Badge tone={proposalStatusTone(section.status)}>
-                        {section.status.replace("_", " ")}
-                      </Badge>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            moveSection(section.id, "up");
+                          }}
+                          disabled={index === 0}
+                        >
+                          <ArrowUp className="size-4" />
+                          Up
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            moveSection(section.id, "down");
+                          }}
+                          disabled={index === proposalState.sections.length - 1}
+                        >
+                          <ArrowDown className="size-4" />
+                          Down
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          moveSection(section.id, "up");
-                        }}
-                        disabled={index === 0}
-                      >
-                        <ArrowUp className="size-4" />
-                        Up
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          moveSection(section.id, "down");
-                        }}
-                        disabled={index === proposalState.sections.length - 1}
-                      >
-                        <ArrowDown className="size-4" />
-                        Down
-                      </Button>
-                    </div>
-                  </div>
                   <div className="flex flex-wrap gap-2">
                     <Button
                       size="sm"
@@ -2009,10 +2312,16 @@ function ProposalAssembly({
                 </CardContent>
               </Card>
             </div>
-          ))}
+          );
+          })}
         </div>
 
-        <ProposalEvidencePanel analysis={analysis} section={selectedSection} sources={selectedSectionSources} />
+        <ProposalEvidencePanel
+          analysis={analysis}
+          section={selectedSection}
+          sources={selectedSectionSources}
+          evidenceStatus={selectedSectionEvidenceStatus}
+        />
       </div>
     </div>
   );
@@ -2143,10 +2452,12 @@ function ProposalEvidencePanel({
   analysis,
   section,
   sources,
+  evidenceStatus,
 }: {
   analysis: ProposalAnalysis;
   section: WorkspaceProposalState["sections"][number] | null;
   sources: ProposalAnalysis["sources"];
+  evidenceStatus: EvidenceStatus | null;
 }) {
   const [selectedEvidenceId, setSelectedEvidenceId] = useState<string | null>(
     sources[0]?.id ?? null,
@@ -2172,6 +2483,11 @@ function ProposalEvidencePanel({
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="flex flex-wrap gap-2">
+          {evidenceStatus ? (
+            <Badge tone={evidenceStatusTone(evidenceStatus)}>
+              evidence: {evidenceStatus.replace("_", " ")}
+            </Badge>
+          ) : null}
           <Badge tone="zinc">{section.sourceRequirementIds.length} linked requirements</Badge>
           <Badge tone="yellow">{section.sourceRefs.length} cited chunks</Badge>
         </div>
@@ -2357,11 +2673,13 @@ function ExportView({
   workspaceId,
   analysis,
   reviewState,
+  knowledgeAssets,
   proposalState,
 }: {
   workspaceId: string;
   analysis: ProposalAnalysis;
   reviewState: WorkspaceReviewState;
+  knowledgeAssets: NonNullable<Workspace["knowledgeAssets"]>;
   proposalState: WorkspaceProposalState;
 }) {
   const requirementMatrix = useMemo(
@@ -2383,18 +2701,29 @@ function ExportView({
       (section) => section.status === "approved" && !section.reviewerName.trim(),
     ).length;
     const uncited = proposalState.sections.filter((section) => section.sourceRefs.length === 0).length;
+    const evidenceFlags = proposalState.sections.filter((section) => {
+      const status = getSectionEvidenceStatus({
+        section,
+        analysis,
+        reviewState,
+        knowledgeAssets,
+      });
+      return status === "unverified" || status === "stale" || status === "conflicted";
+    }).length;
     return {
       approvedCount,
       totalCount: proposalState.sections.length,
       unsignedApproved,
       uncited,
+      evidenceFlags,
       ready:
         proposalState.sections.length > 0 &&
         approvedCount === proposalState.sections.length &&
         unsignedApproved === 0 &&
-        uncited === 0,
+        uncited === 0 &&
+        evidenceFlags === 0,
     };
-  }, [proposalState.sections]);
+  }, [analysis, knowledgeAssets, proposalState.sections, reviewState]);
 
   function continueToExport(target: { kind: "docx" | "print"; href: string }) {
     if (target.kind === "print") {
@@ -2443,6 +2772,9 @@ function ExportView({
             <Badge tone={exportReadiness.uncited ? "yellow" : "green"}>
               {exportReadiness.uncited} sections without citations
             </Badge>
+            <Badge tone={exportReadiness.evidenceFlags ? "yellow" : "green"}>
+              {exportReadiness.evidenceFlags} evidence flags
+            </Badge>
           </div>
           <p className="text-sm text-zinc-600">
             Use this as the final gate before copying or exporting the proposal pack.
@@ -2489,6 +2821,31 @@ function ExportView({
                   Missing evidence:{" "}
                   {proposalState.sections
                     .filter((section) => section.sourceRefs.length === 0)
+                    .map((section) => section.title)
+                    .join(", ")}
+                </p>
+              ) : null}
+              {proposalState.sections.filter((section) => {
+                const status = getSectionEvidenceStatus({
+                  section,
+                  analysis,
+                  reviewState,
+                  knowledgeAssets,
+                });
+                return status === "unverified" || status === "stale" || status === "conflicted";
+              }).length ? (
+                <p>
+                  Evidence flags:{" "}
+                  {proposalState.sections
+                    .filter((section) => {
+                      const status = getSectionEvidenceStatus({
+                        section,
+                        analysis,
+                        reviewState,
+                        knowledgeAssets,
+                      });
+                      return status === "unverified" || status === "stale" || status === "conflicted";
+                    })
                     .map((section) => section.title)
                     .join(", ")}
                 </p>

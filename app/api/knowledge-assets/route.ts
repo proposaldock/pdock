@@ -8,8 +8,22 @@ import {
   getUserAccountById,
   listKnowledgeAssetsForUser,
 } from "@/lib/store";
+import type { KnowledgeAsset } from "@/lib/types";
 
 export const runtime = "nodejs";
+
+function normalizeApprovalStatus(value: FormDataEntryValue | string | null | undefined) {
+  const status = String(value ?? "").trim();
+  if (status === "needs_review" || status === "draft" || status === "approved") {
+    return status as NonNullable<KnowledgeAsset["approvalStatus"]>;
+  }
+  return "approved";
+}
+
+function normalizeOptionalText(value: FormDataEntryValue | string | null | undefined) {
+  const text = String(value ?? "").trim();
+  return text || null;
+}
 
 export async function GET() {
   const { user, response } = await requireApiUser();
@@ -50,6 +64,10 @@ export async function POST(request: Request) {
     let title = "";
     let category = "";
     let content = "";
+    let approvalStatus: NonNullable<KnowledgeAsset["approvalStatus"]> = "approved";
+    let lastReviewedAt: string | null = null;
+    let intendedUseCase: string | null = null;
+    let proofNote: string | null = null;
     let fileSize: number | null = null;
     let sourceFilename: string | null = null;
     let sourceMimeType: string | null = null;
@@ -63,6 +81,10 @@ export async function POST(request: Request) {
       title = String(formData.get("title") ?? "").trim();
       category = String(formData.get("category") ?? "").trim();
       content = String(formData.get("content") ?? "").trim();
+      approvalStatus = normalizeApprovalStatus(formData.get("approvalStatus"));
+      lastReviewedAt = normalizeOptionalText(formData.get("lastReviewedAt"));
+      intendedUseCase = normalizeOptionalText(formData.get("intendedUseCase"));
+      proofNote = normalizeOptionalText(formData.get("proofNote"));
       const file = formData.get("file");
 
       if (file instanceof File && file.size > 0) {
@@ -85,11 +107,19 @@ export async function POST(request: Request) {
         title?: string;
         category?: string;
         content?: string;
+        approvalStatus?: string;
+        lastReviewedAt?: string;
+        intendedUseCase?: string;
+        proofNote?: string;
       };
 
       title = body.title?.trim() ?? "";
       category = body.category?.trim() ?? "";
       content = body.content?.trim() ?? "";
+      approvalStatus = normalizeApprovalStatus(body.approvalStatus);
+      lastReviewedAt = normalizeOptionalText(body.lastReviewedAt);
+      intendedUseCase = normalizeOptionalText(body.intendedUseCase);
+      proofNote = normalizeOptionalText(body.proofNote);
     }
 
     if (!title || !category || !content) {
@@ -103,6 +133,10 @@ export async function POST(request: Request) {
       title,
       category,
       content,
+      approvalStatus,
+      lastReviewedAt,
+      intendedUseCase,
+      proofNote,
       fileSize,
       sourceFilename,
       sourceMimeType,

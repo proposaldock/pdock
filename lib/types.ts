@@ -11,6 +11,11 @@ export type KnowledgeAsset = {
   excerpt: string;
   organizationId?: string | null;
   organizationName?: string | null;
+  ownerName?: string | null;
+  approvalStatus?: "approved" | "needs_review" | "draft" | null;
+  lastReviewedAt?: string | null;
+  intendedUseCase?: string | null;
+  proofNote?: string | null;
   fileSize?: number | null;
   sourceFilename?: string | null;
   sourceMimeType?: string | null;

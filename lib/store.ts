@@ -203,6 +203,10 @@ type KnowledgeAssetRecord = {
   category: string;
   content: string;
   excerpt: string;
+  approvalStatus: string | null;
+  lastReviewedAt: Date | null;
+  intendedUseCase: string | null;
+  proofNote: string | null;
   fileSize: number | null;
   sourceFilename: string | null;
   sourceMimeType: string | null;
@@ -213,6 +217,7 @@ type KnowledgeAssetRecord = {
   createdAt: Date;
   updatedAt: Date;
   organization?: { name: string } | null;
+  owner?: { name: string } | null;
 };
 
 type OrganizationMembershipRecord = {
@@ -491,14 +496,24 @@ function createActivityEntry(
 }
 
 function fromKnowledgeAssetRecord(record: KnowledgeAssetRecord): KnowledgeAsset {
+  const approvalStatus =
+    record.approvalStatus === "needs_review" || record.approvalStatus === "draft"
+      ? record.approvalStatus
+      : "approved";
+
   return {
     id: record.id,
     organizationId: record.organizationId,
     organizationName: record.organization?.name ?? null,
+    ownerName: record.owner?.name ?? null,
     title: record.title,
     category: record.category,
     content: record.content,
     excerpt: record.excerpt,
+    approvalStatus,
+    lastReviewedAt: record.lastReviewedAt?.toISOString() ?? null,
+    intendedUseCase: record.intendedUseCase,
+    proofNote: record.proofNote,
     fileSize: record.fileSize,
     sourceFilename: record.sourceFilename,
     sourceMimeType: record.sourceMimeType,
@@ -787,6 +802,11 @@ export async function listWorkspacesForUser(userId: string | null): Promise<Work
         }
       : undefined,
     include: {
+      owner: {
+        select: {
+          name: true,
+        },
+      },
       organization: {
         select: {
           name: true,
@@ -815,6 +835,11 @@ export async function getWorkspace(id: string, userId?: string | null) {
   const workspace = await prisma.workspace.findUnique({
     where: { id },
     include: {
+      owner: {
+        select: {
+          name: true,
+        },
+      },
       organization: {
         select: {
           name: true,
@@ -1054,6 +1079,11 @@ export async function updateWorkspaceMetadataForUser(
           name: true,
         },
       },
+      owner: {
+        select: {
+          name: true,
+        },
+      },
     },
   });
 
@@ -1223,6 +1253,11 @@ export async function listKnowledgeAssetsForUser(userId: string | null): Promise
           name: true,
         },
       },
+      owner: {
+        select: {
+          name: true,
+        },
+      },
     },
     orderBy: [{ updatedAt: "desc" }, { title: "asc" }],
   });
@@ -1267,6 +1302,10 @@ export async function createKnowledgeAsset(input: {
   title: string;
   category: string;
   content: string;
+  approvalStatus?: KnowledgeAsset["approvalStatus"];
+  lastReviewedAt?: string | null;
+  intendedUseCase?: string | null;
+  proofNote?: string | null;
   fileSize?: number | null;
   sourceFilename?: string | null;
   sourceMimeType?: string | null;
@@ -1289,6 +1328,10 @@ export async function createKnowledgeAsset(input: {
       category: input.category,
       content: input.content,
       excerpt: input.content.slice(0, 220).trim(),
+      approvalStatus: input.approvalStatus ?? "approved",
+      lastReviewedAt: input.lastReviewedAt ? new Date(input.lastReviewedAt) : null,
+      intendedUseCase: input.intendedUseCase ?? null,
+      proofNote: input.proofNote ?? null,
       fileSize: input.fileSize ?? null,
       sourceFilename: input.sourceFilename ?? null,
       sourceMimeType: input.sourceMimeType ?? null,
@@ -1310,6 +1353,10 @@ export async function updateKnowledgeAsset(
     title: string;
     category: string;
     content: string;
+    approvalStatus?: KnowledgeAsset["approvalStatus"];
+    lastReviewedAt?: string | null;
+    intendedUseCase?: string | null;
+    proofNote?: string | null;
     fileSize?: number | null;
     sourceFilename?: string | null;
     sourceMimeType?: string | null;
@@ -1340,6 +1387,10 @@ export async function updateKnowledgeAsset(
       category: input.category,
       content: input.content,
       excerpt: input.content.slice(0, 220).trim(),
+      approvalStatus: input.approvalStatus ?? "approved",
+      lastReviewedAt: input.lastReviewedAt ? new Date(input.lastReviewedAt) : null,
+      intendedUseCase: input.intendedUseCase ?? null,
+      proofNote: input.proofNote ?? null,
       fileSize: input.fileSize ?? null,
       sourceFilename: input.sourceFilename ?? null,
       sourceMimeType: input.sourceMimeType ?? null,

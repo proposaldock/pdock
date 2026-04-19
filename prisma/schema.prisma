@@ -38,6 +38,10 @@ model KnowledgeAsset {
   excerpt        String
   ownerId        String?
   organizationId String?
+  approvalStatus String?
+  lastReviewedAt DateTime?
+  intendedUseCase String?
+  proofNote      String?
   fileSize       Int?
   sourceFilename String?
   sourceMimeType String?
