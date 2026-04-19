@@ -14,16 +14,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Proposal Software for Consultants",
+  title: "Proposal Software for Consultants | ProposalDock",
   description:
-    "ProposalDock helps consultants analyze client briefs, reuse approved expertise, draft stronger proposals, and keep review work organized in one AI-assisted workspace.",
+    "Proposal software for consultants who need to analyze client briefs, reuse approved expertise, draft stronger proposals, and keep review work organized in one AI-assisted workspace.",
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
   openGraph: {
-    title: "Proposal Software for Consultants",
+    title: "Proposal Software for Consultants | ProposalDock",
     description:
-      "ProposalDock helps consultants analyze client briefs, reuse approved expertise, draft stronger proposals, and keep review work organized.",
+      "ProposalDock gives consultants one AI-assisted workspace to analyze client briefs, reuse expertise, and draft stronger proposals.",
     url: buildCanonical("/proposal-software-for-consultants"),
   },
 };
@@ -62,6 +62,29 @@ const fits = [
   "Consulting leads who need faster first-pass analysis before client follow-up",
 ] as const;
 
+const consultantFaqs = [
+  {
+    question: "What is proposal software for consultants?",
+    answer:
+      "Proposal software for consultants helps turn client briefs, RFPs, discovery notes, and approved expertise into a more structured proposal workflow. ProposalDock focuses on brief analysis, reusable knowledge, review decisions, draft sections, and export-ready proposal material.",
+  },
+  {
+    question: "Can solo consultants use ProposalDock?",
+    answer:
+      "Yes. Solo consultants can use ProposalDock to analyze one client request, reuse their own background material or case study language, draft a stronger response, and keep risks or open questions visible before sending a proposal.",
+  },
+  {
+    question: "How does ProposalDock help boutique consulting firms?",
+    answer:
+      "Boutique consulting firms can use ProposalDock to keep proposal work in one workspace instead of spreading requirements, reusable expertise, review notes, and final proposal sections across old documents, chat threads, and memory.",
+  },
+  {
+    question: "Does ProposalDock replace consultant judgment?",
+    answer:
+      "No. AI helps with analysis, structure, risk spotting, and first-pass drafting. The consultant still reviews the output, edits the positioning, approves what is safe to use, and decides what should go to the client.",
+  },
+] as const;
+
 const consultantBeforeAfter = [
   {
     before: "Starting every proposal from a blank document",
@@ -78,8 +101,27 @@ const consultantBeforeAfter = [
 ] as const;
 
 export default function ProposalSoftwareForConsultantsPage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: consultantFaqs.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <div className="mx-auto max-w-6xl">
         <Link
           href="/"
@@ -95,7 +137,7 @@ export default function ProposalSoftwareForConsultantsPage() {
               Proposal software for consultants
             </p>
             <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl">
-              ProposalDock helps consultants turn client briefs into stronger proposal drafts faster.
+              Proposal software for consultants who need stronger drafts without starting from scratch.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
               Consultants often have the expertise, but the proposal process still burns time:
@@ -103,9 +145,9 @@ export default function ProposalSoftwareForConsultantsPage() {
               and shaping a response that feels specific to the client.
             </p>
             <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
-              ProposalDock gives that work one AI-assisted workspace, so you can analyze the request,
-              attach approved knowledge, review what matters, and move into proposal drafting with
-              more structure.
+              ProposalDock gives that work one AI-assisted proposal workspace for consultants, so
+              you can analyze the request, attach approved knowledge, review what matters, and move
+              into proposal drafting with more structure.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Badge tone="green">Client brief analysis</Badge>
@@ -223,6 +265,23 @@ export default function ProposalSoftwareForConsultantsPage() {
             >
               Talk to us
             </Link>
+          </div>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Consultant FAQ
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            Questions consultants ask before trying proposal software
+          </h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {consultantFaqs.map((item) => (
+              <div key={item.question} className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+                <h3 className="font-semibold text-zinc-950">{item.question}</h3>
+                <p className="mt-2 text-sm leading-7 text-zinc-600">{item.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
       </div>
