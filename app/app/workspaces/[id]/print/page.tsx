@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { requireCurrentUser } from "@/lib/auth";
 import { getPlanEntitlements } from "@/lib/entitlements";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import {
   appendWorkspaceActivity,
   createActivityEntry,
@@ -71,7 +72,10 @@ export default async function PrintableWorkspacePackPage({
     notFound();
   }
 
-  if (!getPlanEntitlements(account.billing).canExport) {
+  const canExport =
+    getPlanEntitlements(account.billing).canExport ||
+    isPlatformAdminEmail(account.email);
+  if (!canExport) {
     redirect("/app/settings?plan=pro");
   }
 

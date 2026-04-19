@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/authz";
 import { getPlanEntitlements, getPlanGuardMessage } from "@/lib/entitlements";
+import { isPlatformAdminEmail } from "@/lib/platform-admin";
 import {
   appendWorkspaceActivity,
   createActivityEntry,
@@ -22,7 +23,10 @@ export async function GET(
     return NextResponse.json({ error: "Account not found." }, { status: 404 });
   }
 
-  if (!getPlanEntitlements(account.billing).canExport) {
+  const canExport =
+    getPlanEntitlements(account.billing).canExport ||
+    isPlatformAdminEmail(account.email);
+  if (!canExport) {
     return NextResponse.json({ error: getPlanGuardMessage("exports") }, { status: 403 });
   }
 
