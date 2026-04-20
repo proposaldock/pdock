@@ -14,16 +14,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Proposal Software for Consultants | ProposalDock",
+  title: "Proposal Software for Consultants | AI Proposal Workspace",
   description:
-    "Proposal software for consultants who need to analyze client briefs, reuse approved expertise, draft stronger proposals, and keep review work organized in one AI-assisted workspace.",
+    "Proposal software for consultants who need to analyze client briefs, reuse approved expertise, manage evidence, review risks, and draft stronger proposals in one AI-assisted workspace.",
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
   openGraph: {
-    title: "Proposal Software for Consultants | ProposalDock",
+    title: "Proposal Software for Consultants | AI Proposal Workspace",
     description:
-      "ProposalDock gives consultants one AI-assisted workspace to analyze client briefs, reuse expertise, and draft stronger proposals.",
+      "ProposalDock gives consultants one AI-assisted workspace to analyze client briefs, reuse expertise, review risks, and draft stronger proposals.",
     url: buildCanonical("/proposal-software-for-consultants"),
   },
 };
@@ -79,6 +79,11 @@ const consultantFaqs = [
       "Boutique consulting firms can use ProposalDock to keep proposal work in one workspace instead of spreading requirements, reusable expertise, review notes, and final proposal sections across old documents, chat threads, and memory.",
   },
   {
+    question: "How is ProposalDock different from a generic AI proposal generator?",
+    answer:
+      "ProposalDock is built around a proposal workflow rather than one prompt. It helps consultants analyze the brief, spot risks, reuse approved knowledge, review evidence, manage proposal sections, and export a response pack after human review.",
+  },
+  {
     question: "Does ProposalDock replace consultant judgment?",
     answer:
       "No. AI helps with analysis, structure, risk spotting, and first-pass drafting. The consultant still reviews the output, edits the positioning, approves what is safe to use, and decides what should go to the client.",
@@ -97,6 +102,47 @@ const consultantBeforeAfter = [
   {
     before: "Trying to remember what still needs follow-up",
     after: "Seeing risks, pending items, and review decisions in one place",
+  },
+] as const;
+
+const consultantUseCases = [
+  {
+    title: "RFP response for consulting teams",
+    body:
+      "Break an RFP into requirements, risks, clarification questions, proof gaps, and draft sections before the team starts writing.",
+  },
+  {
+    title: "Client brief review",
+    body:
+      "Turn a messy client request into a clearer view of what the buyer wants, what is missing, and what needs follow-up before proposal work goes too far.",
+  },
+  {
+    title: "Scope, assumptions, and delivery risk",
+    body:
+      "Keep assumptions, delivery risks, and open questions visible so the proposal does not quietly promise work the team has not reviewed.",
+  },
+  {
+    title: "Evidence-backed proposal drafting",
+    body:
+      "Use approved consulting knowledge, case references, and source-linked analysis to draft from stronger material instead of generic AI output.",
+  },
+] as const;
+
+const comparisonPoints = [
+  {
+    title: "Compared with generic AI writers",
+    body:
+      "ProposalDock is structured around requirements, risks, sources, knowledge assets, human review, section ownership, and export readiness instead of a blank chat box.",
+  },
+  {
+    title: "Compared with heavy enterprise proposal tools",
+    body:
+      "ProposalDock is lighter-weight for consultants and small service teams that need a focused proposal workspace without a long implementation project.",
+  },
+  {
+    title: "Compared with old proposal folders",
+    body:
+      "ProposalDock keeps the brief, analysis, reusable expertise, review notes, proposal sections, and evidence in one working context.",
   },
 ] as const;
 
@@ -137,7 +183,7 @@ export default function ProposalSoftwareForConsultantsPage() {
               Proposal software for consultants
             </p>
             <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl">
-              Proposal software for consultants who need stronger drafts without starting from scratch.
+              Proposal software for consultants who want better briefs, stronger drafts, and less weekend scramble.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
               Consultants often have the expertise, but the proposal process still burns time:
@@ -176,6 +222,29 @@ export default function ProposalSoftwareForConsultantsPage() {
           </Card>
         </section>
 
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Consulting proposal use cases
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            How consultants use ProposalDock before the proposal becomes a final document.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
+            Proposal software for consultants should help before the writing stage gets expensive.
+            ProposalDock is designed to support the messy middle: reading the brief, deciding what
+            deserves caution, finding proof, and turning reviewed material into a client-ready
+            response.
+          </p>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {consultantUseCases.map((item) => (
+              <div key={item.title} className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+                <h3 className="font-semibold text-zinc-950">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-zinc-600">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="mt-12">
           <div className="max-w-3xl">
             <h2 className="text-3xl font-black tracking-tight text-zinc-950">
@@ -200,6 +269,23 @@ export default function ProposalSoftwareForConsultantsPage() {
                   <p className="text-sm leading-7 text-zinc-600">{item.body}</p>
                 </CardContent>
               </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Why not just use a generic AI writer?
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            Consultants need proposal judgment, not just faster text.
+          </h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {comparisonPoints.map((item) => (
+              <div key={item.title} className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+                <h3 className="font-semibold text-zinc-950">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-zinc-600">{item.body}</p>
+              </div>
             ))}
           </div>
         </section>

@@ -196,6 +196,16 @@ export default function RfpResponseSoftwarePage() {
               Talk to us
             </Link>
           </div>
+          <p className="mt-5 text-sm leading-6 text-zinc-600">
+            If your RFP work is mainly consulting-led, see how ProposalDock works as{" "}
+            <Link
+              href="/proposal-software-for-consultants"
+              className="font-semibold text-emerald-700 hover:text-emerald-800"
+            >
+              proposal software for consultants
+            </Link>
+            .
+          </p>
         </section>
       </div>
     </main>

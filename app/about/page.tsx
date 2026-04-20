@@ -255,6 +255,16 @@ export default function AboutPage() {
               </Button>
             </Link>
           </div>
+          <p className="mt-5 text-sm leading-6 text-zinc-600">
+            Consultants can also read the focused guide to{" "}
+            <Link
+              href="/proposal-software-for-consultants"
+              className="font-semibold text-emerald-700 hover:text-emerald-800"
+            >
+              proposal software for consultants
+            </Link>
+            .
+          </p>
         </section>
       </div>
     </main>

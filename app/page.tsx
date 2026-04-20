@@ -151,9 +151,9 @@ const seoResources = [
 
 const useCases = [
   {
-    title: "Consultants",
+    title: "Proposal software for consultants",
     body:
-      "Analyze client briefs, reuse approved expertise, and move into a grounded proposal draft without rebuilding the process from scratch.",
+      "Analyze client briefs, review risks, reuse approved expertise, and move into a grounded proposal draft without rebuilding the process from scratch.",
     href: "/proposal-software-for-consultants",
   },
   {
