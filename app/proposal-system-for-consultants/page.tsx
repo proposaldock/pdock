@@ -1,17 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  ClipboardCheck,
-  FileSearch,
-  Layers3,
-  LibraryBig,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -29,80 +20,93 @@ export const metadata: Metadata = {
   },
 };
 
-const systemParts = [
+const tableOfContents = [
+  { href: "#definition", label: "What it means" },
+  { href: "#components", label: "Core components" },
+  { href: "#comparison", label: "Template vs system" },
+  { href: "#playbook", label: "Operating playbook" },
+  { href: "#proposaldock", label: "Where ProposalDock fits" },
+] as const;
+
+const components = [
   {
-    icon: FileSearch,
     title: "Brief intake",
     body:
-      "A consulting proposal system should keep the client request, RFP, discovery notes, and uploaded source material attached to the work from the start.",
+      "The system starts by capturing the real client request, RFP, discovery notes, and any deal-specific context in one place.",
   },
   {
-    icon: Layers3,
     title: "Requirement and risk triage",
     body:
-      "Before writing starts, the team needs a practical view of requirements, missing information, clarification questions, and delivery or compliance risks.",
+      "The team needs an early read on what matters, what is missing, where the risks are, and what must be clarified before writing goes too far.",
   },
   {
-    icon: LibraryBig,
-    title: "Approved knowledge reuse",
+    title: "Evidence and proof",
     body:
-      "Reusable consulting material should be easy to find, but also reviewable: who owns it, when it was last checked, and where proof lives.",
+      "Claims should connect to source material, approved company knowledge, case references, or a clear proof note.",
   },
   {
-    icon: ClipboardCheck,
-    title: "Human review and signoff",
+    title: "Review decisions",
     body:
-      "A useful proposal system makes review decisions visible so accepted content, rejected assumptions, and pending follow-ups do not get lost.",
+      "Accepted content, rejected assumptions, pending answers, ownership, and signoff should be visible before anything becomes client-facing.",
+  },
+  {
+    title: "Proposal assembly",
+    body:
+      "Reviewed material should turn into useful sections such as executive summary, client context, approach, scope, assumptions, risks, proof, and next steps.",
   },
 ] as const;
 
-const systemChecklist = [
-  "What did the client actually ask for?",
-  "Which requirements are high priority or risky?",
-  "What proof or case evidence supports the response?",
-  "Which assumptions need client clarification?",
-  "Who needs to review each proposal section?",
-  "What is ready to export and what still needs work?",
-] as const;
-
-const comparisonRows = [
+const comparison = [
   {
     label: "Proposal template",
-    detail:
-      "Useful for formatting, but it does not analyze the brief, track risks, or show whether claims are supported by evidence.",
+    usefulFor: "Formatting and repeatable document structure.",
+    limitation:
+      "Does not analyze the brief, expose delivery risk, verify claims, or manage review.",
   },
   {
     label: "Generic AI writer",
-    detail:
-      "Useful for fast text, but often weak on source grounding, reusable company knowledge, review decisions, and export readiness.",
+    usefulFor: "Producing fast first-pass text.",
+    limitation:
+      "Often separates writing from source material, reusable knowledge, approvals, and export readiness.",
   },
   {
     label: "Proposal system",
-    detail:
-      "Connects intake, requirements, proof, reusable knowledge, human review, drafting, ownership, and final output in one operating flow.",
+    usefulFor: "Running the full proposal workflow from intake to reviewed output.",
+    limitation:
+      "Requires the team to be deliberate about evidence, ownership, and final judgment.",
   },
 ] as const;
 
-const workflowSteps = [
+const playbook = [
   {
-    title: "Capture the client request",
+    step: "01",
+    title: "Start with the buyer's request",
     body:
-      "Start from the real brief, RFP, or discovery notes instead of a blank proposal document.",
+      "Keep the brief, RFP, pasted notes, and uploaded documents attached to the opportunity rather than scattered across folders and chat.",
   },
   {
-    title: "Decide what needs caution",
+    step: "02",
+    title: "Create the decision view before drafting",
     body:
-      "Review deadline pressure, missing facts, unsupported claims, compliance risk, and questions for the client.",
+      "Summarize the recommendation, deadline risk, missing information, proof gaps, clarification questions, and delivery or compliance risks.",
   },
   {
-    title: "Draft from reviewed material",
+    step: "03",
+    title: "Reuse only material you trust",
     body:
-      "Use approved knowledge and source-linked analysis as the base for proposal sections.",
+      "Approved knowledge should carry enough context to show who owns it, when it was reviewed, and how it should be used.",
   },
   {
-    title: "Export only after review",
+    step: "04",
+    title: "Draft from evidence, then review",
     body:
-      "Check evidence, ownership, status, and signoff before sending proposal material to the client.",
+      "Use AI for structure and first-pass language, but keep human review, source checks, and section ownership in the workflow.",
+  },
+  {
+    step: "05",
+    title: "Export when the proposal is ready",
+    body:
+      "Treat export as a final gate: empty sections, missing citations, unsigned approvals, and stale evidence should be visible first.",
   },
 ] as const;
 
@@ -129,6 +133,14 @@ const faqs = [
   },
 ] as const;
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+      {children}
+    </p>
+  );
+}
+
 export default function ProposalSystemForConsultantsPage() {
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -144,7 +156,7 @@ export default function ProposalSystemForConsultantsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
+    <main className="min-h-screen bg-[#f4f6f7] px-6 py-12 lg:py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -160,160 +172,179 @@ export default function ProposalSystemForConsultantsPage() {
           Back to ProposalDock
         </Link>
 
-        <section className="mt-8 grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-              Proposal system for consultants
-            </p>
-            <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl">
-              A proposal system helps consultants manage briefs, evidence, reviews, and drafts.
-            </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
-              Consultants rarely lose proposals because they lack writing ability. The harder
-              problem is operational: understanding the brief, finding reusable proof, spotting
-              risky assumptions, getting review, and turning everything into a client-ready
-              response.
-            </p>
-            <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
-              A proposal system gives that work a repeatable shape. ProposalDock supports that
-              system with AI-assisted analysis, approved knowledge, review status, evidence checks,
-              and export-ready proposal workspaces.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <Badge tone="green">Brief intake</Badge>
-              <Badge tone="teal">Evidence review</Badge>
-              <Badge tone="yellow">Proposal drafts</Badge>
+        <header className="mt-10 border-b border-zinc-200 pb-10">
+          <div className="flex flex-wrap gap-2">
+            <Badge tone="green">Guide</Badge>
+            <Badge tone="teal">Consulting proposals</Badge>
+            <Badge tone="yellow">Evidence-first workflow</Badge>
+          </div>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl">
+            Proposal system for consultants: a practical guide to briefs, evidence, reviews, and drafts.
+          </h1>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
+            Consultants rarely lose proposal time because they cannot write. The work slows down
+            when the brief is messy, proof is scattered, assumptions are unclear, and review happens
+            too late. A proposal system gives that work a repeatable operating shape.
+          </p>
+        </header>
+
+        <div className="mt-10 grid gap-10 lg:grid-cols-[260px_1fr]">
+          <aside className="h-fit rounded-lg border border-zinc-200 bg-white p-5 lg:sticky lg:top-6">
+            <p className="text-sm font-semibold text-zinc-950">In this guide</p>
+            <nav className="mt-4 grid gap-2">
+              {tableOfContents.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <div className="mt-5 border-t border-zinc-200 pt-5">
+              <Link href="/proposal-software-for-consultants">
+                <Button variant="accent" className="w-full">
+                  Consultant software guide
+                </Button>
+              </Link>
             </div>
-          </div>
+          </aside>
 
-          <Card className="border-zinc-200">
-            <CardHeader>
-              <CardTitle>A consultant proposal system should answer</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3">
-              {systemChecklist.map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm leading-6 text-zinc-700">
-                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-600" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-            Core components
-          </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
-            What a good proposal system includes.
-          </h2>
-          <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
-            A system does not need to be heavy. For consultants and small B2B service teams, the
-            useful version is usually focused: capture the request, understand the risk, reuse
-            trusted material, review the response, and export when the work is ready.
-          </p>
-          <div className="mt-8 grid gap-5 md:grid-cols-2">
-            {systemParts.map((item) => (
-              <Card key={item.title} className="border-zinc-200 bg-zinc-50">
-                <CardHeader>
-                  <item.icon className="size-7 text-emerald-600" />
-                  <CardTitle>{item.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm leading-7 text-zinc-600">{item.body}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-12 grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
-          <Card className="border-zinc-200 bg-zinc-950 text-white">
-            <CardHeader>
-              <CardTitle>Template, AI writer, or proposal system?</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              {comparisonRows.map((item) => (
-                <div key={item.label} className="rounded-lg border border-white/15 bg-white/8 p-4">
-                  <p className="font-semibold text-white">{item.label}</p>
-                  <p className="mt-2 text-sm leading-7 text-zinc-300">{item.detail}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card className="border-zinc-200 bg-white">
-            <CardHeader>
-              <CardTitle>A practical consulting proposal workflow</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              {workflowSteps.map((item, index) => (
-                <div key={item.title} className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-                  <div className="flex items-center gap-3">
-                    <Badge tone="teal">0{index + 1}</Badge>
-                    <p className="font-semibold text-zinc-950">{item.title}</p>
-                  </div>
-                  <p className="mt-2 text-sm leading-7 text-zinc-600">{item.body}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
-
-        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="size-6 text-emerald-600" />
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-              How ProposalDock fits
-            </p>
-          </div>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
-            ProposalDock is built as proposal software for consultants who want the system without the sprawl.
-          </h2>
-          <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
-            <p>
-              ProposalDock gives each opportunity a workspace where the team can analyze the brief,
-              review risks, attach approved knowledge, assemble proposal sections, track evidence,
-              and export response material.
-            </p>
-            <p>
-              The product is intentionally focused: it is not a giant enterprise proposal suite,
-              and it is not just a generic AI text generator. It is a structured place for
-              evidence-first proposal work.
-            </p>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/proposal-software-for-consultants">
-              <Button variant="accent" size="lg">
-                Explore proposal software for consultants
-              </Button>
-            </Link>
-            <Link
-              href="/register?plan=free"
-              className="inline-flex h-12 items-center justify-center rounded-lg bg-white px-6 text-sm font-semibold text-zinc-950 ring-1 ring-zinc-200 transition hover:bg-zinc-50"
-            >
-              Start free
-            </Link>
-          </div>
-        </section>
-
-        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-            FAQ
-          </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
-            Questions about proposal systems for consultants
-          </h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {faqs.map((item) => (
-              <div key={item.question} className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
-                <h3 className="font-semibold text-zinc-950">{item.question}</h3>
-                <p className="mt-2 text-sm leading-7 text-zinc-600">{item.answer}</p>
+          <article className="grid gap-12">
+            <section id="definition" className="rounded-lg border border-zinc-200 bg-white p-8">
+              <SectionLabel>What it means</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+                A proposal system is the way your team moves from opportunity to reviewed response.
+              </h2>
+              <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+                <p>
+                  A template gives you a document shape. A generic AI writer gives you text. A
+                  proposal system gives you an operating flow: capture the request, understand the
+                  risk, find the proof, assign the review, assemble the response, and export when it
+                  is ready.
+                </p>
+                <p>
+                  For consultants, this matters because the proposal is often a promise about
+                  diagnosis, scope, delivery approach, capability, and trust. The system should help
+                  protect that promise from rushed assumptions.
+                </p>
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+
+            <section id="components">
+              <SectionLabel>Core components</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+                The useful version is focused, not heavy.
+              </h2>
+              <div className="mt-6 divide-y divide-zinc-200 rounded-lg border border-zinc-200 bg-white">
+                {components.map((item) => (
+                  <div key={item.title} className="grid gap-2 p-6 md:grid-cols-[220px_1fr]">
+                    <h3 className="font-semibold text-zinc-950">{item.title}</h3>
+                    <p className="text-sm leading-7 text-zinc-600">{item.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section id="comparison" className="rounded-lg border border-zinc-200 bg-zinc-950 p-8 text-white">
+              <SectionLabel>Template vs system</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight">
+                The difference shows up before the proposal is written.
+              </h2>
+              <div className="mt-7 overflow-hidden rounded-lg border border-white/15">
+                <div className="grid grid-cols-[0.75fr_1fr_1fr] border-b border-white/15 bg-white/10 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300">
+                  <div className="p-4">Option</div>
+                  <div className="p-4">Useful for</div>
+                  <div className="p-4">Limitation</div>
+                </div>
+                {comparison.map((item) => (
+                  <div
+                    key={item.label}
+                    className="grid grid-cols-1 border-b border-white/15 last:border-b-0 md:grid-cols-[0.75fr_1fr_1fr]"
+                  >
+                    <div className="p-4 font-semibold text-white">{item.label}</div>
+                    <div className="p-4 text-sm leading-7 text-zinc-300">{item.usefulFor}</div>
+                    <div className="p-4 text-sm leading-7 text-zinc-300">{item.limitation}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section id="playbook">
+              <SectionLabel>Operating playbook</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+                A simple five-step proposal system consultants can repeat.
+              </h2>
+              <div className="mt-6 grid gap-4">
+                {playbook.map((item) => (
+                  <div
+                    key={item.step}
+                    className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-6 md:grid-cols-[80px_1fr]"
+                  >
+                    <div className="text-3xl font-black text-emerald-700">{item.step}</div>
+                    <div>
+                      <h3 className="font-semibold text-zinc-950">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-7 text-zinc-600">{item.body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section id="proposaldock" className="rounded-lg border border-zinc-200 bg-white p-8">
+              <SectionLabel>Where ProposalDock fits</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+                ProposalDock supports the system without turning it into an enterprise rollout.
+              </h2>
+              <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+                <p>
+                  ProposalDock gives each opportunity a workspace for brief analysis, bid/no-bid
+                  thinking, approved knowledge, evidence status, proposal sections, ownership,
+                  review, and export readiness.
+                </p>
+                <p>
+                  It is intentionally more structured than a generic AI writer, but lighter than a
+                  large proposal platform. That makes it a practical fit for consultants, agencies,
+                  and small B2B service teams that want evidence-first proposal work.
+                </p>
+              </div>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link href="/proposal-software-for-consultants">
+                  <Button variant="accent" size="lg">
+                    Explore proposal software for consultants
+                    <ArrowRight className="size-4" />
+                  </Button>
+                </Link>
+                <Link href="/register?plan=free">
+                  <Button variant="secondary" size="lg">
+                    Start free
+                  </Button>
+                </Link>
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-zinc-200 bg-white p-8">
+              <SectionLabel>FAQ</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+                Questions about proposal systems for consultants
+              </h2>
+              <div className="mt-8 grid gap-5">
+                {faqs.map((item) => (
+                  <div key={item.question} className="border-t border-zinc-200 pt-5 first:border-t-0 first:pt-0">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-600" />
+                      <div>
+                        <h3 className="font-semibold text-zinc-950">{item.question}</h3>
+                        <p className="mt-2 text-sm leading-7 text-zinc-600">{item.answer}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </article>
+        </div>
       </div>
     </main>
   );
