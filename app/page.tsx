@@ -368,14 +368,14 @@ const faqs = [
 export const metadata: Metadata = {
   title: "AI Proposal Workspace for Consultants and B2B Service Teams",
   description:
-    "ProposalDock is a lightweight AI proposal workspace for consultants, agencies, and B2B service teams. Turn client briefs and RFPs into reviewed, grounded proposal drafts faster.",
+    "AI proposal workspace for consultants, agencies, and B2B service teams. Turn client briefs and RFPs into reviewed proposal drafts faster.",
   alternates: {
     canonical: buildCanonical("/"),
   },
   openGraph: {
     title: "AI Proposal Workspace for Consultants and B2B Service Teams",
     description:
-      "ProposalDock helps consultants, agencies, and B2B service teams turn client briefs and RFPs into reviewed, grounded proposal drafts faster.",
+      "ProposalDock helps consultants, agencies, and B2B service teams turn client briefs and RFPs into reviewed proposal drafts faster.",
     url: buildCanonical("/"),
   },
 };

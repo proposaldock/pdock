@@ -9,7 +9,7 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "AI Proposal Software for B2B Service Teams",
   description:
-    "ProposalDock is AI proposal software for B2B service teams that need faster brief analysis, grounded draft support, review workflows, and export-ready proposal packs.",
+    "AI proposal software for B2B service teams that need brief analysis, grounded drafts, review workflows, and export-ready proposal packs.",
   alternates: {
     canonical: buildCanonical("/ai-proposal-software"),
   },
@@ -108,7 +108,9 @@ export default function AiProposalSoftwarePage() {
 
           <Card className="border-zinc-200 bg-zinc-950 text-white">
             <CardHeader>
-              <CardTitle>AI should speed up the work, not hide the judgment.</CardTitle>
+              <h2 className="text-lg font-semibold text-white">
+                AI should speed up the work, not hide the judgment.
+              </h2>
             </CardHeader>
             <CardContent className="grid gap-5">
               {aiControls.map((group) => (

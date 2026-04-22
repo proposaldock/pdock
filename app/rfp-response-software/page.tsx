@@ -9,14 +9,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "RFP Response Software for Service Teams",
   description:
-    "ProposalDock is RFP response software for service teams that need structured brief analysis, risk review, reusable knowledge, and a cleaner path to proposal draft and export.",
+    "RFP response software for service teams that need brief analysis, risk review, reusable knowledge, proposal drafting, and export.",
   alternates: {
     canonical: buildCanonical("/rfp-response-software"),
   },
   openGraph: {
     title: "RFP Response Software for Service Teams",
     description:
-      "ProposalDock helps service teams manage RFP intake, requirements, risks, reusable knowledge, review, and proposal export in one workflow.",
+      "ProposalDock helps service teams manage RFP intake, requirements, risks, reusable knowledge, review, and proposal export.",
     url: buildCanonical("/rfp-response-software"),
   },
 };
@@ -102,7 +102,9 @@ export default function RfpResponseSoftwarePage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>The questions every RFP response has to answer</CardTitle>
+              <h2 className="text-lg font-semibold text-zinc-950">
+                The questions every RFP response has to answer
+              </h2>
             </CardHeader>
             <CardContent className="grid gap-3">
               {responseChecklist.map((item) => (

@@ -14,14 +14,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Proposal Software for Consultants | AI Proposal Workspace",
+  title: "Proposal Software for Consultants | ProposalDock",
   description:
-    "Proposal software for consultants who need to analyze client briefs, reuse approved expertise, manage evidence, review risks, and draft stronger proposals in one AI-assisted workspace.",
+    "Proposal software for consultants who need brief analysis, reusable expertise, evidence review, risk checks, and stronger AI-assisted proposal drafts.",
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
   openGraph: {
-    title: "Proposal Software for Consultants | AI Proposal Workspace",
+    title: "Proposal Software for Consultants | ProposalDock",
     description:
       "ProposalDock gives consultants one AI-assisted workspace to analyze client briefs, reuse expertise, review risks, and draft stronger proposals.",
     url: buildCanonical("/proposal-software-for-consultants"),
@@ -204,7 +204,9 @@ export default function ProposalSoftwareForConsultantsPage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>When consultants feel the pain most</CardTitle>
+              <h2 className="text-lg font-semibold text-zinc-950">
+                When consultants feel the pain most
+              </h2>
             </CardHeader>
             <CardContent className="grid gap-3">
               {[

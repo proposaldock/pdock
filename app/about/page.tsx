@@ -18,14 +18,14 @@ import { buildCanonical, getOrganizationJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "About ProposalDock | AI Proposal Software",
   description:
-    "Learn how ProposalDock works as AI proposal software for RFP responses, how it accelerates proposal work, and how teams stay in control of review, signoff, and final export.",
+    "Learn how ProposalDock uses AI for RFP responses, proposal review, signoff, reusable knowledge, and final export.",
   alternates: {
     canonical: buildCanonical("/about"),
   },
   openGraph: {
     title: "About ProposalDock | AI Proposal Software",
     description:
-      "Learn how ProposalDock works as AI proposal software for RFP responses, how it accelerates proposal work, and how teams stay in control.",
+      "Learn how ProposalDock uses AI for RFP responses, proposal review, reusable knowledge, signoff, and final export.",
     url: buildCanonical("/about"),
   },
 };
@@ -142,7 +142,9 @@ export default function AboutPage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>What teams usually get from ProposalDock</CardTitle>
+              <h2 className="text-lg font-semibold text-zinc-950">
+                What teams usually get from ProposalDock
+              </h2>
             </CardHeader>
             <CardContent className="grid gap-3">
               {outcomes.map((item) => (
