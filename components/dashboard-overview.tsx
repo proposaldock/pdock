@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyButton } from "@/components/copy-button";
 import { WorkspaceLibrary } from "@/components/workspace-library";
 import {
@@ -312,79 +312,109 @@ export function DashboardOverview({
       <Card className="mt-8">
         <CardHeader>
           <CardTitle>Ops actions</CardTitle>
+          <CardDescription>
+            Focus the dashboard or jump straight to the next item that needs work.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button
-            variant="secondary"
-            onClick={() => setHealthFilter("ready")}
-          >
-            Show ready workspaces
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => setHealthFilter("at_risk")}
-          >
-            Show items needing attention
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => setHealthFilter("in_progress")}
-          >
-            Show in-progress workspaces
-          </Button>
-          <Button
-            onClick={() => {
-              if (nextNeedsAttention) {
-                router.push(`/app/workspaces/${nextNeedsAttention.id}`);
-              }
-            }}
-            disabled={!nextNeedsAttention}
-          >
-            Open next needs-attention workspace
-            <ArrowRight className="size-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              if (nextInProgress) {
-                router.push(`/app/workspaces/${nextInProgress.id}`);
-              }
-            }}
-            disabled={!nextInProgress}
-          >
-            Open next in-progress workspace
-            <ArrowRight className="size-4" />
-          </Button>
-          <CopyButton
-            text={
-              opsSummary ||
-              "No workspaces matched the current dashboard filters."
-            }
-          />
-          {leads.length ? (
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => router.push("/app/settings")}
-              >
-                Open lead follow-ups
-                <ArrowRight className="size-4" />
-              </Button>
-              <CopyButton
-                text={
-                  leadOpsSummary ||
-                  "No inbound leads matched the current dashboard search."
-                }
-              />
-              <Button
-                onClick={() => router.push("/app/settings")}
-                disabled={!nextLeadToOpen}
-              >
-                Open next lead needing follow-up
-                <ArrowRight className="size-4" />
-              </Button>
-            </>
-          ) : null}
+        <CardContent className="grid gap-5">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="secondary" onClick={() => setHealthFilter("ready")}>
+              Ready
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setHealthFilter("at_risk")}>
+              Needs attention
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setHealthFilter("in_progress")}>
+              In progress
+            </Button>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-zinc-950">Workspace queue</p>
+                  <p className="mt-1 text-sm leading-6 text-zinc-600">
+                    Open the next workspace that needs review or copy the current filtered summary.
+                  </p>
+                </div>
+                <Badge tone={nextNeedsAttention ? "yellow" : "green"}>
+                  {nextNeedsAttention ? "Action available" : "Clear"}
+                </Badge>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    if (nextNeedsAttention) {
+                      router.push(`/app/workspaces/${nextNeedsAttention.id}`);
+                    }
+                  }}
+                  disabled={!nextNeedsAttention}
+                >
+                  Open next attention item
+                  <ArrowRight className="size-4" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    if (nextInProgress) {
+                      router.push(`/app/workspaces/${nextInProgress.id}`);
+                    }
+                  }}
+                  disabled={!nextInProgress}
+                >
+                  Open in-progress
+                  <ArrowRight className="size-4" />
+                </Button>
+                <CopyButton
+                  label="Copy summary"
+                  text={
+                    opsSummary ||
+                    "No workspaces matched the current dashboard filters."
+                  }
+                />
+              </div>
+            </div>
+
+            {leads.length ? (
+              <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-semibold text-zinc-950">Lead follow-ups</p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-600">
+                      Review inbound leads and jump to the next follow-up from Settings.
+                    </p>
+                  </div>
+                  <Badge tone={nextLeadToOpen ? "yellow" : "zinc"}>
+                    {nextLeadToOpen ? "Follow-up due" : "No follow-up"}
+                  </Badge>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button size="sm" variant="secondary" onClick={() => router.push("/app/settings")}>
+                    Open leads
+                    <ArrowRight className="size-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => router.push("/app/settings")}
+                    disabled={!nextLeadToOpen}
+                  >
+                    Open next follow-up
+                    <ArrowRight className="size-4" />
+                  </Button>
+                  <CopyButton
+                    label="Copy leads"
+                    text={
+                      leadOpsSummary ||
+                      "No inbound leads matched the current dashboard search."
+                    }
+                  />
+                </div>
+              </div>
+            ) : null}
+          </div>
         </CardContent>
       </Card>
 
