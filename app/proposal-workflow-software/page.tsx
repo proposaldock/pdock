@@ -14,14 +14,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Proposal Workflow Software for RFPs and Client Briefs",
+  title: "Proposal Workflow Software | ProposalDock",
   description:
     "ProposalDock is proposal workflow software that helps teams manage brief intake, AI analysis, knowledge reuse, review, drafting, and export in one workspace.",
   alternates: {
     canonical: buildCanonical("/proposal-workflow-software"),
   },
   openGraph: {
-    title: "Proposal Workflow Software for RFPs and Client Briefs",
+    title: "Proposal Workflow Software | ProposalDock",
     description:
       "ProposalDock helps teams manage brief intake, AI analysis, knowledge reuse, review, drafting, and export in one proposal workflow.",
     url: buildCanonical("/proposal-workflow-software"),
@@ -120,7 +120,9 @@ export default function ProposalWorkflowSoftwarePage() {
 
           <Card className="border-zinc-200">
             <CardHeader>
-              <CardTitle>The operating rhythm ProposalDock supports</CardTitle>
+              <h2 className="text-lg font-semibold text-zinc-950">
+                The operating rhythm ProposalDock supports
+              </h2>
             </CardHeader>
             <CardContent className="grid gap-3">
               {operatingRhythm.map((item) => (

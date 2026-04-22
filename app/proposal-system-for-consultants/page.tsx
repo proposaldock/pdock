@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Proposal System for Consultants | Briefs, Evidence, Reviews, Drafts",
+  title: "Proposal System for Consultants | ProposalDock",
   description:
-    "A practical guide to building a proposal system for consultants, including brief intake, evidence, reusable knowledge, review workflows, proposal drafts, and export readiness.",
+    "A practical guide to building a proposal system for consultants with brief intake, evidence, reusable knowledge, review, drafting, and export.",
   alternates: {
     canonical: buildCanonical("/proposal-system-for-consultants"),
   },
   openGraph: {
-    title: "Proposal System for Consultants | Briefs, Evidence, Reviews, Drafts",
+    title: "Proposal System for Consultants | ProposalDock",
     description:
       "Learn what a proposal system for consultants should include and how ProposalDock supports evidence-first proposal work.",
     url: buildCanonical("/proposal-system-for-consultants"),
