@@ -10,12 +10,30 @@ import { getEffectivePlan, hasPaidBillingAccess } from "@/lib/entitlements";
 import type { BillingPlan, UserBillingSummary } from "@/lib/types";
 import { formatDate, formatDateTime } from "@/lib/utils";
 
+declare global {
+  interface Window {
+    gtag?: (
+      command: "event",
+      eventName: "conversion",
+      params: {
+        send_to: string;
+        value?: number;
+        currency?: string;
+        transaction_id?: string;
+      },
+    ) => void;
+  }
+}
+
 type BillingSettingsProps = {
   billing: UserBillingSummary;
   isConfigured: boolean;
   memberSince: string;
   showStorageAndData?: boolean;
 };
+
+const googleAdsSubscribeSendTo =
+  process.env.NEXT_PUBLIC_GOOGLE_ADS_SUBSCRIBE_SEND_TO?.trim();
 
 function statusTone(status: UserBillingSummary["status"]) {
   switch (status) {
@@ -48,6 +66,7 @@ export function BillingSettings({
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const hasAutoOpened = useRef(false);
   const hasSyncedSuccess = useRef(false);
+  const hasTrackedSubscribeConversion = useRef(false);
   const billingIntent = searchParams.get("plan");
   const billingResult = searchParams.get("billing");
   const sessionId = searchParams.get("session_id");
@@ -58,6 +77,26 @@ export function BillingSettings({
   );
   const hasPaidPlan =
     hasPaidBillingAccess(billingState.status) && billingState.plan !== "free";
+
+  const trackSubscribeConversion = useCallback((nextBilling: UserBillingSummary) => {
+    if (
+      hasTrackedSubscribeConversion.current ||
+      !googleAdsSubscribeSendTo ||
+      !window.gtag ||
+      nextBilling.plan === "free" ||
+      !hasPaidBillingAccess(nextBilling.status)
+    ) {
+      return;
+    }
+
+    hasTrackedSubscribeConversion.current = true;
+    window.gtag("event", "conversion", {
+      send_to: googleAdsSubscribeSendTo,
+      value: nextBilling.plan === "team" ? 149 : 49,
+      currency: "USD",
+      transaction_id: sessionId ?? undefined,
+    });
+  }, [sessionId]);
 
   const redirectToBilling = useCallback(async (
     action: "checkout" | "portal",
@@ -124,6 +163,7 @@ export function BillingSettings({
         }
 
         setBillingState(payload.billing);
+        trackSubscribeConversion(payload.billing);
         setConfirmationMessage(
           payload.billing.plan === "team"
             ? "Team plan confirmed. Shared workspaces and team tools are now unlocked."
@@ -140,7 +180,7 @@ export function BillingSettings({
         setBusyAction(null);
       }
     })();
-  }, [billingResult, router, sessionId, upgradedPlan]);
+  }, [billingResult, router, sessionId, trackSubscribeConversion, upgradedPlan]);
 
   return (
     <div className="grid gap-6">
