@@ -352,6 +352,16 @@ export default function ProposalSoftwareForConsultantsPage() {
               Talk to us
             </Link>
           </div>
+          <p className="mt-5 text-sm leading-6 text-zinc-600">
+            Want the operating model first? Read the guide to building a{" "}
+            <Link
+              href="/proposal-system-for-consultants"
+              className="font-semibold text-emerald-700 hover:text-emerald-800"
+            >
+              proposal system for consultants
+            </Link>
+            .
+          </p>
         </section>
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">

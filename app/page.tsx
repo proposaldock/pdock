@@ -142,6 +142,12 @@ const seoResources = [
       "A practical guide for consultants who need a cleaner way to analyze briefs, reuse expertise, and draft proposals.",
   },
   {
+    href: "/proposal-system-for-consultants",
+    title: "Proposal system for consultants",
+    body:
+      "A guide to managing briefs, evidence, reviews, reusable knowledge, and proposal drafts in one consulting proposal system.",
+  },
+  {
     href: "/proposal-workflow-software",
     title: "Proposal workflow software",
     body:
