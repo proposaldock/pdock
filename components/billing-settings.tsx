@@ -67,6 +67,7 @@ export function BillingSettings({
   const hasAutoOpened = useRef(false);
   const hasSyncedSuccess = useRef(false);
   const hasTrackedSubscribeConversion = useRef(false);
+  const conversionRetryTimer = useRef<number | null>(null);
   const billingIntent = searchParams.get("plan");
   const billingResult = searchParams.get("billing");
   const sessionId = searchParams.get("session_id");
@@ -82,20 +83,35 @@ export function BillingSettings({
     if (
       hasTrackedSubscribeConversion.current ||
       !googleAdsSubscribeSendTo ||
-      !window.gtag ||
       nextBilling.plan === "free" ||
       !hasPaidBillingAccess(nextBilling.status)
     ) {
       return;
     }
 
-    hasTrackedSubscribeConversion.current = true;
-    window.gtag("event", "conversion", {
-      send_to: googleAdsSubscribeSendTo,
-      value: nextBilling.plan === "team" ? 149 : 49,
-      currency: "USD",
-      transaction_id: sessionId ?? undefined,
-    });
+    const sendConversion = (attempt = 0) => {
+      if (hasTrackedSubscribeConversion.current) return;
+
+      if (!window.gtag) {
+        if (attempt < 12) {
+          conversionRetryTimer.current = window.setTimeout(
+            () => sendConversion(attempt + 1),
+            500,
+          );
+        }
+        return;
+      }
+
+      hasTrackedSubscribeConversion.current = true;
+      window.gtag("event", "conversion", {
+        send_to: googleAdsSubscribeSendTo,
+        value: nextBilling.plan === "team" ? 149 : 49,
+        currency: "USD",
+        transaction_id: sessionId ?? undefined,
+      });
+    };
+
+    sendConversion();
   }, [sessionId]);
 
   const redirectToBilling = useCallback(async (
@@ -130,6 +146,14 @@ export function BillingSettings({
   useEffect(() => {
     setBillingState(billing);
   }, [billing]);
+
+  useEffect(() => {
+    return () => {
+      if (conversionRetryTimer.current) {
+        window.clearTimeout(conversionRetryTimer.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (hasAutoOpened.current || !isConfigured) return;
