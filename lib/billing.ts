@@ -110,6 +110,99 @@ function getPlanPriceId(plan: Exclude<BillingPlan, "free">) {
   return priceId;
 }
 
+async function getPriceProductId(stripe: Stripe, priceId: string) {
+  const price = await stripe.prices.retrieve(priceId);
+  const product = price.product;
+
+  if (typeof product === "string") {
+    return product;
+  }
+
+  if ("deleted" in product && product.deleted) {
+    throw new BillingError("Stripe product for the selected plan was deleted.", 503);
+  }
+
+  return product.id;
+}
+
+async function getPlanUpdatePortalConfigurationId(stripe: Stripe, origin: string) {
+  const proPriceId = getPlanPriceId("pro");
+  const teamPriceId = getPlanPriceId("team");
+  const configurations = await stripe.billingPortal.configurations.list({
+    active: true,
+    limit: 100,
+  });
+  const existing = configurations.data.find(
+    (configuration) =>
+      configuration.metadata?.managedBy === "proposaldock" &&
+      configuration.metadata?.purpose === "plan_updates" &&
+      configuration.metadata?.proPriceId === proPriceId &&
+      configuration.metadata?.teamPriceId === teamPriceId,
+  );
+
+  if (existing) {
+    return existing.id;
+  }
+
+  const [proProductId, teamProductId] = await Promise.all([
+    getPriceProductId(stripe, proPriceId),
+    getPriceProductId(stripe, teamPriceId),
+  ]);
+  const pricesByProduct = new Map<string, string[]>();
+
+  for (const [productId, priceId] of [
+    [proProductId, proPriceId],
+    [teamProductId, teamPriceId],
+  ] as const) {
+    pricesByProduct.set(productId, [
+      ...(pricesByProduct.get(productId) ?? []),
+      priceId,
+    ]);
+  }
+
+  const configuration = await stripe.billingPortal.configurations.create({
+    name: "ProposalDock plan updates",
+    default_return_url: `${origin}/app/settings`,
+    business_profile: {
+      privacy_policy_url: `${origin}/privacy`,
+      terms_of_service_url: `${origin}/terms`,
+    },
+    features: {
+      customer_update: {
+        enabled: true,
+        allowed_updates: ["email", "name", "address"],
+      },
+      invoice_history: {
+        enabled: true,
+      },
+      payment_method_update: {
+        enabled: true,
+      },
+      subscription_cancel: {
+        enabled: true,
+        mode: "at_period_end",
+      },
+      subscription_update: {
+        enabled: true,
+        default_allowed_updates: ["price"],
+        proration_behavior: "always_invoice",
+        products: Array.from(pricesByProduct.entries()).map(([product, prices]) => ({
+          product,
+          prices,
+        })),
+      },
+    },
+    metadata: {
+      managedBy: "proposaldock",
+      purpose: "plan_updates",
+      proPriceId,
+      teamPriceId,
+    },
+  });
+
+  return configuration.id;
+}
+
 export function summarizeBillingPlan(billing: UserBillingSummary) {
   if (billing.plan === "team") return BILLING_PLANS.team;
   if (billing.plan === "pro") return BILLING_PLANS.pro;
@@ -245,6 +338,10 @@ async function createSubscriptionUpgradeConfirmationSession(input: {
   }
 
   const stripe = getStripeClient();
+  const configurationId = await getPlanUpdatePortalConfigurationId(
+    stripe,
+    input.origin,
+  );
   const subscription = await stripe.subscriptions.retrieve(input.subscriptionId);
   const item = subscription.items.data[0];
 
@@ -254,6 +351,7 @@ async function createSubscriptionUpgradeConfirmationSession(input: {
 
   const session = await stripe.billingPortal.sessions.create({
     customer: input.customerId,
+    configuration: configurationId,
     return_url: `${input.origin}/app/settings`,
     flow_data: {
       type: "subscription_update_confirm",
