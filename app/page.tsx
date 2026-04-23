@@ -336,16 +336,16 @@ const faqs = [
 ] as const;
 
 export const metadata: Metadata = {
-  title: "AI Proposal Workspace for Consultants and B2B Service Teams",
+  title: "Proposal Software for Consultants and B2B Service Teams",
   description:
-    "AI proposal workspace for consultants, agencies, and B2B service teams. Turn client briefs and RFPs into reviewed proposal drafts faster.",
+    "Proposal software for consultants and B2B service teams. Analyze client briefs, review risks, reuse approved knowledge, and draft proposals faster.",
   alternates: {
     canonical: buildCanonical("/"),
   },
   openGraph: {
-    title: "AI Proposal Workspace for Consultants and B2B Service Teams",
+    title: "Proposal Software for Consultants and B2B Service Teams",
     description:
-      "ProposalDock helps consultants, agencies, and B2B service teams turn client briefs and RFPs into reviewed proposal drafts faster.",
+      "ProposalDock helps consultants and B2B service teams analyze client briefs, review risks, reuse approved knowledge, and draft proposals faster.",
     url: buildCanonical("/"),
   },
 };
@@ -432,9 +432,9 @@ export default async function LandingPage() {
                 Win the deal without the weekend scramble.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-100">
-                ProposalDock helps consultants, agencies, and small B2B service teams analyze
-                briefs, review requirements and risks, reuse approved knowledge, and draft
-                responses inside one simple workspace.
+                ProposalDock is proposal software for consultants, agencies, and small B2B
+                service teams that need to analyze briefs, review risks, reuse approved
+                knowledge, and draft stronger client proposals inside one workspace.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 {user ? (
@@ -552,6 +552,11 @@ export default async function LandingPage() {
               ProposalDock is intentionally lighter than enterprise RFP suites. It focuses on the
               moment smaller service teams feel most pressure: turning a live client request into a
               credible, reviewable proposal draft quickly.
+            </p>
+            <p className="mt-4 text-sm leading-6 text-zinc-600">
+              If you are comparing proposal software for consultants, proposal workflow software,
+              or a proposal system for consultants, this is the same core idea in practice: one
+              place to move from brief intake to reviewed proposal output.
             </p>
           </div>
 

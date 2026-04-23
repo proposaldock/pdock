@@ -14,16 +14,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildCanonical } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Proposal Workflow Software | ProposalDock",
+  title: "Proposal Workflow Software for Client Briefs | ProposalDock",
   description:
-    "ProposalDock is proposal workflow software that helps teams manage brief intake, AI analysis, knowledge reuse, review, drafting, and export in one workspace.",
+    "Proposal workflow software for teams handling client briefs and RFPs with intake, analysis, knowledge reuse, review, drafting, and export in one workspace.",
   alternates: {
     canonical: buildCanonical("/proposal-workflow-software"),
   },
   openGraph: {
-    title: "Proposal Workflow Software | ProposalDock",
+    title: "Proposal Workflow Software for Client Briefs | ProposalDock",
     description:
-      "ProposalDock helps teams manage brief intake, AI analysis, knowledge reuse, review, drafting, and export in one proposal workflow.",
+      "ProposalDock helps teams manage client brief intake, analysis, knowledge reuse, review, drafting, and export in one proposal workflow.",
     url: buildCanonical("/proposal-workflow-software"),
   },
 };
@@ -99,7 +99,7 @@ export default function ProposalWorkflowSoftwarePage() {
               Proposal workflow software
             </p>
             <h1 className="mt-3 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl">
-              ProposalDock gives teams one workflow from client brief to proposal export.
+              Proposal workflow software for teams moving from client brief to proposal export.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
               Proposal work usually breaks across too many places: the RFP in one folder, notes in
@@ -115,6 +115,20 @@ export default function ProposalWorkflowSoftwarePage() {
               <Badge tone="green">Brief intake</Badge>
               <Badge tone="teal">Review workflow</Badge>
               <Badge tone="yellow">Proposal export</Badge>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-4 text-sm font-semibold">
+              <Link
+                href="/proposal-software-for-consultants"
+                className="text-emerald-700 hover:text-emerald-800"
+              >
+                Consultant software guide
+              </Link>
+              <Link
+                href="/proposal-system-for-consultants"
+                className="text-emerald-700 hover:text-emerald-800"
+              >
+                Proposal system guide
+              </Link>
             </div>
           </div>
 

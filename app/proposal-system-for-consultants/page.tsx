@@ -8,14 +8,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Proposal System for Consultants | ProposalDock",
   description:
-    "A practical guide to building a proposal system for consultants with brief intake, evidence, reusable knowledge, review, drafting, and export.",
+    "A practical guide to building a proposal system for consultants with brief intake, risk review, evidence, reusable knowledge, drafting, and export.",
   alternates: {
     canonical: buildCanonical("/proposal-system-for-consultants"),
   },
   openGraph: {
     title: "Proposal System for Consultants | ProposalDock",
     description:
-      "Learn what a proposal system for consultants should include and how ProposalDock supports evidence-first proposal work.",
+      "Learn what a proposal system for consultants should include, from brief intake and risk review to evidence and export.",
     url: buildCanonical("/proposal-system-for-consultants"),
   },
 };
@@ -186,6 +186,11 @@ export default function ProposalSystemForConsultantsPage() {
             when the brief is messy, proof is scattered, assumptions are unclear, and review happens
             too late. A proposal system gives that work a repeatable operating shape.
           </p>
+          <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
+            This guide is for consultants who want a practical proposal system, not just another
+            template: clearer intake, earlier risk review, stronger proof, and a better path from
+            brief to reviewed draft.
+          </p>
         </header>
 
         <div className="mt-10 grid gap-10 lg:grid-cols-[260px_1fr]">
@@ -203,11 +208,18 @@ export default function ProposalSystemForConsultantsPage() {
               ))}
             </nav>
             <div className="mt-5 border-t border-zinc-200 pt-5">
-              <Link href="/proposal-software-for-consultants">
-                <Button variant="accent" className="w-full">
-                  Consultant software guide
-                </Button>
-              </Link>
+              <div className="grid gap-3">
+                <Link href="/proposal-software-for-consultants">
+                  <Button variant="accent" className="w-full">
+                    Consultant software guide
+                  </Button>
+                </Link>
+                <Link href="/proposal-workflow-software">
+                  <Button variant="secondary" className="w-full">
+                    Workflow software guide
+                  </Button>
+                </Link>
+              </div>
             </div>
           </aside>
 

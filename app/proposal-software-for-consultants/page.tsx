@@ -16,14 +16,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Proposal Software for Consultants | ProposalDock",
   description:
-    "Proposal software for consultants who need brief analysis, reusable expertise, evidence review, risk checks, and stronger AI-assisted proposal drafts.",
+    "Proposal software for consultants who need client brief analysis, reusable expertise, risk review, and stronger proposal drafts without the scramble.",
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
   openGraph: {
     title: "Proposal Software for Consultants | ProposalDock",
     description:
-      "ProposalDock gives consultants one AI-assisted workspace to analyze client briefs, reuse expertise, review risks, and draft stronger proposals.",
+      "ProposalDock gives consultants one workspace to analyze client briefs, reuse expertise, review risks, and draft stronger proposals.",
     url: buildCanonical("/proposal-software-for-consultants"),
   },
 };
@@ -191,14 +191,28 @@ export default function ProposalSoftwareForConsultantsPage() {
               and shaping a response that feels specific to the client.
             </p>
             <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
-              ProposalDock gives that work one AI-assisted proposal workspace for consultants, so
-              you can analyze the request, attach approved knowledge, review what matters, and move
-              into proposal drafting with more structure.
+              ProposalDock gives that work one proposal workspace for consultants, so you can
+              analyze the request, attach approved knowledge, review what matters, and move into
+              proposal drafting with more structure and less last-minute scrambling.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Badge tone="green">Client brief analysis</Badge>
               <Badge tone="teal">Reusable expertise</Badge>
               <Badge tone="yellow">Proposal drafts</Badge>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-4 text-sm font-semibold">
+              <Link
+                href="/proposal-system-for-consultants"
+                className="text-emerald-700 hover:text-emerald-800"
+              >
+                Proposal system guide
+              </Link>
+              <Link
+                href="/proposal-workflow-software"
+                className="text-emerald-700 hover:text-emerald-800"
+              >
+                Proposal workflow guide
+              </Link>
             </div>
           </div>
 
