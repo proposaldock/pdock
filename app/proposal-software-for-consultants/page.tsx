@@ -338,6 +338,60 @@ export default function ProposalSoftwareForConsultantsPage() {
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Related pages
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            Explore the consultant workflow around ProposalDock
+          </h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {[
+              {
+                href: "/consulting-proposal-software",
+                title: "Consulting proposal software",
+                body: "A more focused page on structured consulting proposal work and how it differs from generic writing tools.",
+              },
+              {
+                href: "/client-brief-analysis",
+                title: "Client brief analysis",
+                body: "See how ProposalDock extracts requirements, deadlines, risks, and clarification questions from messy briefs.",
+              },
+              {
+                href: "/proposal-review-checklist",
+                title: "Proposal review checklist",
+                body: "Use a practical checklist for requirements, assumptions, risk, evidence, signoff, and export readiness.",
+              },
+              {
+                href: "/proposal-risk-review",
+                title: "Proposal risk review",
+                body: "Catch scope, delivery, commercial, and evidence risks before the proposal goes out the door.",
+              },
+              {
+                href: "/proposal-automation-for-consultants",
+                title: "Proposal automation for consultants",
+                body: "See how ProposalDock automates repetitive proposal work without removing human review and judgment.",
+              },
+            ].map((item) => (
+              <Card key={item.href} className="border-zinc-200 bg-zinc-50">
+                <CardHeader>
+                  <CardTitle>{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <p className="text-sm leading-6 text-zinc-600">{item.body}</p>
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Read more
+                    <ArrowLeft className="size-4 rotate-180" />
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
             Start with one client request
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">

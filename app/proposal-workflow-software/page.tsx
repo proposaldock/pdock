@@ -233,6 +233,55 @@ export default function ProposalWorkflowSoftwarePage() {
             </Link>
           </div>
         </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Related workflow pages
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            Explore the review steps around the workflow
+          </h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {[
+              {
+                href: "/client-brief-analysis",
+                title: "Client brief analysis",
+                body: "Start the workflow with structured intake, extracted requirements, and clarification questions.",
+              },
+              {
+                href: "/proposal-review-checklist",
+                title: "Proposal review checklist",
+                body: "Use a practical checklist for requirement coverage, assumptions, risk, approvals, and export readiness.",
+              },
+              {
+                href: "/rfp-compliance-matrix",
+                title: "RFP compliance matrix",
+                body: "Track requirement coverage, evidence, ownership, gaps, and review status in one structured view.",
+              },
+              {
+                href: "/bid-no-bid-analysis",
+                title: "Bid/no-bid analysis",
+                body: "See how early fit and risk review should shape whether the team pursues the opportunity at all.",
+              },
+            ].map((item) => (
+              <Card key={item.href} className="border-zinc-200 bg-zinc-50">
+                <CardHeader>
+                  <CardTitle>{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <p className="text-sm leading-6 text-zinc-600">{item.body}</p>
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Read more
+                    <ArrowLeft className="size-4 rotate-180" />
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );

@@ -337,6 +337,49 @@ export default function ProposalSystemForConsultantsPage() {
             </section>
 
             <section className="rounded-lg border border-zinc-200 bg-white p-8">
+              <SectionLabel>Related pages</SectionLabel>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+                Explore the related consultant and review pages
+              </h2>
+              <div className="mt-8 grid gap-5 md:grid-cols-2">
+                {[
+                  {
+                    href: "/consulting-proposal-software",
+                    title: "Consulting proposal software",
+                    body: "A focused look at how ProposalDock supports structured consulting proposal work.",
+                  },
+                  {
+                    href: "/client-brief-analysis",
+                    title: "Client brief analysis",
+                    body: "See how messy briefs become structured requirements, risks, and draft planning signals.",
+                  },
+                  {
+                    href: "/proposal-risk-review",
+                    title: "Proposal risk review",
+                    body: "Review scope, delivery, compliance, and evidence risk before export.",
+                  },
+                  {
+                    href: "/proposal-automation-for-consultants",
+                    title: "Proposal automation for consultants",
+                    body: "Automate repetitive intake and drafting work while keeping human signoff visible.",
+                  },
+                ].map((item) => (
+                  <div key={item.href} className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+                    <h3 className="font-semibold text-zinc-950">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-7 text-zinc-600">{item.body}</p>
+                    <Link
+                      href={item.href}
+                      className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                    >
+                      Read more
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-lg border border-zinc-200 bg-white p-8">
               <SectionLabel>FAQ</SectionLabel>
               <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
                 Questions about proposal systems for consultants

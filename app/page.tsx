@@ -124,6 +124,18 @@ const proofPoints = [
 
 const seoResources = [
   {
+    href: "/proposal-software-for-consultants",
+    title: "Proposal software for consultants",
+    body:
+      "The main consultant pillar page for brief analysis, risk review, knowledge reuse, and review-ready proposal drafts.",
+  },
+  {
+    href: "/consulting-proposal-software",
+    title: "Consulting proposal software",
+    body:
+      "A closer look at how ProposalDock supports structured consulting proposal work from intake through signoff and export.",
+  },
+  {
     href: "/ai-proposal-software",
     title: "AI proposal software",
     body:
@@ -136,22 +148,46 @@ const seoResources = [
       "A focused page on how ProposalDock helps teams move from RFP intake to proposal draft with less chaos.",
   },
   {
-    href: "/proposal-software-for-consultants",
-    title: "Proposal software for consultants",
+    href: "/ai-rfp-analysis",
+    title: "AI RFP analysis",
     body:
-      "A practical guide for consultants who need a cleaner way to analyze briefs, reuse expertise, and draft proposals.",
+      "How ProposalDock extracts requirements, risks, deadlines, and scope gaps before the response moves into drafting.",
   },
   {
-    href: "/proposal-system-for-consultants",
-    title: "Proposal system for consultants",
+    href: "/rfp-requirements-extraction",
+    title: "RFP requirements extraction",
     body:
-      "A guide to managing briefs, evidence, reviews, reusable knowledge, and proposal drafts in one consulting proposal system.",
+      "A product-specific view of turning raw RFP language into structured requirements with ownership and risk context.",
   },
   {
     href: "/proposal-workflow-software",
     title: "Proposal workflow software",
     body:
       "A closer look at how ProposalDock connects intake, analysis, review, drafting, and export in one workflow.",
+  },
+  {
+    href: "/client-brief-analysis",
+    title: "Client brief analysis",
+    body:
+      "See how ProposalDock turns messy client briefs into requirements, deadlines, risk signals, and better proposal planning.",
+  },
+  {
+    href: "/proposal-risk-review",
+    title: "Proposal risk review",
+    body:
+      "A focused page on catching scope, delivery, compliance, commercial, and evidence risks before export.",
+  },
+  {
+    href: "/proposal-review-checklist",
+    title: "Proposal review checklist",
+    body:
+      "A practical checklist teams can use manually or inside ProposalDock's structured review workflow.",
+  },
+  {
+    href: "/proposal-system-for-consultants",
+    title: "Proposal system for consultants",
+    body:
+      "A guide to managing briefs, evidence, reviews, reusable knowledge, and proposal drafts in one consulting proposal system.",
   },
 ] as const;
 

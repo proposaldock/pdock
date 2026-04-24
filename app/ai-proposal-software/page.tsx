@@ -230,6 +230,55 @@ export default function AiProposalSoftwarePage() {
             </Link>
           </div>
         </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Related pages
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            Explore where AI fits in the wider ProposalDock workflow
+          </h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {[
+              {
+                href: "/ai-rfp-analysis",
+                title: "AI RFP analysis",
+                body: "Use AI-assisted review to extract requirements, risks, deadlines, and scope gaps before drafting.",
+              },
+              {
+                href: "/client-brief-analysis",
+                title: "Client brief analysis",
+                body: "See how ProposalDock handles brief intake, extraction, and proposal planning for service teams.",
+              },
+              {
+                href: "/proposal-automation-for-consultants",
+                title: "Proposal automation for consultants",
+                body: "Automate repetitive proposal work while keeping human review, positioning, and signoff visible.",
+              },
+              {
+                href: "/proposal-risk-review",
+                title: "Proposal risk review",
+                body: "Review proposal risk before export instead of relying on a late-stage final skim.",
+              },
+            ].map((item) => (
+              <Card key={item.href} className="border-zinc-200 bg-zinc-50">
+                <CardHeader>
+                  <CardTitle>{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <p className="text-sm leading-6 text-zinc-600">{item.body}</p>
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Read more
+                    <ArrowLeft className="size-4 rotate-180" />
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );

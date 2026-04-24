@@ -1,8 +1,16 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AuthForm } from "@/components/auth-form";
 import { getCurrentUser } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 const planCopy = {
   free: {

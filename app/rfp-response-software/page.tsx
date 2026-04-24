@@ -209,6 +209,60 @@ export default function RfpResponseSoftwarePage() {
             .
           </p>
         </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Related RFP pages
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            Explore the RFP cluster around ProposalDock
+          </h2>
+          <div className="mt-8 grid gap-5 md:grid-cols-2">
+            {[
+              {
+                href: "/ai-rfp-analysis",
+                title: "AI RFP analysis",
+                body: "See how ProposalDock helps turn raw RFP files into structured requirements, risks, and review priorities.",
+              },
+              {
+                href: "/rfp-requirements-extraction",
+                title: "RFP requirements extraction",
+                body: "Understand how buyer language becomes structured requirements with ownership and risk context.",
+              },
+              {
+                href: "/rfp-risk-assessment",
+                title: "RFP risk assessment",
+                body: "Review delivery, compliance, scope, and commercial risks before the team fully commits.",
+              },
+              {
+                href: "/bid-no-bid-analysis",
+                title: "Bid/no-bid analysis",
+                body: "Use structured fit, deadline, and risk review to decide whether an opportunity is worth pursuing.",
+              },
+              {
+                href: "/rfp-compliance-matrix",
+                title: "RFP compliance matrix",
+                body: "Track requirements, evidence, gaps, ownership, and review status in a clearer response structure.",
+              },
+            ].map((item) => (
+              <Card key={item.href} className="border-zinc-200 bg-zinc-50">
+                <CardHeader>
+                  <CardTitle>{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                  <p className="text-sm leading-6 text-zinc-600">{item.body}</p>
+                  <Link
+                    href={item.href}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Read more
+                    <ArrowLeft className="size-4 rotate-180" />
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );
