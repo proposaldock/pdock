@@ -45,26 +45,6 @@ export function getSoftwareApplicationJsonLd() {
     operatingSystem: "Web",
     url,
     description: SITE_DESCRIPTION,
-    offers: [
-      {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-        category: "Free",
-      },
-      {
-        "@type": "Offer",
-        price: "49",
-        priceCurrency: "USD",
-        category: "Pro",
-      },
-      {
-        "@type": "Offer",
-        price: "149",
-        priceCurrency: "USD",
-        category: "Team",
-      },
-    ],
   };
 }
 
