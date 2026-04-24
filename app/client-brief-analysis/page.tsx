@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   RelatedPagesSection,
@@ -9,7 +11,7 @@ import {
   SeoPageShell,
   SectionLabel,
 } from "@/components/public-seo";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Client Brief Analysis Software | ProposalDock",
@@ -49,9 +51,40 @@ const riskPoints = [
   },
 ] as const;
 
+const faqs = [
+  {
+    question: "What is client brief analysis?",
+    answer:
+      "Client brief analysis is the process of turning a messy client request into structured requirements, deadlines, risks, owners, and clarification questions. ProposalDock supports that process before the proposal moves too far into drafting.",
+  },
+  {
+    question: "Why does brief analysis matter before proposal drafting?",
+    answer:
+      "It helps the team understand what the client actually asked for, what is still unclear, and where delivery or scope risk may appear before unsupported language gets into the draft.",
+  },
+  {
+    question: "How does ProposalDock keep humans in control?",
+    answer:
+      "ProposalDock uses AI-assisted extraction as a first pass, but the team still reviews requirements, checks risks, decides what approved knowledge to reuse, and signs off before export.",
+  },
+  {
+    question: "Can client brief analysis support RFP work too?",
+    answer:
+      "Yes. The same structured review approach can be applied to formal RFP documents when the team needs clearer requirements and risk extraction before drafting.",
+  },
+] as const;
+
 export default function ClientBriefAnalysisPage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <SeoPageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <SeoBackLink />
 
       <SeoHero
@@ -197,6 +230,15 @@ export default function ClientBriefAnalysisPage() {
             body: "How AI-assisted analysis and drafting work inside ProposalDock.",
           },
         ]}
+      />
+
+      <AiReadableSummary
+        summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is client brief analysis: extracting requirements, deadlines, risks, owners, and clarification questions so proposal work starts from a structured review instead of guesswork."
+      />
+
+      <PageFaqSection
+        title="Questions people ask about client brief analysis"
+        items={faqs}
       />
 
       <SeoCtaSection

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft, CheckCircle2, ClipboardCheck, FileSearch, LibraryBig, ShieldCheck } from "lucide-react";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "RFP Response Software for Service Teams",
@@ -63,9 +65,40 @@ const responseChecklist = [
   "What approved material should be reused in the response?",
 ] as const;
 
+const faqs = [
+  {
+    question: "What is RFP response software?",
+    answer:
+      "RFP response software helps teams turn buyer requirements into a structured response process. In ProposalDock, that includes RFP intake, requirements extraction, risk review, approved knowledge reuse, draft review, and export.",
+  },
+  {
+    question: "What is the best way to review an RFP with AI?",
+    answer:
+      "The safest approach is AI-assisted extraction followed by human review. ProposalDock helps teams extract requirements, deadlines, and risks first, then review that structured output before the response is drafted too far.",
+  },
+  {
+    question: "How do you extract requirements from an RFP?",
+    answer:
+      "You turn raw buyer language into a structured list of requirements, likely owners, deadlines, evidence gaps, and risk signals. ProposalDock is designed to support exactly that workflow.",
+  },
+  {
+    question: "How does ProposalDock keep humans in control?",
+    answer:
+      "ProposalDock supports AI-assisted analysis and drafting, but people still decide fit, assess risk, approve claims, reuse trusted knowledge, and sign off before export.",
+  },
+] as const;
+
 export default function RfpResponseSoftwarePage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <div className="mx-auto max-w-6xl">
         <Link
           href="/"
@@ -115,6 +148,25 @@ export default function RfpResponseSoftwarePage() {
               ))}
             </CardContent>
           </Card>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Definition
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            What is RFP response software?
+          </h2>
+          <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+            <p>
+              RFP response software is software that helps a team turn a formal buyer request into
+              a structured response workflow instead of a pile of disconnected documents.
+            </p>
+            <p>
+              In ProposalDock, that workflow includes RFP intake, requirements and risk extraction,
+              approved knowledge reuse, human review, signoff, and export-ready proposal work.
+            </p>
+          </div>
         </section>
 
         <section className="mt-12">
@@ -263,6 +315,12 @@ export default function RfpResponseSoftwarePage() {
             ))}
           </div>
         </section>
+
+        <AiReadableSummary
+          summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is RFP response work: analyzing buyer documents, extracting requirements, identifying risks, reusing approved knowledge, reviewing drafts, and exporting client-ready proposals with human signoff."
+        />
+
+        <PageFaqSection title="Questions people ask about RFP response software" items={faqs} />
       </div>
     </main>
   );

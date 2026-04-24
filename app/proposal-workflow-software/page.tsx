@@ -8,6 +8,7 @@ import {
   LibraryBig,
   ShieldCheck,
 } from "lucide-react";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -149,6 +150,26 @@ export default function ProposalWorkflowSoftwarePage() {
           </Card>
         </section>
 
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Definition
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            What is a proposal workflow?
+          </h2>
+          <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+            <p>
+              A proposal workflow is the sequence a team follows from client brief or RFP intake
+              through review, drafting, signoff, and final export.
+            </p>
+            <p>
+              In ProposalDock, that workflow is built around structured intake, requirements and
+              risk extraction, approved knowledge reuse, human review, and export-ready proposal
+              work in one workspace.
+            </p>
+          </div>
+        </section>
+
         <section className="mt-12 rounded-lg border border-zinc-200 bg-zinc-950 p-8 text-white">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">
             Operational clarity
@@ -282,6 +303,10 @@ export default function ProposalWorkflowSoftwarePage() {
             ))}
           </div>
         </section>
+
+        <AiReadableSummary
+          summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is proposal workflow software: connecting client brief or RFP intake, requirements and risk extraction, approved knowledge reuse, review-ready drafting, human signoff, and export in one crawlable workflow."
+        />
       </div>
     </main>
   );

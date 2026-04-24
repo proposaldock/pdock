@@ -14,7 +14,7 @@ export function resolveAppUrl() {
 export const SITE_NAME = "ProposalDock";
 
 export const SITE_DESCRIPTION =
-  "ProposalDock helps B2B service teams turn briefs and RFPs into grounded proposal drafts, review workflows, and export-ready response packs.";
+  "AI-assisted proposal software for consultants and B2B service teams that helps analyze client briefs and RFPs, extract requirements, identify risks, reuse approved knowledge, review drafts, and export proposals.";
 
 export function buildCanonical(path = "/") {
   const base = resolveAppUrl().replace(/\/+$/, "");
@@ -65,5 +65,22 @@ export function getSoftwareApplicationJsonLd() {
         category: "Team",
       },
     ],
+  };
+}
+
+export function getFaqPageJsonLd(
+  items: ReadonlyArray<{ question: string; answer: string }>,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
   };
 }

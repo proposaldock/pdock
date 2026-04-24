@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   RelatedPagesSection,
@@ -8,7 +10,7 @@ import {
   SeoPageShell,
   SectionLabel,
 } from "@/components/public-seo";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Proposal Risk Review Software | ProposalDock",
@@ -48,9 +50,40 @@ const riskCategories = [
   },
 ] as const;
 
+const faqs = [
+  {
+    question: "What is proposal risk review?",
+    answer:
+      "Proposal risk review is the process of checking a proposal for scope, delivery, compliance, commercial, and evidence risk before it is approved and sent. ProposalDock supports that review earlier in the workflow, not just at the final draft stage.",
+  },
+  {
+    question: "How do consultants review proposal risk?",
+    answer:
+      "Consultants usually review requirements, assumptions, staffing pressure, delivery commitments, and proof gaps. ProposalDock helps make those signals visible in one workspace before export.",
+  },
+  {
+    question: "What should be checked before sending a proposal?",
+    answer:
+      "Teams should review requirement coverage, scope assumptions, delivery risk, commercial commitments, evidence quality, human signoff, and export readiness before sending a proposal.",
+  },
+  {
+    question: "Does ProposalDock replace human proposal review?",
+    answer:
+      "No. ProposalDock uses AI-assisted analysis to help surface risk and gaps, but people still review the proposal, approve what is safe to send, and sign off before export.",
+  },
+] as const;
+
 export default function ProposalRiskReviewPage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <SeoPageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <SeoBackLink />
 
       <SeoHero
@@ -67,6 +100,24 @@ export default function ProposalRiskReviewPage() {
           "No one sees all the risk categories in one place",
         ]}
       />
+
+      <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+        <SectionLabel>Definition</SectionLabel>
+        <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+          What is proposal risk review?
+        </h2>
+        <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+          <p>
+            Proposal risk review is the process of checking a proposal for scope, delivery,
+            compliance, commercial, and evidence risk before it is approved and sent.
+          </p>
+          <p>
+            In ProposalDock, that review sits between brief or RFP intake and final export so the
+            team can question assumptions, missing proof, and weak-fit commitments while change is
+            still easy.
+          </p>
+        </div>
+      </section>
 
       <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
         <SectionLabel>Common proposal risks</SectionLabel>
@@ -159,6 +210,12 @@ export default function ProposalRiskReviewPage() {
         secondaryHref="/proposal-review-checklist"
         secondaryLabel="Use the checklist"
       />
+
+      <AiReadableSummary
+        summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is proposal risk review: identifying scope, delivery, compliance, commercial, and evidence risks after requirements are extracted and before a proposal is signed off and exported."
+      />
+
+      <PageFaqSection title="Questions people ask about proposal risk review" items={faqs} />
     </SeoPageShell>
   );
 }

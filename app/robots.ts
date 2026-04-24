@@ -8,19 +8,23 @@ export default function robots(): MetadataRoute.Robots {
 
   if (!isProduction) {
     return {
-      rules: {
-        userAgent: "*",
-        disallow: "/",
-      },
+      rules: [{ userAgent: "*", disallow: "/" }],
     };
   }
 
   return {
-    rules: {
-      userAgent: "*",
-      allow: ["/", "/about", "/contact", "/privacy", "/terms"],
-      disallow: ["/app", "/api", "/status"],
-    },
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: ["/app", "/api", "/status", "/login", "/register", "/launch-checklist"],
+      },
+      {
+        userAgent: "OAI-SearchBot",
+        allow: "/",
+        disallow: ["/app", "/api", "/status", "/login", "/register", "/launch-checklist"],
+      },
+    ],
     sitemap: `${appUrl}/sitemap.xml`,
   };
 }

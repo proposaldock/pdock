@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   RelatedPagesSection,
@@ -8,7 +10,7 @@ import {
   SeoPageShell,
   SectionLabel,
 } from "@/components/public-seo";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "AI RFP Analysis Software | ProposalDock",
@@ -33,9 +35,40 @@ const whatItFinds = [
   "Risk flags before drafting and pricing move too far",
 ] as const;
 
+const faqs = [
+  {
+    question: "What is AI RFP analysis?",
+    answer:
+      "AI RFP analysis is the process of using AI-assisted review to turn an RFP document into structured requirements, risks, deadlines, scope gaps, and response priorities. In ProposalDock, this analysis supports human review rather than replacing commercial or delivery judgment.",
+  },
+  {
+    question: "What is the best way to review an RFP with AI?",
+    answer:
+      "The best approach is to use AI-assisted extraction first, then review the structured output with humans. ProposalDock is built to show requirements, risks, and gaps clearly before the response is drafted too far.",
+  },
+  {
+    question: "Can AI decide whether to bid on an RFP?",
+    answer:
+      "AI can help organize the inputs, but ProposalDock is designed so humans still decide fit, risk tolerance, and whether the opportunity should move forward.",
+  },
+  {
+    question: "How does ProposalDock keep the analysis review-ready?",
+    answer:
+      "ProposalDock turns the RFP into structured requirements, deadlines, risks, and draft direction that the team can inspect, question, and approve before export.",
+  },
+] as const;
+
 export default function AiRfpAnalysisPage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <SeoPageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <SeoBackLink />
 
       <SeoHero
@@ -56,7 +89,7 @@ export default function AiRfpAnalysisPage() {
       <section className="mt-12 grid gap-8 lg:grid-cols-2">
         <Card className="border-zinc-200 bg-white">
           <CardHeader>
-            <CardTitle>What AI RFP analysis means in practice</CardTitle>
+            <CardTitle>What is AI RFP analysis?</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 text-sm leading-7 text-zinc-700">
             <p>
@@ -140,6 +173,12 @@ export default function AiRfpAnalysisPage() {
         secondaryHref="/rfp-response-software"
         secondaryLabel="See the RFP workflow"
       />
+
+      <AiReadableSummary
+        summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is AI RFP analysis: turning raw RFP documents into structured requirements, risks, deadlines, scope gaps, and response priorities that can be reviewed by humans before drafting and export."
+      />
+
+      <PageFaqSection title="Questions people ask about AI RFP analysis" items={faqs} />
     </SeoPageShell>
   );
 }

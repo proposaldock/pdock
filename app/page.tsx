@@ -21,6 +21,7 @@ import {
   getSoftwareApplicationJsonLd,
 } from "@/lib/site";
 import { ActivationLink } from "@/components/activation-link";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
 
 const featureCards = [
   {
@@ -123,6 +124,12 @@ const proofPoints = [
 ] as const;
 
 const seoResources = [
+  {
+    href: "/use-cases",
+    title: "ProposalDock use cases",
+    body:
+      "A grouped index of consultant, RFP, review, and AI-assisted proposal workflows across ProposalDock.",
+  },
   {
     href: "/proposal-software-for-consultants",
     title: "Proposal software for consultants",
@@ -924,6 +931,15 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      <section className="border-t border-zinc-200 bg-[#f4f6f7]">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <AiReadableSummary
+            title="What ProposalDock is"
+            summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. It helps teams analyze client briefs and RFPs, extract requirements, identify risks, reuse approved knowledge, review drafts, and export client-ready proposals. The workflow is designed for structured review and human signoff rather than blind automation."
+          />
+        </div>
+      </section>
+
       <section className="border-t border-zinc-200 bg-zinc-950">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
           <div className="max-w-3xl">
@@ -968,6 +984,9 @@ export default async function LandingPage() {
             </Link>
             <Link href="/terms" className="hover:text-white">
               Terms
+            </Link>
+            <Link href="/use-cases" className="hover:text-white">
+              Use cases
             </Link>
             <Link href="/contact?intent=contact_sales&plan=team" className="hover:text-white">
               Contact

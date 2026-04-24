@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import {
   RelatedPagesSection,
   SeoBackLink,
@@ -7,7 +9,7 @@ import {
   SeoPageShell,
   SectionLabel,
 } from "@/components/public-seo";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "RFP Requirements Extraction Software | ProposalDock",
@@ -24,9 +26,40 @@ export const metadata: Metadata = {
   },
 };
 
+const faqs = [
+  {
+    question: "What is RFP requirements extraction?",
+    answer:
+      "RFP requirements extraction is the process of turning raw buyer language into a structured set of requirements, deadlines, owners, and risk signals. ProposalDock helps teams do that before they commit too deeply to drafting.",
+  },
+  {
+    question: "How do you extract requirements from an RFP?",
+    answer:
+      "You identify the explicit asks, timing constraints, role expectations, ownership implications, and risk flags hidden in the RFP. ProposalDock supports that with AI-assisted extraction and human review.",
+  },
+  {
+    question: "Why does structured extraction matter?",
+    answer:
+      "It makes the next steps easier: ownership, risk assessment, compliance tracking, approved knowledge reuse, and review-ready proposal drafting.",
+  },
+  {
+    question: "Does ProposalDock guarantee compliance?",
+    answer:
+      "No. ProposalDock helps teams organize requirements, evidence, gaps, and review status, but human review is still necessary before a response is submitted.",
+  },
+] as const;
+
 export default function RfpRequirementsExtractionPage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <SeoPageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <SeoBackLink />
 
       <SeoHero
@@ -77,6 +110,20 @@ export default function RfpRequirementsExtractionPage() {
       <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
         <SectionLabel>Why extraction matters</SectionLabel>
         <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+          What is RFP requirements extraction?
+        </h2>
+        <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+          <p>
+            RFP requirements extraction is the process of converting buyer language into a
+            structured list of requirements, deadlines, owners, and risk signals that the team can
+            review.
+          </p>
+          <p>
+            In ProposalDock, that structured view becomes the basis for risk assessment, compliance
+            tracking, approved knowledge reuse, and response drafting.
+          </p>
+        </div>
+        <h2 className="mt-8 text-3xl font-black tracking-tight text-zinc-950">
           Structured requirements make response work easier to review.
         </h2>
         <div className="mt-6 grid gap-4 text-sm leading-7 text-zinc-700">
@@ -125,6 +172,15 @@ export default function RfpRequirementsExtractionPage() {
         primaryLabel="Start free"
         secondaryHref="/rfp-response-software"
         secondaryLabel="See the RFP workflow"
+      />
+
+      <AiReadableSummary
+        summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is RFP requirements extraction: converting raw buyer language into structured requirements, deadlines, owners, risks, and review signals that support compliance tracking and proposal drafting."
+      />
+
+      <PageFaqSection
+        title="Questions people ask about RFP requirements extraction"
+        items={faqs}
       />
     </SeoPageShell>
   );

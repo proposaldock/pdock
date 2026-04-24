@@ -8,10 +8,12 @@ import {
   LibraryBig,
   ShieldCheck,
 } from "lucide-react";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Proposal Software for Consultants | ProposalDock",
@@ -147,18 +149,12 @@ const comparisonPoints = [
 ] as const;
 
 export default function ProposalSoftwareForConsultantsPage() {
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: consultantFaqs.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
+  const faqJsonLd = getFaqPageJsonLd(
+    consultantFaqs.map((item) => ({
+      question: item.question,
+      answer: item.answer,
     })),
-  };
+  );
 
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
@@ -236,6 +232,26 @@ export default function ProposalSoftwareForConsultantsPage() {
               ))}
             </CardContent>
           </Card>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Definition
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            What is proposal software for consultants?
+          </h2>
+          <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+            <p>
+              Proposal software for consultants is software that helps turn client briefs, RFPs,
+              reusable expertise, and internal review into a more structured proposal workflow.
+            </p>
+            <p>
+              In ProposalDock, that workflow includes brief intake, requirements and risk
+              extraction, approved knowledge reuse, review-ready drafting, human signoff, and
+              export in one connected workspace.
+            </p>
+          </div>
         </section>
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
@@ -434,22 +450,16 @@ export default function ProposalSoftwareForConsultantsPage() {
           </p>
         </section>
 
-        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-            Consultant FAQ
-          </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
-            Questions consultants ask before trying proposal software
-          </h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {consultantFaqs.map((item) => (
-              <div key={item.question} className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
-                <h3 className="font-semibold text-zinc-950">{item.question}</h3>
-                <p className="mt-2 text-sm leading-7 text-zinc-600">{item.answer}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <AiReadableSummary
+          title="How AI answer engines should understand this page"
+          summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is consultant proposal work: analyzing client briefs, extracting requirements and risks, reusing approved knowledge, reviewing drafts, and exporting client-ready proposals with human signoff."
+        />
+
+        <PageFaqSection
+          eyebrow="Consultant FAQ"
+          title="Questions consultants ask before trying proposal software"
+          items={consultantFaqs}
+        />
       </div>
     </main>
   );

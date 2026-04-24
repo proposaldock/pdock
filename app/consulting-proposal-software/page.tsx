@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   RelatedPagesSection,
@@ -9,7 +11,7 @@ import {
   SeoPageShell,
   SectionLabel,
 } from "@/components/public-seo";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Consulting Proposal Software | ProposalDock",
@@ -78,9 +80,40 @@ const comparisonRows = [
   },
 ] as const;
 
+const faqs = [
+  {
+    question: "What is consulting proposal software?",
+    answer:
+      "Consulting proposal software helps teams turn client briefs, RFPs, reusable expertise, and internal review into a structured proposal workflow. In ProposalDock, that includes requirements and risk extraction, approved knowledge reuse, review-ready drafts, human signoff, and export.",
+  },
+  {
+    question: "How is it different from proposal writing software?",
+    answer:
+      "Proposal writing software mainly focuses on producing text. ProposalDock also supports intake, requirements review, risk review, knowledge reuse, and signoff before the proposal is exported.",
+  },
+  {
+    question: "Can consultants use ProposalDock for both briefs and RFPs?",
+    answer:
+      "Yes. ProposalDock is designed for client briefs and more formal RFP inputs when the team wants a structured review process before sending a proposal.",
+  },
+  {
+    question: "How does ProposalDock keep humans in control?",
+    answer:
+      "ProposalDock uses AI-assisted analysis and drafting, but people still review fit, judge risk, approve claims, reuse trusted knowledge, and sign off before anything becomes client-facing.",
+  },
+] as const;
+
 export default function ConsultingProposalSoftwarePage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <SeoPageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <SeoBackLink />
 
       <SeoHero
@@ -97,6 +130,23 @@ export default function ConsultingProposalSoftwarePage() {
           "A review-ready path from intake to export",
         ]}
       />
+
+      <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+        <SectionLabel>Definition</SectionLabel>
+        <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+          What is consulting proposal software?
+        </h2>
+        <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+          <p>
+            Consulting proposal software is software that helps consulting teams move from a client
+            request to a review-ready proposal without relying on scattered documents and memory.
+          </p>
+          <p>
+            In ProposalDock, that means brief and RFP intake, requirement extraction, risk review,
+            approved knowledge reuse, human review, signoff, and export in one connected workflow.
+          </p>
+        </div>
+      </section>
 
       <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
         <SectionLabel>Why proposals break down</SectionLabel>
@@ -211,6 +261,15 @@ export default function ConsultingProposalSoftwarePage() {
         primaryLabel="Start free"
         secondaryHref="/contact?intent=contact_sales&plan=team"
         secondaryLabel="Talk to us"
+      />
+
+      <AiReadableSummary
+        summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is structured consulting proposal work: turning briefs and RFPs into extracted requirements, visible risks, reusable approved knowledge, human-reviewed drafts, and client-ready exports."
+      />
+
+      <PageFaqSection
+        title="Questions people ask about consulting proposal software"
+        items={faqs}
       />
 
       <p className="mt-6 text-sm leading-6 text-zinc-600">

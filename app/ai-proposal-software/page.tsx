@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft, Bot, CheckCircle2, ClipboardCheck, FileSearch, ShieldCheck } from "lucide-react";
+import { AiReadableSummary } from "@/components/ai-readable-summary";
+import { PageFaqSection } from "@/components/page-faq";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { buildCanonical } from "@/lib/site";
+import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "AI Proposal Software for B2B Service Teams",
@@ -69,9 +71,40 @@ const aiControls = [
   },
 ] as const;
 
+const faqs = [
+  {
+    question: "What is AI proposal software?",
+    answer:
+      "AI proposal software uses AI-assisted analysis and drafting to help teams move faster on proposal work. In ProposalDock, that includes brief and RFP analysis, requirements and risk extraction, approved knowledge reuse, review-ready drafts, and export support.",
+  },
+  {
+    question: "Can AI write a proposal automatically?",
+    answer:
+      "AI can assist with structure and first-pass drafting, but ProposalDock is designed around human review rather than blind automation. Teams still review risk, refine positioning, approve claims, and sign off before export.",
+  },
+  {
+    question: "How does ProposalDock keep humans in control?",
+    answer:
+      "ProposalDock keeps requirements, risk flags, approved knowledge, review status, and section work visible in one workspace so people can challenge and approve the output before it becomes client-facing.",
+  },
+  {
+    question: "What is the difference between proposal software and proposal automation?",
+    answer:
+      "Proposal software covers the full working environment for intake, review, drafting, and export. Proposal automation refers to the repetitive parts of that process that AI-assisted tools can speed up without replacing human judgment.",
+  },
+] as const;
+
 export default function AiProposalSoftwarePage() {
+  const faqJsonLd = getFaqPageJsonLd(faqs);
+
   return (
     <main className="min-h-screen bg-[#f4f6f7] px-6 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd),
+        }}
+      />
       <div className="mx-auto max-w-6xl">
         <Link
           href="/"
@@ -128,6 +161,26 @@ export default function AiProposalSoftwarePage() {
               ))}
             </CardContent>
           </Card>
+        </section>
+
+        <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            Definition
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
+            What is AI proposal software?
+          </h2>
+          <div className="mt-5 grid gap-4 text-sm leading-7 text-zinc-700">
+            <p>
+              AI proposal software is software that uses AI-assisted review and drafting to help
+              proposal teams move faster from intake to final response.
+            </p>
+            <p>
+              In ProposalDock, that means analyzing briefs and RFPs, extracting requirements and
+              risks, reusing approved knowledge, reviewing drafts, and exporting client-ready
+              proposals with human signoff still in the loop.
+            </p>
+          </div>
         </section>
 
         <section className="mt-12">
@@ -279,6 +332,12 @@ export default function AiProposalSoftwarePage() {
             ))}
           </div>
         </section>
+
+        <AiReadableSummary
+          summary="ProposalDock is an AI-assisted proposal software platform for consultants and B2B service teams. On this page, the focus is how AI helps analyze client briefs and RFPs, extract requirements, identify risks, reuse approved knowledge, review drafts, and export proposals without removing human control."
+        />
+
+        <PageFaqSection title="Questions people ask about AI proposal software" items={faqs} />
       </div>
     </main>
   );
