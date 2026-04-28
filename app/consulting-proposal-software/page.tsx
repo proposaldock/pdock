@@ -16,14 +16,14 @@ import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Consulting Proposal Software | ProposalDock",
   description:
-    "ProposalDock helps consulting and B2B service teams turn client briefs, RFPs, and reusable knowledge into structured, reviewable proposals.",
+    "Consulting proposal software for teams that need structured brief review, risk analysis, reusable approved knowledge, and client-ready proposal drafts.",
   alternates: {
     canonical: buildCanonical("/consulting-proposal-software"),
   },
   openGraph: {
     title: "Consulting Proposal Software | ProposalDock",
     description:
-      "ProposalDock gives consulting teams a structured proposal workspace for brief intake, risk review, knowledge reuse, human signoff, and export.",
+      "ProposalDock gives consulting teams a structured proposal workspace for brief intake, risk review, approved knowledge reuse, human signoff, and export.",
     url: buildCanonical("/consulting-proposal-software"),
   },
 };
@@ -119,7 +119,7 @@ export default function ConsultingProposalSoftwarePage() {
       <SeoHero
         eyebrow="Consulting proposal software"
         title="Consulting Proposal Software for Structured Client Work"
-        intro="ProposalDock is not just proposal writing software. It is a structured proposal workspace for consulting teams that need to review briefs, identify risk, reuse approved knowledge, and export a clean response."
+        intro="ProposalDock is consulting proposal software for teams that need more than a document template. It gives consulting teams a structured proposal workspace to review briefs, identify risk, reuse approved knowledge, and export a clean response."
         detail="The workflow is designed around the real work before a proposal becomes client-ready: brief intake, requirement extraction, risk review, knowledge reuse, human review, signoff, and export."
         badges={["Brief and RFP intake", "Risk review", "Approved knowledge reuse"]}
         sideTitle="What consulting teams need before drafting"

@@ -18,14 +18,14 @@ import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Proposal Software for Consultants | ProposalDock",
   description:
-    "Proposal software for consultants who need client brief analysis, reusable expertise, risk review, and stronger proposal drafts without the scramble.",
+    "Proposal software for consultants with client brief analysis, risk review, reusable approved knowledge, and AI-assisted draft support in one workspace.",
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
   openGraph: {
     title: "Proposal Software for Consultants | ProposalDock",
     description:
-      "ProposalDock gives consultants one workspace to analyze client briefs, reuse expertise, review risks, and draft stronger proposals.",
+      "ProposalDock gives consultants one workspace to review client briefs, surface risk, reuse approved knowledge, and draft stronger proposals.",
     url: buildCanonical("/proposal-software-for-consultants"),
   },
 };
@@ -187,9 +187,10 @@ export default function ProposalSoftwareForConsultantsPage() {
               and shaping a response that feels specific to the client.
             </p>
             <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
-              ProposalDock gives that work one proposal workspace for consultants, so you can
-              analyze the request, attach approved knowledge, review what matters, and move into
-              proposal drafting with more structure and less last-minute scrambling.
+              ProposalDock is proposal software for consultants that gives that work one proposal
+              workspace, so you can analyze the request, attach approved knowledge, review what
+              matters, and move into proposal drafting with more structure and less last-minute
+              scrambling.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Badge tone="green">Client brief analysis</Badge>
@@ -256,10 +257,10 @@ export default function ProposalSoftwareForConsultantsPage() {
 
         <section className="mt-12 rounded-lg border border-zinc-200 bg-white p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
-            Consulting proposal use cases
+            Consultant use cases
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-zinc-950">
-            How consultants use ProposalDock before the proposal becomes a final document.
+            How consultants use this proposal software before the proposal becomes a final document.
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
             Proposal software for consultants should help before the writing stage gets expensive.
