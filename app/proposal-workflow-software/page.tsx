@@ -17,14 +17,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Proposal Workflow Software for Client Briefs | ProposalDock",
   description:
-    "Proposal workflow software for teams handling client briefs and RFPs with intake, analysis, knowledge reuse, review, drafting, and export in one workspace.",
+    "Proposal workflow software for consultants and service teams handling client briefs and RFPs with intake, analysis, review, drafting, and export in one workspace.",
   alternates: {
     canonical: buildCanonical("/proposal-workflow-software"),
   },
   openGraph: {
     title: "Proposal Workflow Software for Client Briefs | ProposalDock",
     description:
-      "ProposalDock helps teams manage client brief intake, analysis, knowledge reuse, review, drafting, and export in one proposal workflow.",
+      "ProposalDock helps consultants and service teams manage client brief intake, analysis, knowledge reuse, review, drafting, and export in one proposal workflow.",
     url: buildCanonical("/proposal-workflow-software"),
   },
 };
@@ -104,13 +104,13 @@ export default function ProposalWorkflowSoftwarePage() {
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
               Proposal work usually breaks across too many places: the RFP in one folder, notes in
-              another, AI prompts somewhere else, review comments in chat, and final copy in a doc.
-              ProposalDock brings that work into one structured proposal workflow.
+              another, AI prompts somewhere else, review comments in chat, and final copy in a
+              doc. ProposalDock brings that work into one structured proposal workflow.
             </p>
             <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
-              Teams can analyze the brief, reuse approved company knowledge, review requirements
-              and risks, draft response sections, and export a cleaner proposal pack without losing
-              context along the way.
+              Consultants and service teams can analyze the brief, reuse approved company
+              knowledge, review requirements and risks, draft response sections, and export a
+              cleaner proposal pack without losing context along the way.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Badge tone="green">Brief intake</Badge>

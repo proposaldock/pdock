@@ -8,14 +8,14 @@ import { buildCanonical } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Proposal System for Consultants | ProposalDock",
   description:
-    "A practical proposal system for consultants with brief intake, risk review, reusable approved knowledge, review-ready drafts, and export.",
+    "A practical proposal system for consultants with structured brief intake, requirement review, reusable approved knowledge, review-ready drafts, and export.",
   alternates: {
     canonical: buildCanonical("/proposal-system-for-consultants"),
   },
   openGraph: {
     title: "Proposal System for Consultants | ProposalDock",
     description:
-      "Learn what a proposal system for consultants should include, from brief intake and risk review to approved knowledge and export.",
+      "Learn what a proposal system for consultants should include, from structured intake and requirement review to approved knowledge and export.",
     url: buildCanonical("/proposal-system-for-consultants"),
   },
 };
@@ -183,7 +183,7 @@ export default function ProposalSystemForConsultantsPage() {
           </h1>
           <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
             Consultants rarely lose proposal time because they cannot write. The work slows down
-            when the brief is messy, proof is scattered, assumptions are unclear, and review
+            when the brief is messy, requirements are unclear, proof is scattered, and review
             happens too late. A proposal system for consultants gives that work a repeatable
             operating shape.
           </p>

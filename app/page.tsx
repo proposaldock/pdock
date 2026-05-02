@@ -379,16 +379,16 @@ const faqs = [
 ] as const;
 
 export const metadata: Metadata = {
-  title: "Proposal Software for Consultants and B2B Service Teams",
+  title: "Proposal Software for Consultants and Service Teams | ProposalDock",
   description:
-    "Proposal software for consultants and B2B service teams. Analyze client briefs, review risks, reuse approved knowledge, and draft proposals faster.",
+    "Proposal software for consultants and service teams. Analyze client briefs, review risks, reuse approved knowledge, and draft stronger proposals faster.",
   alternates: {
     canonical: buildCanonical("/"),
   },
   openGraph: {
-    title: "Proposal Software for Consultants and B2B Service Teams",
+    title: "Proposal Software for Consultants and Service Teams | ProposalDock",
     description:
-      "ProposalDock helps consultants and B2B service teams analyze client briefs, review risks, reuse approved knowledge, and draft proposals faster.",
+      "ProposalDock helps consultants and service teams analyze client briefs, review risks, reuse approved knowledge, and draft stronger proposals faster.",
     url: buildCanonical("/"),
   },
 };
@@ -469,14 +469,14 @@ export default async function LandingPage() {
           <div className="flex flex-1 items-center py-16 sm:py-20">
             <div className="max-w-3xl">
               <p className="inline-flex rounded-md bg-white/12 px-3 py-1 text-sm font-semibold text-emerald-200 ring-1 ring-white/15 backdrop-blur">
-                Lightweight AI proposal workspace for service teams
+                Proposal software for consultants and service teams
               </p>
               <h1 className="mt-6 text-5xl font-black tracking-tight text-white sm:text-6xl lg:text-7xl">
                 Win the deal without the weekend scramble.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-100">
                 ProposalDock is proposal software for consultants, agencies, and small B2B
-                service teams that need to analyze briefs, review risks, reuse approved
+                service teams that need to analyze client briefs, review risks, reuse approved
                 knowledge, and draft stronger client proposals inside one workspace.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">

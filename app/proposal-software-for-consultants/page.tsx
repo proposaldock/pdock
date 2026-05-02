@@ -18,14 +18,14 @@ import { buildCanonical, getFaqPageJsonLd } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Proposal Software for Consultants | ProposalDock",
   description:
-    "Proposal software for consultants with client brief analysis, risk review, reusable approved knowledge, and AI-assisted draft support in one workspace.",
+    "Proposal software for consultants that turns client briefs into structured requirements, risk review, reusable approved knowledge, and review-ready drafts.",
   alternates: {
     canonical: buildCanonical("/proposal-software-for-consultants"),
   },
   openGraph: {
     title: "Proposal Software for Consultants | ProposalDock",
     description:
-      "ProposalDock gives consultants one workspace to review client briefs, surface risk, reuse approved knowledge, and draft stronger proposals.",
+      "ProposalDock gives consultants one workspace to review client briefs, surface risks, reuse approved knowledge, and draft stronger proposals.",
     url: buildCanonical("/proposal-software-for-consultants"),
   },
 };
@@ -183,14 +183,14 @@ export default function ProposalSoftwareForConsultantsPage() {
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-zinc-700">
               Consultants often have the expertise, but the proposal process still burns time:
-              reading the brief, extracting requirements, finding reusable language, checking risks,
-              and shaping a response that feels specific to the client.
+              reading the client brief, extracting requirements, finding reusable language,
+              checking risks, and shaping a response that feels specific to the buyer.
             </p>
             <p className="mt-4 max-w-3xl text-base leading-8 text-zinc-700">
               ProposalDock is proposal software for consultants that gives that work one proposal
               workspace, so you can analyze the request, attach approved knowledge, review what
-              matters, and move into proposal drafting with more structure and less last-minute
-              scrambling.
+              matters, and move into review-ready proposal drafting with more structure and less
+              last-minute scrambling.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Badge tone="green">Client brief analysis</Badge>
